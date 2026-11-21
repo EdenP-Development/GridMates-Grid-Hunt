@@ -48,3 +48,6 @@ These are research/design notes. None of the discussed libraries or code are cur
 
 - [Mechanics research track GM01–GM08](GAMEPLAY_MECHANICS_RESEARCH_TRACK.md) — rule systems, objective design, difficulty, hints/scoring, skill practice, mission character, customization and player testing.
 - [GM01 — Core gameplay rules, choices, win/retry conditions](GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) — three mechanic variants with state changes and a controlled prototype plan. **Research only; next GM02.**
+
+- [GM02 — Distinct hunt and answer mechanics](GM02_DISTINCT_PUZZLE_MECHANICS_RESEARCH.md) — Coordinate, Reverse, Landmark, Precision and Mixed task contracts; **research only**.
+- [GM03 — What makes a good puzzle?](GM03_PUZZLE_QUALITY_AND_CLUE_DESIGN_RESEARCH.md) — published source review, fair-clue criteria, examples of repaired invalid puzzles, hard/soft quality gates and 20 **unexecuted** tests. **GM04 next.**
