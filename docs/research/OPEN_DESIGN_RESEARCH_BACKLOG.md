@@ -114,3 +114,8 @@ No feature, art pipeline, lesson, or SDK is marked implemented by this document.
 ## Research progress — R02 (2026-11-21)
 
 **R02: RESEARCHED; GAMEPLAY PROTOTYPE AND PLAYER VALIDATION OPEN.** [R02 report](R02_GAME_FEEL_AND_REPLAYABILITY_RESEARCH.md) compares a minimal Classic Find loop with a curiosity-driven Discovery Hunt on the exact same map/grid. Literature indicates ease, manageable novelty, choice, expectations and clear feedback matter, but does **not** prove one Grid Hunt version is fun. R07 generator and R04 map art remain independent open questions. **Next focused research: R03 (how to present coordinate clues correctly and unintimidatingly).**
+
+
+## Research progress — R03 (2026-11-21)
+
+**R03: RESEARCHED; UI AND PLAYER VALIDATION OPEN.** [R03 report](R03_COORDINATE_PRESENTATION_AND_GRID_LABELS_RESEARCH.md) documents grid-line labeling (not cell center numbering), east/right then north/up semantics, beginner display cues and 6-digit interpolation. It compares standard clues vs a decomposed cue as prototype hypotheses and tests for learning errors vs touchscreen slips. Current FGDC/USGS/NGA authority is separate from general NN/g/Android UX guidance. **Next focused research: R04 map production/code vs assets vs hybrid.**

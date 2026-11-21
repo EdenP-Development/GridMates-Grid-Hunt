@@ -31,3 +31,5 @@ These are research/design notes. None of the discussed libraries or code are cur
 - [R01 — First 30 seconds: beginner onboarding research](R01_FIRST_30_SECONDS_ONBOARDING_RESEARCH.md) — source-backed beginner UX findings, proposed first puzzle, competing tutorial approaches and an **unexecuted** playtest plan. R02 and other research questions remain open.
 
 - [R02 — Making Coordinate Hunt fun and replayable](R02_GAME_FEEL_AND_REPLAYABILITY_RESEARCH.md) — evidence review, Classic Find vs Discovery Hunt comparison, difficulty/feedback hypotheses and unrun playtest; **R03 is next**.
+
+- [R03 — Friendly and technically accurate coordinate clues](R03_COORDINATE_PRESENTATION_AND_GRID_LABELS_RESEARCH.md) — FGDC/USGS-backed grid-label rules, progressive display proposals, error taxonomy, accessibility and an unrun comparison test. **R04 is next.**

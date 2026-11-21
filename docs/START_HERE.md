@@ -76,3 +76,8 @@ Review [Open Design Questions and Research Backlog](research/OPEN_DESIGN_RESEARC
 ## Focused research session — R02, November 21, 2026
 
 [R02 game-feel and replayability research](research/R02_GAME_FEEL_AND_REPLAYABILITY_RESEARCH.md) now compares Classic Find and Discovery Hunt using published player-motivation, difficulty and feedback evidence. The recommendation is a **controlled prototype comparison**, not an approved feature. No gameplay prototype or human trial has yet occurred. **Next research: R03 beginner grid-clue presentation.**
+
+
+## Focused research session — R03, November 21, 2026
+
+[R03 friendly coordinate presentation and grid labels](research/R03_COORDINATE_PRESENTATION_AND_GRID_LABELS_RESEARCH.md) now documents technical/UX source findings, genuine 4-digit area selection, temporary split-digit clues and a proposed 6-digit lesson. **Research only** — no tested clue UI or approval. **R04 map production comparisons are next.**

@@ -47,3 +47,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [R01 — First 30 seconds beginner-experience study](docs/research/R01_FIRST_30_SECONDS_ONBOARDING_RESEARCH.md): focused source-backed research on learning-through-play and a first-square tutorial, awaiting actual playtesting.
 
 - [R02 — Making the Hunt fun and replayable](docs/research/R02_GAME_FEEL_AND_REPLAYABILITY_RESEARCH.md): research-backed gameplay loop comparison, difficulty and feedback guidance; experimental until playable testing.
+
+- [R03 — Beginner-friendly coordinate clues and grid labels](docs/research/R03_COORDINATE_PRESENTATION_AND_GRID_LABELS_RESEARCH.md): evidence and proposed tests for correct grid-line numbering, familiar clue format and gentle guidance.
