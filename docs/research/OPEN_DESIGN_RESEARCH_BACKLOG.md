@@ -109,3 +109,8 @@ No feature, art pipeline, lesson, or SDK is marked implemented by this document.
 ## Research progress — R01 (2026-11-21)
 
 **R01: RESEARCHED; PROTOTYPE AND PLAYER VALIDATION OPEN.** See [first-30-seconds research report](R01_FIRST_30_SECONDS_ONBOARDING_RESEARCH.md). Contextual help, progressive disclosure and fading guidance support a gentle first-puzzle prototype; these are **external general findings**, not evidence from our game. Do not mark the 30-second target as measured or user-approved. **R02 is next; no broader research topics were closed by this pass.**
+
+
+## Research progress — R02 (2026-11-21)
+
+**R02: RESEARCHED; GAMEPLAY PROTOTYPE AND PLAYER VALIDATION OPEN.** [R02 report](R02_GAME_FEEL_AND_REPLAYABILITY_RESEARCH.md) compares a minimal Classic Find loop with a curiosity-driven Discovery Hunt on the exact same map/grid. Literature indicates ease, manageable novelty, choice, expectations and clear feedback matter, but does **not** prove one Grid Hunt version is fun. R07 generator and R04 map art remain independent open questions. **Next focused research: R03 (how to present coordinate clues correctly and unintimidatingly).**

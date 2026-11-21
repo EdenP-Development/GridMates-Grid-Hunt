@@ -71,3 +71,8 @@ Review [Open Design Questions and Research Backlog](research/OPEN_DESIGN_RESEARC
 ## Focused research sessions
 
 **R01 beginner first-30-seconds research completed as documentation on 2026-11-21.** Read [R01 source-backed report](research/R01_FIRST_30_SECONDS_ONBOARDING_RESEARCH.md) for proposed tutorial and playtest criteria; neither prototype nor real user trial has been executed. **Next research topic: R02 puzzle feel / replayable hunt.**
+
+
+## Focused research session — R02, November 21, 2026
+
+[R02 game-feel and replayability research](research/R02_GAME_FEEL_AND_REPLAYABILITY_RESEARCH.md) now compares Classic Find and Discovery Hunt using published player-motivation, difficulty and feedback evidence. The recommendation is a **controlled prototype comparison**, not an approved feature. No gameplay prototype or human trial has yet occurred. **Next research: R03 beginner grid-clue presentation.**

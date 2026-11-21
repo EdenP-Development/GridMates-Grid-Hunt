@@ -45,3 +45,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [Open Design Research Backlog](docs/research/OPEN_DESIGN_RESEARCH_BACKLOG.md) — prioritized questions and experiments for accessible game feel, grid-accurate map assets, randomized objectives, contour-line introduction and customizable hunts.
 
 - [R01 — First 30 seconds beginner-experience study](docs/research/R01_FIRST_30_SECONDS_ONBOARDING_RESEARCH.md): focused source-backed research on learning-through-play and a first-square tutorial, awaiting actual playtesting.
+
+- [R02 — Making the Hunt fun and replayable](docs/research/R02_GAME_FEEL_AND_REPLAYABILITY_RESEARCH.md): research-backed gameplay loop comparison, difficulty and feedback guidance; experimental until playable testing.
