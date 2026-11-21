@@ -63,3 +63,12 @@ Before any claim of **real-world coordinate output**, add validated UTM/MGRS con
 ## Required test matrix
 
 Correct floor/truncation; digit order; leading zeroes; 1 km/100 m/10 m scales; 100 km-square boundaries rejected or handled explicitly; taps at gridline boundaries; reverse hunt parity; zoom/pan invariance; portrait/landscape transformations; save/load preserving objective coordinates and pins. Include an independent manual worked-example review before publishing instructional copy.
+
+## Reference study notes (2026-11-21)
+
+The owner-supplied UK Royal School of Military Survey *Military Map Reading* (2010), pp. 3–7, reinforces the right/up easting–northing convention, leading zeros, four-figure 1 km squares, six-figure 100 m subdivision and use of a correctly scaled Romer. It is a **historic British instructional source**, not our sole current MGRS authority. See [annotated study](research/MILITARY_MAP_READING_2010_SOURCE_NOTES.md) and [source register](research/SOURCE_REGISTER.md).
+
+- Distinguish numeric-only local training references from **fully qualified** MGRS (zone + 100 km square + digits).
+- Never treat a grid area's resolution as a phone-tap, map-survey or real-world positional-accuracy guarantee.
+- The booklet's British/Irish map-specific MGRS caveat is **not a global geographic ban**. If real data is introduced, honor the map's actual printed reference system.
+- Do not use historical magnetic variation or GPS capability statements as current facts; these are deferred topics.

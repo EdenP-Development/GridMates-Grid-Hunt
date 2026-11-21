@@ -53,3 +53,7 @@ Do not claim a feature is built because it appears in design documentation.
 - How much of the optional GridMates profile/collection system is worth porting for this game's first release.
 
 **Important distinction:** early training-grid references behave like the numeric portion of MGRS but do not claim a valid location on Earth. A full MGRS implementation must supply a genuine grid-zone designation and 100 km square identifier tied to a real coordinate frame.
+
+## Research foundation (2026-11-21)
+
+The owner supplied *Military Map Reading* (Royal School of Military Survey, UK, 2010). It has been studied and documented in the [research index](research/README.md), [source notes](research/MILITARY_MAP_READING_2010_SOURCE_NOTES.md), and [skill-to-puzzle matrix](research/SKILL_TO_PUZZLE_MATRIX.md). Use these to justify future chapters and identify what should be tested. Since it is a historic British manual, official modern NGA/USGS/FGDC sources take precedence for current geospatial conventions. The PDF itself is **not stored in the public repo** because embedded OS mapping rights require review.

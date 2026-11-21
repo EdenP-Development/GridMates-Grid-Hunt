@@ -28,3 +28,11 @@
 - **Respect separate apps:** no shared package identifiers, secrets, saves or assumed drop-in Sudoku/Word Search engine.
 
 **Next implementation target:** an isolated native Android proof-of-concept that renders one deterministic training grid and accepts/verifies three four-digit square selections. See [GH-01](docs/ROADMAP.md).
+
+## Research library (2026-11-21)
+
+- [Research library index](docs/research/README.md) — primary sources, historical studies, licensing, learning approach.
+- [2010 UK military map-reading manual — annotated source review](docs/research/MILITARY_MAP_READING_2010_SOURCE_NOTES.md) — page-linked insights from the owner-provided 44-page reference.
+- [Skill-to-puzzle matrix](docs/research/SKILL_TO_PUZZLE_MATRIX.md) — how real map-reading techniques become game objectives.
+
+The full source PDF is **linked, not republished**, because it contains third-party Ordnance Survey maps requiring a separate rights check. No PDF figures or map images have been imported. The game remains in the **design** stage.

@@ -42,3 +42,7 @@
 - If adding real geodata later: confirm zone, square, datum, map georeferencing, real location validity, and source/version tests.
 
 **No images, map packs or borrowed code have been imported by this documentation pass.**
+
+## Registered owner-provided source — 2026-11-21
+
+**UK-RSMS-2010-01:** *Military Map Reading*, UK Royal School of Military Survey, Version 2.0 (December 2010), 44-page PDF supplied by the project owner. A [page-indexed original study and rights record](research/MILITARY_MAP_READING_2010_SOURCE_NOTES.md), [source registry](research/SOURCE_REGISTER.md), and [skill-to-puzzle crosswalk](research/SKILL_TO_PUZZLE_MATRIX.md) are now part of the repository. Public third-party PDF reference link and file SHA-256 are in the study. Use its examples for inspiration but verify coordinate standards using modern official NGA, USGS and [FGDC USNG](https://www.fgdc.gov/usng/how-to-read-usng) sources. Do not copy Ordnance Survey imagery from the PDF into this public repo or the Android game without licensing clearance. No PDF/images have been imported.
