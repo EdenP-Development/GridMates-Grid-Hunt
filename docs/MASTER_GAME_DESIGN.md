@@ -84,3 +84,8 @@ Real-time GPS navigation, GPS-precise outdoor use, actual operational map coordi
 ## Core gameplay mechanics research note — 2026-11-21
 
 [GM01](research/GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) proposes **but does not finalize** a recoverable three-target Find & Mark proof, independent objective order, whole-cell validation, no compulsory timer/lives, and an A/B comparison against a small Discovery Hunt payoff. Clue Chains are deferred until prerequisites are understood. Different objective rules, score/hint economy and Custom Hunt constraints belong to the separate [GM research track](research/GAMEPLAY_MECHANICS_RESEARCH_TRACK.md). No playable implementation or user preference finding exists.
+
+
+## GM05 chapter progression research (2026-11-21)
+
+The [GM05 source-backed report](research/GM05_CHAPTER_PROGRESSION_SPACED_PRACTICE_AND_TRANSFER.md) preserves the six themed **illustrative** chapter names above while proposing a *spiral* sequencing method: introduce one skill, use short contextual help, offer independent fresh examples, revisit earlier skills in later chapters, and reserve mixed finales for already-learned operations. Completion and novel-map retention are distinct; paper-map transfer is yet another proposed measurement. Research only: **no actual chapter levels, practice scheduler or transfer study built**. Next GM06.

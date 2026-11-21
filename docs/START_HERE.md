@@ -111,3 +111,8 @@ The owner asked to study *game rules, decisions and mechanics* more deeply inste
 ## GM04 research: help without punishment (2026-11-21)
 
 [GM04 hints, feedback, scoring and rewards](research/GM04_HINTS_FEEDBACK_SCORING_REWARDS_RESEARCH.md) compares graduated on-demand hints, supportive error explanations, normal assisted completion and optional independent-practice stamps against more competitive alternatives. **Literature-informed hypotheses; no game, playtest or feature implementation. GM05 skill sequencing next.**
+
+
+## GM05 research — chapter pacing, practice and retention (2026-11-21)
+
+[GM05 chapter progression](research/GM05_CHAPTER_PROGRESSION_SPACED_PRACTICE_AND_TRANSFER.md) is now researched: keep the existing six-chapter theme skeleton, reintroduce earlier objective verbs during later themed hunts, fade mandatory training without removing optional help, and measure novel-map/paper-map retention separately from immediate completion. **Proposal only; no chapter content or follow-up study created. GM06 mission narrative research next.**

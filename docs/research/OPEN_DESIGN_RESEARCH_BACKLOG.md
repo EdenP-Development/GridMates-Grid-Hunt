@@ -154,3 +154,8 @@ Added [GM01–GM08 dedicated game-mechanics research](GAMEPLAY_MECHANICS_RESEARC
 ## GM04 research status (2026-11-21)
 
 [GM04 documented](GM04_HINTS_FEEDBACK_SCORING_REWARDS_RESEARCH.md) as **research only**, with proposed unlimited gradual hints, actionable wrong-answer feedback, normal completion independent of help, optional independent-practice recognition and evidence-grounded risks of competitive rewards. No system or device test exists. **Next GM05 chapter skill practice/retention.**
+
+
+## GM05 research progress — 2026-11-21
+
+[GM05 chapter/skill revisit report](GM05_CHAPTER_PROGRESSION_SPACED_PRACTICE_AND_TRANSFER.md) connects the original six proposed themed chapters to a spiral practice hypothesis: introduce, guide, try, vary, and revisit earlier verbs on fresh maps. Reviews 2026 classroom testing/spacing/interleaving meta-analysis and guidance-fading/game tutorial/transfer research with **explicit non-transfer caveats**. One- and four-week retention tests are **experimental proposals**, not efficacy claims. No levels, timers, adaptivity or retention system built. **Next GM06: story-lite mission personality.**
