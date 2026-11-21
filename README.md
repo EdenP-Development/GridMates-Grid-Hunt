@@ -49,3 +49,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [R02 — Making the Hunt fun and replayable](docs/research/R02_GAME_FEEL_AND_REPLAYABILITY_RESEARCH.md): research-backed gameplay loop comparison, difficulty and feedback guidance; experimental until playable testing.
 
 - [R03 — Beginner-friendly coordinate clues and grid labels](docs/research/R03_COORDINATE_PRESENTATION_AND_GRID_LABELS_RESEARCH.md): evidence and proposed tests for correct grid-line numbering, familiar clue format and gentle guidance.
+
+- [R04 — Map creation and artwork options](docs/research/R04_MAP_CREATION_AND_ARTWORK_RESEARCH.md): compares code-drawn, full illustration and hybrid approaches, with an identical-data three-map test plan. Research-only; map prototypes and art approval remain open.
