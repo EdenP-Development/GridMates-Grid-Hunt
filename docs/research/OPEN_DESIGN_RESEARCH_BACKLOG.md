@@ -129,3 +129,8 @@ No feature, art pipeline, lesson, or SDK is marked implemented by this document.
 ## Research progress — R05 (2026-11-21)
 
 **R05: RESEARCHED; FEATURE ENGINE AND VALIDATION OPEN.** [R05 report](R05_GRID_ACCURATE_FEATURE_GEOMETRY_AND_ANCHORS.md) separates canonical world geometry (point/line/polygon), visual sprite anchors, and puzzle-specific selection/grading. Sources include RFC 7946, Tiled, MapLibre, USGS, PostGIS and Android; the chosen fictional training grid uses **custom local-meter schema, NOT GeoJSON or real-world MGRS**. Proposed tests cover oversize icons, grid boundaries, bridge/river crossings, lake polygons, meaningful placement, reproducible seeds and content rights. **Next R06: mobile tap/pan/reticle interaction, one research topic at a time.**
+
+
+## Research progress — R06 (2026-11-21)
+
+**R06: RESEARCHED; PROTOTYPE, GESTURE TESTS AND OWNER PHONE REVIEW OPEN.** [R06 report](R06_MOBILE_MAP_INTERACTION_RESEARCH.md) compares tap auto-check, tap preview/confirm, drag pin and reticle input; documents Android gesture arbitration, 48 dp control guidance, accessible alternatives and test fixtures I01–I20. Preliminary preference: **tap whole 1 km cell -> preview -> Check**, then compare 100 m inset vs stationary reticle after zoom. None of these patterns are user-approved or implemented. **Next focused research R07: seed-driven, valid, varied objectives on reusable maps.**

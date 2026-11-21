@@ -86,3 +86,8 @@ Review [Open Design Questions and Research Backlog](research/OPEN_DESIGN_RESEARC
 ## Focused research session — R05, November 21, 2026
 
 [R05 feature geometry, anchors and grid integrity](research/R05_GRID_ACCURATE_FEATURE_GEOMETRY_AND_ANCHORS.md) documents a source-backed, small local-meter point/line/polygon model, art anchor/reference rules, bridges at stream crossings, and boundary/placement test cases. **Research only; no engine, art, coordinate tests or phone prototype implemented.** Next R06 mobile map interaction research.
+
+
+## Focused research session — R06, November 21, 2026
+
+[R06 Android touch and precision selection research](research/R06_MOBILE_MAP_INTERACTION_RESEARCH.md) documents official Android gesture mechanics, preview-before-submit and precision selection hypotheses, W3C accessibility alternatives, and **unexecuted** touchscreen QA. No UI or game has been implemented. **Next research: R07 seeded puzzle and objective generation.**
