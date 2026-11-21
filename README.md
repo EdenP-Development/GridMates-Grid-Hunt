@@ -55,3 +55,6 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [R05 — Accurate feature placement and sprite anchors](docs/research/R05_GRID_ACCURATE_FEATURE_GEOMETRY_AND_ANCHORS.md): source-backed point/line/area map model, object reference accuracy, bridges/rivers, and planned content integrity tests; unimplemented.
 
 - [R06 — Mobile map touch and precision controls](docs/research/R06_MOBILE_MAP_INTERACTION_RESEARCH.md): official Android/W3C sources, four-digit tapping versus preview, precision magnifier/reticle, and planned gesture/phone QA; not built.
+
+- [Gameplay mechanics research track (GM01–GM08)](docs/research/GAMEPLAY_MECHANICS_RESEARCH_TRACK.md) — actual puzzle rules, distinct challenge types, difficulty, rewards, practice and Custom Hunt research ahead of content generation.
+- [GM01 — Core gameplay rules](docs/research/GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) — source-backed Find & Mark/Discovery/Clue Chain rule comparisons, win/retry conditions and an **unrun** prototype test.

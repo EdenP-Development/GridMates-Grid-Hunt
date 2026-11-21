@@ -134,3 +134,8 @@ No feature, art pipeline, lesson, or SDK is marked implemented by this document.
 ## Research progress — R06 (2026-11-21)
 
 **R06: RESEARCHED; PROTOTYPE, GESTURE TESTS AND OWNER PHONE REVIEW OPEN.** [R06 report](R06_MOBILE_MAP_INTERACTION_RESEARCH.md) compares tap auto-check, tap preview/confirm, drag pin and reticle input; documents Android gesture arbitration, 48 dp control guidance, accessible alternatives and test fixtures I01–I20. Preliminary preference: **tap whole 1 km cell -> preview -> Check**, then compare 100 m inset vs stationary reticle after zoom. None of these patterns are user-approved or implemented. **Next focused research R07: seed-driven, valid, varied objectives on reusable maps.**
+
+
+## Owner-requested priority shift — gameplay mechanics first (2026-11-21)
+
+Added [GM01–GM08 dedicated game-mechanics research](GAMEPLAY_MECHANICS_RESEARCH_TRACK.md). [GM01 rules and core loop](GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) is documented but not built/tested. This work defines meaningful actions, objective state, win/retry policy and baseline Find & Mark vs Discovery Hunt comparison; it does **not** close map-art or gesture research. **NEXT: GM02 objective/mode rule grammar**, then GM03 puzzle challenge quality. **R07 seeded generator remains open but moves after GM02/GM03**—otherwise we risk generating hundreds of mechanically uninteresting puzzles.

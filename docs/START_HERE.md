@@ -91,3 +91,8 @@ Review [Open Design Questions and Research Backlog](research/OPEN_DESIGN_RESEARC
 ## Focused research session — R06, November 21, 2026
 
 [R06 Android touch and precision selection research](research/R06_MOBILE_MAP_INTERACTION_RESEARCH.md) documents official Android gesture mechanics, preview-before-submit and precision selection hypotheses, W3C accessibility alternatives, and **unexecuted** touchscreen QA. No UI or game has been implemented. **Next research: R07 seeded puzzle and objective generation.**
+
+
+## Current research priority — actual game mechanics (2026-11-21)
+
+The owner asked to study *game rules, decisions and mechanics* more deeply instead of progressing immediately to seed generation. [Gameplay mechanics track](research/GAMEPLAY_MECHANICS_RESEARCH_TRACK.md) and [GM01 mechanics report](research/GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) are now documented. The research compares a simple **Find & Mark** loop with **Discovery Hunt** and later **Clue Chains**, specifying actual state transitions and win/retry rules. **No gameplay or playtest implemented. NEXT: GM02 objective families; R07 procedural generation postponed, not canceled.**

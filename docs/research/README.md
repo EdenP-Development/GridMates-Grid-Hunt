@@ -42,3 +42,9 @@ These are research/design notes. None of the discussed libraries or code are cur
 - [R05 — Grid-accurate landmarks and feature placement](R05_GRID_ACCURATE_FEATURE_GEOMETRY_AND_ANCHORS.md) — sourced point/line/polygon geometry, symbol anchor vs physical footprint, crossing/overlap rules, seed-safe placement and an unexecuted 18-case verification matrix. **R06 next.**
 
 - [R06 — Mobile map interaction and precision controls](R06_MOBILE_MAP_INTERACTION_RESEARCH.md) — tap-preview-check, pan/zoom arbitration, 100 m magnifier vs reticle, accessible alternatives and unexecuted 20-case QA plan. **Next: R07 objective generation.**
+
+
+## Gameplay mechanics (not map-engine implementation)
+
+- [Mechanics research track GM01–GM08](GAMEPLAY_MECHANICS_RESEARCH_TRACK.md) — rule systems, objective design, difficulty, hints/scoring, skill practice, mission character, customization and player testing.
+- [GM01 — Core gameplay rules, choices, win/retry conditions](GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) — three mechanic variants with state changes and a controlled prototype plan. **Research only; next GM02.**

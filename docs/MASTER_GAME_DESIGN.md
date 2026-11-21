@@ -80,3 +80,7 @@ Real-time GPS navigation, GPS-precise outdoor use, actual operational map coordi
 ## Core user story
 
 “Given a clean fictional woodland map, I can select the correct square for a 4-digit reference, understand why it is correct, and eventually locate 100 m sub-squares and read coordinates from landmarks—without needing to study a manual first.”
+
+## Core gameplay mechanics research note — 2026-11-21
+
+[GM01](research/GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) proposes **but does not finalize** a recoverable three-target Find & Mark proof, independent objective order, whole-cell validation, no compulsory timer/lives, and an A/B comparison against a small Discovery Hunt payoff. Clue Chains are deferred until prerequisites are understood. Different objective rules, score/hint economy and Custom Hunt constraints belong to the separate [GM research track](research/GAMEPLAY_MECHANICS_RESEARCH_TRACK.md). No playable implementation or user preference finding exists.
