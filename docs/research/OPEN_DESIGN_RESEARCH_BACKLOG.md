@@ -149,3 +149,8 @@ Added [GM01–GM08 dedicated game-mechanics research](GAMEPLAY_MECHANICS_RESEARC
 ## Game-mechanics research — GM03 progress (2026-11-21)
 
 [GM03 research report](GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md) defines publishable puzzle-quality rules: well-specified answers and clue information, valid unique semantic answer for single-choice clues, meaningful distractors, fairness, novelty and distinct skill dimensions. Includes hypothetical cases and 20 **unrun** test scenarios. This is **design research, not implementation or validated player fun**. **Next GM04:** hints, retries, reward/completion systems. R07 random-generator research remains scheduled after quality rules and playtests.
+
+
+## GM04 research status (2026-11-21)
+
+[GM04 documented](GM04_HINTS_FEEDBACK_SCORING_REWARDS_RESEARCH.md) as **research only**, with proposed unlimited gradual hints, actionable wrong-answer feedback, normal completion independent of help, optional independent-practice recognition and evidence-grounded risks of competitive rewards. No system or device test exists. **Next GM05 chapter skill practice/retention.**

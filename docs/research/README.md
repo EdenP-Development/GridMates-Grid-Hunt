@@ -54,3 +54,5 @@ These are research/design notes. None of the discussed libraries or code are cur
 
 - [GM02 — Distinct hunt mechanics](GM02_DISTINCT_PUZZLE_MECHANICS_RESEARCH.md) — different player verbs/answer types and proposed 12-puzzle comparison; unimplemented.
 - [GM03 — Puzzle quality, fairness and difficulty](GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md) — source-backed research on clue sufficiency, unambiguous answers, meaningful distractors, difficulty dimensions, hard/soft quality gates and 20 **planned** tests. **GM04 next.**
+
+- [GM04 — Hints, mistakes, scoring and rewards](GM04_HINTS_FEEDBACK_SCORING_REWARDS_RESEARCH.md) — studies guidance and reward evidence; compares free staged hints, actionable feedback, relaxed completion and optional mastery. **Unimplemented/unplaytested; GM05 next.**

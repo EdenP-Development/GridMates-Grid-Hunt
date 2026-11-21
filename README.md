@@ -62,3 +62,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [GM03 — Fair Clues and Puzzle Quality](docs/research/GM03_PUZZLE_QUALITY_AND_CLUE_DESIGN_RESEARCH.md): research into real deductions, puzzle uniqueness, difficulty, answer-leak prevention and future quality checks. **Research only.**
 
 - [GM03 — Puzzle quality and fairness research](docs/research/GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md): constraints for solvable, fair, interesting grid puzzles before generating them; includes 20 planned tests, no code built.
+
+- [GM04 — Help, mistakes, scoring and rewards](docs/research/GM04_HINTS_FEEDBACK_SCORING_REWARDS_RESEARCH.md): evidence-informed low-pressure puzzle feedback/hint/reward alternatives, with unexecuted A/B and QA plans.

@@ -11,8 +11,8 @@
 | **GM01** | P0 | What can players do, what changes, and how do they win/undo/retry? | Formal core loop, Find & Mark vs Discovery vs later linked clues | **Research documented; untested** |
 | **GM02** | P0 | How do Coordinate, Reverse, Landmark, Precision and short Mixed challenges **actually play differently**? | A small family of objective verbs, validators, meaningful examples and state rules | **Research documented; untested** |
 | **GM03** | P0 | How do we create **good puzzles** rather than rote lookups or unfair guesswork? | Clue constraints, difficulty dimensions, distractor logic, novelty and solution uniqueness | **Research documented; untested** |
-| **GM04** | P1 | What scoring, hints, mistakes, rewards and completion mechanics are worth having? | Low-pressure, fair optional mastery and nonintrusive game feedback | **NEXT** |
-| **GM05** | P1 | How do levels build, revisit and combine skills for **continued practice**? | Skill layering, beginner-to-expert learning curve, retention and transfer test concepts | Open |
+| **GM04** | P1 | What scoring, hints, mistakes, rewards and completion mechanics are worth having? | Low-pressure, fair optional mastery and nonintrusive game feedback | **Research documented; untested** |
+| **GM05** | P1 | How do levels build, revisit and combine skills for **continued practice**? | Skill layering, beginner-to-expert learning curve, retention and transfer test concepts | **NEXT** |
 | **GM06** | P1 | What gives a mission a personality: theme, small story, discoveries or a collection? | Narrative wrappers with minimal reading and low authoring burden | Open |
 | **GM07** | P1 | How much choice belongs in Quick Hunt and Custom Hunt? | Presets, valid options, compatible constraints, easy defaults | Open |
 | **GM08** | P1 | How do actual playtests tell us if mechanics are enjoyable and fair? | Playtest protocol, observations, objective and experience acceptance criteria | Open |
@@ -29,3 +29,5 @@ No implemented code, player tests or app behavior are implied by this research t
 
 
 **GM03 report:** [Fairness, deduction and difficulty study](GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md) documents hard quality gates vs soft enjoyment criteria, candidate-uniqueness/distractor rules, difficulty dimensions and 20 **unexecuted** QA cases. **GM04 next.**
+
+**GM04 report:** [Hints, feedback, scoring and rewards](GM04_HINTS_FEEDBACK_SCORING_REWARDS_RESEARCH.md) — literature-backed alternatives, explicit unrun A/B plans and QA; **GM05 next**.

@@ -106,3 +106,8 @@ The owner asked to study *game rules, decisions and mechanics* more deeply inste
 ## Game mechanics research — GM03, November 21, 2026
 
 [GM03 puzzle quality/fairness](research/GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md) is now documented alongside [GM02 objective mechanics](research/GM02_DISTINCT_PUZZLE_MECHANICS_RESEARCH.md). The study separates **hard validity gates** (clue sufficiency, unique or explicitly multi-answer targets, correct map-data semantics) from **soft quality** (meaningful reasoning, novelty, legibility and satisfaction). Research only: no quality checker, generator, gameplay, APK or playtest built. **GM04 feedback/hints/rewards next**; R07 generator remains later.
+
+
+## GM04 research: help without punishment (2026-11-21)
+
+[GM04 hints, feedback, scoring and rewards](research/GM04_HINTS_FEEDBACK_SCORING_REWARDS_RESEARCH.md) compares graduated on-demand hints, supportive error explanations, normal assisted completion and optional independent-practice stamps against more competitive alternatives. **Literature-informed hypotheses; no game, playtest or feature implementation. GM05 skill sequencing next.**
