@@ -58,3 +58,5 @@ These are research/design notes. None of the discussed libraries or code are cur
 - [GM04 — Hints, mistakes, scoring and rewards](GM04_HINTS_FEEDBACK_SCORING_REWARDS_RESEARCH.md) — studies guidance and reward evidence; compares free staged hints, actionable feedback, relaxed completion and optional mastery. **Unimplemented/unplaytested; GM05 next.**
 
 - [GM05 — Chapter progression and skill revisit](GM05_CHAPTER_PROGRESSION_SPACED_PRACTICE_AND_TRANSFER.md) — reviews spacing/interleaving/guidance fading and game-transfer boundaries; proposes a spiral six-chapter arc, local practice rotation and 20 **unrun** QA checks. **GM06 next.**
+
+- [GM06 — Small missions, environmental storytelling and discovery](GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md) — Jenkins/intrinsic-integration/story-attention evidence, six optional thematic mission templates, narrative-validity rules, A/B comparison, and 20 **unrun** QA scenarios. **GM07 next.**

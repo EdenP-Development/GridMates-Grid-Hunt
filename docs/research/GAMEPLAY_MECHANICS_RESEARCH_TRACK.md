@@ -13,8 +13,8 @@
 | **GM03** | P0 | How do we create **good puzzles** rather than rote lookups or unfair guesswork? | Clue constraints, difficulty dimensions, distractor logic, novelty and solution uniqueness | **Research documented; untested** |
 | **GM04** | P1 | What scoring, hints, mistakes, rewards and completion mechanics are worth having? | Low-pressure, fair optional mastery and nonintrusive game feedback | **Research documented; untested** |
 | **GM05** | P1 | How do levels build, revisit and combine skills for **continued practice**? | Skill layering, beginner-to-expert learning curve, retention and transfer test concepts | **Research documented; untested** |
-| **GM06** | P1 | What gives a mission a personality: theme, small story, discoveries or a collection? | Narrative wrappers with minimal reading and low authoring burden | **NEXT** |
-| **GM07** | P1 | How much choice belongs in Quick Hunt and Custom Hunt? | Presets, valid options, compatible constraints, easy defaults | Open |
+| **GM06** | P1 | What gives a mission a personality: theme, small story, discoveries or a collection? | Narrative wrappers with minimal reading and low authoring burden | **Research documented; untested** |
+| **GM07** | P1 | How much choice belongs in Quick Hunt and Custom Hunt? | Presets, valid options, compatible constraints, easy defaults | **NEXT** |
 | **GM08** | P1 | How do actual playtests tell us if mechanics are enjoyable and fair? | Playtest protocol, observations, objective and experience acceptance criteria | Open |
 
 **Sources to consult:** [MDA](https://aaai.org/papers/ws04-04-001-mda-a-formal-approach-to-game-design-and-game-research/), [Sicart mechanics](https://www.gamestudies.org/0802/articles/sicart/), [GameFlow](https://doi.org/10.1145/1077246.1077253), [2024 gameplay loop method](https://intellectdiscover.com/content/journals/10.1386/jgvw_00094_1), [Patrick's Parabox GDC design talk](https://www.gdcvault.com/play/1034415/System-Centric-Puzzle-Design-in), [player agency study](https://doi.org/10.1016/j.entcom.2024.100754).
@@ -33,3 +33,5 @@ No implemented code, player tests or app behavior are implied by this research t
 **GM04 report:** [Hints, feedback, scoring and rewards](GM04_HINTS_FEEDBACK_SCORING_REWARDS_RESEARCH.md) — literature-backed alternatives, explicit unrun A/B plans and QA; **GM05 next**.
 
 **GM05 report:** [Chapter progression, skill revisit, retention/transfer](GM05_CHAPTER_PROGRESSION_SPACED_PRACTICE_AND_TRANSFER.md). Literature supports examining spaced/retrieval/interleaved practice **in other learning settings**, not guaranteed transfer to navigation. Spiral chapter arc and delayed tests are hypothetical. **GM06 next.**
+
+**GM06 report:** [Mission themes and environmental storytelling](GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md) source-backed narrative research, six reusable motifs and **unrun** validation/A-B tests. GM07 is next.

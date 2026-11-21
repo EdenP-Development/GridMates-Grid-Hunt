@@ -116,3 +116,8 @@ The owner asked to study *game rules, decisions and mechanics* more deeply inste
 ## GM05 research — chapter pacing, practice and retention (2026-11-21)
 
 [GM05 chapter progression](research/GM05_CHAPTER_PROGRESSION_SPACED_PRACTICE_AND_TRANSFER.md) is now researched: keep the existing six-chapter theme skeleton, reintroduce earlier objective verbs during later themed hunts, fade mandatory training without removing optional help, and measure novel-map/paper-map retention separately from immediate completion. **Proposal only; no chapter content or follow-up study created. GM06 mission narrative research next.**
+
+
+## GM06 research: story-light expeditions (2026-11-21)
+
+[GM06 mission themes and environmental storytelling](research/GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md) reviews map-driven storytelling, intrinsic gameplay integration and narrative distraction risks. Proposal: test a **one-sentence Mini Expedition** and optional discovery journal against a clean no-story puzzle, with the **same exact map and answers**. Research only: **no story system, illustrations, Android code or playtests built**. Next GM07 Quick vs Custom choices.

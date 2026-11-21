@@ -89,3 +89,8 @@ Real-time GPS navigation, GPS-precise outdoor use, actual operational map coordi
 ## GM05 chapter progression research (2026-11-21)
 
 The [GM05 source-backed report](research/GM05_CHAPTER_PROGRESSION_SPACED_PRACTICE_AND_TRANSFER.md) preserves the six themed **illustrative** chapter names above while proposing a *spiral* sequencing method: introduce one skill, use short contextual help, offer independent fresh examples, revisit earlier skills in later chapters, and reserve mixed finales for already-learned operations. Completion and novel-map retention are distinct; paper-map transfer is yet another proposed measurement. Research only: **no actual chapter levels, practice scheduler or transfer study built**. Next GM06.
+
+
+## GM06 story and discovery research note (2026-11-21)
+
+[GM06 micro-mission narrative report](research/GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md) recommends **prototyping** one-sentence map-grounded mission purposes, small optional discovery/stamp rewards, and a short cohesive end card while preserving the existing no-story puzzle baseline. Story wording must not give away canonical grid answers or invent geography. No journal, narrative assets, level content or player study has been implemented; user approval remains open. **Next GM07 Quick/Custom Hunt choice research.**

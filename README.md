@@ -66,3 +66,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [GM04 — Help, mistakes, scoring and rewards](docs/research/GM04_HINTS_FEEDBACK_SCORING_REWARDS_RESEARCH.md): evidence-informed low-pressure puzzle feedback/hint/reward alternatives, with unexecuted A/B and QA plans.
 
 - [GM05 — Chapters, spaced practice and skill transfer](docs/research/GM05_CHAPTER_PROGRESSION_SPACED_PRACTICE_AND_TRANSFER.md): source-backed progression hypothesis and proposed separate gameplay/retention/transfer tests; no implemented levels.
+
+- [GM06 — Environmental storytelling and mini-mission design](docs/research/GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md): researched mission templates, narrative/map consistency requirements and unrun A/B player tests; no story systems implemented.

@@ -159,3 +159,8 @@ Added [GM01–GM08 dedicated game-mechanics research](GAMEPLAY_MECHANICS_RESEARC
 ## GM05 research progress — 2026-11-21
 
 [GM05 chapter/skill revisit report](GM05_CHAPTER_PROGRESSION_SPACED_PRACTICE_AND_TRANSFER.md) connects the original six proposed themed chapters to a spiral practice hypothesis: introduce, guide, try, vary, and revisit earlier verbs on fresh maps. Reviews 2026 classroom testing/spacing/interleaving meta-analysis and guidance-fading/game tutorial/transfer research with **explicit non-transfer caveats**. One- and four-week retention tests are **experimental proposals**, not efficacy claims. No levels, timers, adaptivity or retention system built. **Next GM06: story-lite mission personality.**
+
+
+## GM06 game-story research progress (2026-11-21)
+
+[GM06 research](GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md) studies map-driven environmental storytelling vs learning attention. It proposes **tiny contextual Mini Expeditions**, an optional field journal, six content templates and safeguards against map-art answer leaks, subjective clues and required information trapped behind skippable story rewards. This is **unvalidated design research, not playable features**. **GM07 Quick/Custom Hunt user choice research is next**, with R07 seeded procedural mission generation still later.
