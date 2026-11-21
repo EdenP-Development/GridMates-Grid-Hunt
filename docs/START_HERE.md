@@ -96,3 +96,8 @@ Review [Open Design Questions and Research Backlog](research/OPEN_DESIGN_RESEARC
 ## Current research priority — actual game mechanics (2026-11-21)
 
 The owner asked to study *game rules, decisions and mechanics* more deeply instead of progressing immediately to seed generation. [Gameplay mechanics track](research/GAMEPLAY_MECHANICS_RESEARCH_TRACK.md) and [GM01 mechanics report](research/GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) are now documented. The research compares a simple **Find & Mark** loop with **Discovery Hunt** and later **Clue Chains**, specifying actual state transitions and win/retry rules. **No gameplay or playtest implemented. NEXT: GM02 objective families; R07 procedural generation postponed, not canceled.**
+
+
+## Focused mechanics research — GM03, November 21, 2026
+
+[GM03 fair puzzle/clue design research](research/GM03_PUZZLE_QUALITY_AND_CLUE_DESIGN_RESEARCH.md) examines verified clue sufficiency, one well-defined answer, relevant distractors and human puzzle-quality tests. It recommends strict hard correctness gates before random content and **does not** claim those validators or playtests exist. **Next GM04: hints, scoring, mistakes and rewards.**
