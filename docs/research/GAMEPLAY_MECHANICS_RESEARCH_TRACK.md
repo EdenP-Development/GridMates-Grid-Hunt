@@ -9,8 +9,8 @@
 | ID | Priority | Focused game-design research question | Outcome wanted | State |
 |---|---|---|---|---|
 | **GM01** | P0 | What can players do, what changes, and how do they win/undo/retry? | Formal core loop, Find & Mark vs Discovery vs later linked clues | **Research documented; untested** |
-| **GM02** | P0 | How do Coordinate, Reverse, Landmark, Precision and short Mixed challenges **actually play differently**? | A small family of objective verbs, validators, meaningful examples and state rules | **NEXT** |
-| **GM03** | P0 | How do we create **good puzzles** rather than rote lookups or unfair guesswork? | Clue constraints, difficulty dimensions, distractor logic, novelty and solution uniqueness | Open |
+| **GM02** | P0 | How do Coordinate, Reverse, Landmark, Precision and short Mixed challenges **actually play differently**? | A small family of objective verbs, validators, meaningful examples and state rules | **Research documented; untested** |
+| **GM03** | P0 | How do we create **good puzzles** rather than rote lookups or unfair guesswork? | Clue constraints, difficulty dimensions, distractor logic, novelty and solution uniqueness | **NEXT** |
 | **GM04** | P1 | What scoring, hints, mistakes, rewards and completion mechanics are worth having? | Low-pressure, fair optional mastery and nonintrusive game feedback | Open |
 | **GM05** | P1 | How do levels build, revisit and combine skills for **continued practice**? | Skill layering, beginner-to-expert learning curve, retention and transfer test concepts | Open |
 | **GM06** | P1 | What gives a mission a personality: theme, small story, discoveries or a collection? | Narrative wrappers with minimal reading and low authoring burden | Open |
@@ -22,3 +22,5 @@
 **Links to other work:** [R02 — game feel](R02_GAME_FEEL_AND_REPLAYABILITY_RESEARCH.md) studies motivation, not rules. [R06 — map interaction](R06_MOBILE_MAP_INTERACTION_RESEARCH.md) is physical touch/gesture behavior. [R07 — seeded objective generator](OPEN_DESIGN_RESEARCH_BACKLOG.md) remains **OPEN but postponed until GM02–GM03** define good objective types and puzzle constraints.
 
 No implemented code, player tests or app behavior are implied by this research track.
+
+**GM02 report:** [Distinct puzzle mechanics — five hunts, different thinking](GM02_DISTINCT_PUZZLE_MECHANICS_RESEARCH.md) (research documented 2026-11-21; not implemented or tested). GM03 now next.
