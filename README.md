@@ -58,3 +58,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 
 - [Gameplay mechanics research track (GM01–GM08)](docs/research/GAMEPLAY_MECHANICS_RESEARCH_TRACK.md) — actual puzzle rules, distinct challenge types, difficulty, rewards, practice and Custom Hunt research ahead of content generation.
 - [GM01 — Core gameplay rules](docs/research/GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) — source-backed Find & Mark/Discovery/Clue Chain rule comparisons, win/retry conditions and an **unrun** prototype test.
+
+- [GM03 — Fair Clues and Puzzle Quality](docs/research/GM03_PUZZLE_QUALITY_AND_CLUE_DESIGN_RESEARCH.md): research into real deductions, puzzle uniqueness, difficulty, answer-leak prevention and future quality checks. **Research only.**
