@@ -62,3 +62,7 @@ The owner supplied *Military Map Reading* (Royal School of Military Survey, UK, 
 ## Current engineering recommendation (research addendum, 2026-11-21)
 
 Build our own small **meter-based training-grid math + Compose map viewport**, not a full GPS/OSM engine. The [technology survey](research/MAPPING_TECH_SURVEY_2026-11-21.md), [camera equations](research/MAP_ENGINE_MATH_AND_VIEWPORT.md), [offline format rules](research/OFFLINE_MAP_FORMATS_LICENSES.md), and [test vectors](research/MAP_ENGINE_TEST_AND_SPIKE_PLAN.md) explain what to borrow from professional mapping apps and what to defer. The engineering study is a **documentation milestone only**.
+
+## Active design research questions (2026-11-21)
+
+Review [Open Design Questions and Research Backlog](research/OPEN_DESIGN_RESEARCH_BACKLOG.md) before treating illustration, code-drawn maps, terrain procedural generation, grid hit-testing, or Custom Hunt settings as locked. The priority is to test an approachable first-puzzle experience and compare a small number of viable map/art treatments before building an elaborate mapping engine.

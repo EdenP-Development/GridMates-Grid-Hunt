@@ -20,3 +20,7 @@ For implemented accuracy contracts see [../MAP_READING_ACCURACY.md](../MAP_READI
 - [Coordinate/viewport test vectors and implementation spikes](MAP_ENGINE_TEST_AND_SPIKE_PLAN.md)
 
 These are research/design notes. None of the discussed libraries or code are currently integrated.
+
+## Active research decisions and open questions
+
+- [Open Design Questions and Research Backlog](OPEN_DESIGN_RESEARCH_BACKLOG.md) — prioritized game feel, map/art accuracy, puzzle generation, contours, chapter progression and Custom Hunt questions. These are **not yet finalized decisions**.
