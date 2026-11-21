@@ -52,3 +52,7 @@ No massive procedural landscape engine; no required GPS/location permissions; no
 ## Evidence gates
 
 A successful Gradle build is not proof of functional navigation, Android UI execution, physical phone acceptance, safe in-place upgrades or a publishable package. Maintain those as distinct verification states and preserve rollback commits.
+
+## Mapping/GPS architecture research, November 21, 2026
+
+See [technical survey](research/MAPPING_TECH_SURVEY_2026-11-21.md), [map math and touch rules](research/MAP_ENGINE_MATH_AND_VIEWPORT.md), [formats and licences](research/OFFLINE_MAP_FORMATS_LICENSES.md), and [test/spike plan](research/MAP_ENGINE_TEST_AND_SPIKE_PLAN.md). **GH-01 recommendation remains native Compose Canvas + pure Kotlin meter-based coordinates**, with explicit world↔screen camera transforms. Do not use MapLibre, Mapsforge, Google Maps, GPS or GIS coordinate libraries until a tested requirement justifies one. Research links are not implemented dependencies.

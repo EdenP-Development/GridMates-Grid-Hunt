@@ -10,3 +10,13 @@
 The user-supplied original PDF is **not committed** due third-party OS map rights uncertainty. The source study stores exact provenance and a public reference URL.
 
 For implemented accuracy contracts see [../MAP_READING_ACCURACY.md](../MAP_READING_ACCURACY.md), and for overall sources see [../RESEARCH_AND_SOURCES.md](../RESEARCH_AND_SOURCES.md).
+
+## Mapping engineering and GPS app references (2026-11-21)
+
+- [Technical sources and documentation index](MAPPING_TECHNICAL_REFERENCE_INDEX.md)
+- [SDK/renderer technology comparison](MAPPING_TECH_SURVEY_2026-11-21.md)
+- [Exact map camera transforms and input architecture](MAP_ENGINE_MATH_AND_VIEWPORT.md)
+- [Offline map file formats and licensing](OFFLINE_MAP_FORMATS_LICENSES.md)
+- [Coordinate/viewport test vectors and implementation spikes](MAP_ENGINE_TEST_AND_SPIKE_PLAN.md)
+
+These are research/design notes. None of the discussed libraries or code are currently integrated.

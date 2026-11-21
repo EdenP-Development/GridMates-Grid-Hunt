@@ -46,3 +46,8 @@
 ## Registered owner-provided source — 2026-11-21
 
 **UK-RSMS-2010-01:** *Military Map Reading*, UK Royal School of Military Survey, Version 2.0 (December 2010), 44-page PDF supplied by the project owner. A [page-indexed original study and rights record](research/MILITARY_MAP_READING_2010_SOURCE_NOTES.md), [source registry](research/SOURCE_REGISTER.md), and [skill-to-puzzle crosswalk](research/SKILL_TO_PUZZLE_MATRIX.md) are now part of the repository. Public third-party PDF reference link and file SHA-256 are in the study. Use its examples for inspiration but verify coordinate standards using modern official NGA, USGS and [FGDC USNG](https://www.fgdc.gov/usng/how-to-read-usng) sources. Do not copy Ordnance Survey imagery from the PDF into this public repo or the Android game without licensing clearance. No PDF/images have been imported.
+
+
+## Mapping technology research (2026-11-21)
+
+Added [official technical reference index](research/MAPPING_TECHNICAL_REFERENCE_INDEX.md), [renderer/SDK comparison](research/MAPPING_TECH_SURVEY_2026-11-21.md), [viewport math](research/MAP_ENGINE_MATH_AND_VIEWPORT.md), [offline formats/licences](research/OFFLINE_MAP_FORMATS_LICENSES.md), and [map engine tests](research/MAP_ENGINE_TEST_AND_SPIKE_PLAN.md). The survey distinguishes source-backed SDK/API capabilities from our proposals and explicitly warns that GeographicLib-Java is geodesic-focused, not necessarily an MGRS converter. No third-party code or tiles were imported.

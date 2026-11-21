@@ -36,3 +36,8 @@
 - [Skill-to-puzzle matrix](docs/research/SKILL_TO_PUZZLE_MATRIX.md) — how real map-reading techniques become game objectives.
 
 The full source PDF is **linked, not republished**, because it contains third-party Ordnance Survey maps requiring a separate rights check. No PDF figures or map images have been imported. The game remains in the **design** stage.
+
+
+## Mapping technology research (2026-11-21)
+
+The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENCE_INDEX.md) collects official Android mapping/gesture docs, MapLibre, Mapsforge, Organic Maps, NGA GEOTRANS, GeographicLib, PROJ, offline map formats and licensing. Read the [technology recommendation](docs/research/MAPPING_TECH_SURVEY_2026-11-21.md) and [camera/coordinate design](docs/research/MAP_ENGINE_MATH_AND_VIEWPORT.md) before changing the proposed app architecture. **Research only: no mapping engine or APK has been implemented.**

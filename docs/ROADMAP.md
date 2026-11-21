@@ -57,3 +57,7 @@ Daily seeded mission; six-mode expansion (Route/Expedition); digital protractor;
 ## Pacing guardrail
 
 Do not add menus, endless collections, new maps or elaborate aesthetic systems before the **map interaction** and **grid validator** are proven fun and reliable on an actual phone. A small excellent puzzle beats a large collection of unverified systems.
+
+## GH-00T — mapping technical research complete as documentation (2026-11-21)
+
+Map renderer/SDK comparison, viewport math, offline map formats/rights and coordinate verification plan added under [research](research/MAPPING_TECHNICAL_REFERENCE_INDEX.md). Implementation remains **PLANNED**; first build must still pass GH-01 coordinate and real-phone tests. Reassess a third-party map SDK only against a demonstrated product need.

@@ -57,3 +57,8 @@ Do not claim a feature is built because it appears in design documentation.
 ## Research foundation (2026-11-21)
 
 The owner supplied *Military Map Reading* (Royal School of Military Survey, UK, 2010). It has been studied and documented in the [research index](research/README.md), [source notes](research/MILITARY_MAP_READING_2010_SOURCE_NOTES.md), and [skill-to-puzzle matrix](research/SKILL_TO_PUZZLE_MATRIX.md). Use these to justify future chapters and identify what should be tested. Since it is a historic British manual, official modern NGA/USGS/FGDC sources take precedence for current geospatial conventions. The PDF itself is **not stored in the public repo** because embedded OS mapping rights require review.
+
+
+## Current engineering recommendation (research addendum, 2026-11-21)
+
+Build our own small **meter-based training-grid math + Compose map viewport**, not a full GPS/OSM engine. The [technology survey](research/MAPPING_TECH_SURVEY_2026-11-21.md), [camera equations](research/MAP_ENGINE_MATH_AND_VIEWPORT.md), [offline format rules](research/OFFLINE_MAP_FORMATS_LICENSES.md), and [test vectors](research/MAP_ENGINE_TEST_AND_SPIKE_PLAN.md) explain what to borrow from professional mapping apps and what to defer. The engineering study is a **documentation milestone only**.
