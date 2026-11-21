@@ -119,3 +119,8 @@ No feature, art pipeline, lesson, or SDK is marked implemented by this document.
 ## Research progress — R03 (2026-11-21)
 
 **R03: RESEARCHED; UI AND PLAYER VALIDATION OPEN.** [R03 report](R03_COORDINATE_PRESENTATION_AND_GRID_LABELS_RESEARCH.md) documents grid-line labeling (not cell center numbering), east/right then north/up semantics, beginner display cues and 6-digit interpolation. It compares standard clues vs a decomposed cue as prototype hypotheses and tests for learning errors vs touchscreen slips. Current FGDC/USGS/NGA authority is separate from general NN/g/Android UX guidance. **Next focused research: R04 map production/code vs assets vs hybrid.**
+
+
+## Research progress — R04 (2026-11-21)
+
+**R04: RESEARCHED; THREE-VARIANT MAP PROTOTYPE AND DEVICE/PLAYER VALIDATION OPEN.** The [R04 report](R04_MAP_CREATION_AND_ARTWORK_RESEARCH.md) compares pure code drawing, illustration-first maps and a hybrid world-space/asset architecture using a fixed 6×6 training map and five identical canonical landmark positions. Hybrid is a **leading test hypothesis**, not approved architecture or art direction. External Android, MapLibre, USGS and Godot references support feasibility and layered geometry principles, **not** measured game outcomes. **Next focused research: R05 landmark/geometry anchoring, hit targets, and grid boundary correctness.**
