@@ -124,3 +124,8 @@ No feature, art pipeline, lesson, or SDK is marked implemented by this document.
 ## Research progress — R04 (2026-11-21)
 
 **R04: RESEARCHED; THREE-VARIANT MAP PROTOTYPE AND DEVICE/PLAYER VALIDATION OPEN.** The [R04 report](R04_MAP_CREATION_AND_ARTWORK_RESEARCH.md) compares pure code drawing, illustration-first maps and a hybrid world-space/asset architecture using a fixed 6×6 training map and five identical canonical landmark positions. Hybrid is a **leading test hypothesis**, not approved architecture or art direction. External Android, MapLibre, USGS and Godot references support feasibility and layered geometry principles, **not** measured game outcomes. **Next focused research: R05 landmark/geometry anchoring, hit targets, and grid boundary correctness.**
+
+
+## Research progress — R05 (2026-11-21)
+
+**R05: RESEARCHED; FEATURE ENGINE AND VALIDATION OPEN.** [R05 report](R05_GRID_ACCURATE_FEATURE_GEOMETRY_AND_ANCHORS.md) separates canonical world geometry (point/line/polygon), visual sprite anchors, and puzzle-specific selection/grading. Sources include RFC 7946, Tiled, MapLibre, USGS, PostGIS and Android; the chosen fictional training grid uses **custom local-meter schema, NOT GeoJSON or real-world MGRS**. Proposed tests cover oversize icons, grid boundaries, bridge/river crossings, lake polygons, meaningful placement, reproducible seeds and content rights. **Next R06: mobile tap/pan/reticle interaction, one research topic at a time.**

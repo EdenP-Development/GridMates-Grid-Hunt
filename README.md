@@ -51,3 +51,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [R03 — Beginner-friendly coordinate clues and grid labels](docs/research/R03_COORDINATE_PRESENTATION_AND_GRID_LABELS_RESEARCH.md): evidence and proposed tests for correct grid-line numbering, familiar clue format and gentle guidance.
 
 - [R04 — Map creation and artwork options](docs/research/R04_MAP_CREATION_AND_ARTWORK_RESEARCH.md): compares code-drawn, full illustration and hybrid approaches, with an identical-data three-map test plan. Research-only; map prototypes and art approval remain open.
+
+- [R05 — Accurate feature placement and sprite anchors](docs/research/R05_GRID_ACCURATE_FEATURE_GEOMETRY_AND_ANCHORS.md): source-backed point/line/area map model, object reference accuracy, bridges/rivers, and planned content integrity tests; unimplemented.

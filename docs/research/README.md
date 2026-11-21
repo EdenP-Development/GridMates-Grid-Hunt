@@ -38,3 +38,5 @@ These are research/design notes. None of the discussed libraries or code are cur
 ## Focused research sequence — R04
 
 - [R04 — Map creation and artwork research](R04_MAP_CREATION_AND_ARTWORK_RESEARCH.md): compares code-first, illustration-first and hybrid maps; includes a controlled five-landmark 6×6 test fixture, art QA criteria, licensing safeguards and a proposed phone comparison. **Research documented; no prototypes or art style approved.** Next: R05 landmark geometry, anchors and answer integrity.
+
+- [R05 — Grid-accurate landmarks and feature placement](R05_GRID_ACCURATE_FEATURE_GEOMETRY_AND_ANCHORS.md) — sourced point/line/polygon geometry, symbol anchor vs physical footprint, crossing/overlap rules, seed-safe placement and an unexecuted 18-case verification matrix. **R06 next.**

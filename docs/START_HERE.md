@@ -81,3 +81,8 @@ Review [Open Design Questions and Research Backlog](research/OPEN_DESIGN_RESEARC
 ## Focused research session — R03, November 21, 2026
 
 [R03 friendly coordinate presentation and grid labels](research/R03_COORDINATE_PRESENTATION_AND_GRID_LABELS_RESEARCH.md) now documents technical/UX source findings, genuine 4-digit area selection, temporary split-digit clues and a proposed 6-digit lesson. **Research only** — no tested clue UI or approval. **R04 map production comparisons are next.**
+
+
+## Focused research session — R05, November 21, 2026
+
+[R05 feature geometry, anchors and grid integrity](research/R05_GRID_ACCURATE_FEATURE_GEOMETRY_AND_ANCHORS.md) documents a source-backed, small local-meter point/line/polygon model, art anchor/reference rules, bridges at stream crossings, and boundary/placement test cases. **Research only; no engine, art, coordinate tests or phone prototype implemented.** Next R06 mobile map interaction research.
