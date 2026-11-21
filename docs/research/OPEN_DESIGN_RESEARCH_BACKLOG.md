@@ -105,3 +105,7 @@ First suggested design session: **R01/R02/R03** (what the first puzzle feels lik
 - [Roadmap](../ROADMAP.md)
 
 No feature, art pipeline, lesson, or SDK is marked implemented by this document.
+
+## Research progress — R01 (2026-11-21)
+
+**R01: RESEARCHED; PROTOTYPE AND PLAYER VALIDATION OPEN.** See [first-30-seconds research report](R01_FIRST_30_SECONDS_ONBOARDING_RESEARCH.md). Contextual help, progressive disclosure and fading guidance support a gentle first-puzzle prototype; these are **external general findings**, not evidence from our game. Do not mark the 30-second target as measured or user-approved. **R02 is next; no broader research topics were closed by this pass.**

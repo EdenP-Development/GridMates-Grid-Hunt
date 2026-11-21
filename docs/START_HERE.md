@@ -66,3 +66,8 @@ Build our own small **meter-based training-grid math + Compose map viewport**, n
 ## Active design research questions (2026-11-21)
 
 Review [Open Design Questions and Research Backlog](research/OPEN_DESIGN_RESEARCH_BACKLOG.md) before treating illustration, code-drawn maps, terrain procedural generation, grid hit-testing, or Custom Hunt settings as locked. The priority is to test an approachable first-puzzle experience and compare a small number of viable map/art treatments before building an elaborate mapping engine.
+
+
+## Focused research sessions
+
+**R01 beginner first-30-seconds research completed as documentation on 2026-11-21.** Read [R01 source-backed report](research/R01_FIRST_30_SECONDS_ONBOARDING_RESEARCH.md) for proposed tutorial and playtest criteria; neither prototype nor real user trial has been executed. **Next research topic: R02 puzzle feel / replayable hunt.**

@@ -24,3 +24,8 @@ These are research/design notes. None of the discussed libraries or code are cur
 ## Active research decisions and open questions
 
 - [Open Design Questions and Research Backlog](OPEN_DESIGN_RESEARCH_BACKLOG.md) — prioritized game feel, map/art accuracy, puzzle generation, contours, chapter progression and Custom Hunt questions. These are **not yet finalized decisions**.
+
+
+## Completed scoped research reports
+
+- [R01 — First 30 seconds: beginner onboarding research](R01_FIRST_30_SECONDS_ONBOARDING_RESEARCH.md) — source-backed beginner UX findings, proposed first puzzle, competing tutorial approaches and an **unexecuted** playtest plan. R02 and other research questions remain open.
