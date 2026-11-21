@@ -101,3 +101,8 @@ The owner asked to study *game rules, decisions and mechanics* more deeply inste
 ## Focused mechanics research — GM03, November 21, 2026
 
 [GM03 fair puzzle/clue design research](research/GM03_PUZZLE_QUALITY_AND_CLUE_DESIGN_RESEARCH.md) examines verified clue sufficiency, one well-defined answer, relevant distractors and human puzzle-quality tests. It recommends strict hard correctness gates before random content and **does not** claim those validators or playtests exist. **Next GM04: hints, scoring, mistakes and rewards.**
+
+
+## Game mechanics research — GM03, November 21, 2026
+
+[GM03 puzzle quality/fairness](research/GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md) is now documented alongside [GM02 objective mechanics](research/GM02_DISTINCT_PUZZLE_MECHANICS_RESEARCH.md). The study separates **hard validity gates** (clue sufficiency, unique or explicitly multi-answer targets, correct map-data semantics) from **soft quality** (meaningful reasoning, novelty, legibility and satisfaction). Research only: no quality checker, generator, gameplay, APK or playtest built. **GM04 feedback/hints/rewards next**; R07 generator remains later.

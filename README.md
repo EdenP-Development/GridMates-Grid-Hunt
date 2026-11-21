@@ -60,3 +60,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [GM01 — Core gameplay rules](docs/research/GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) — source-backed Find & Mark/Discovery/Clue Chain rule comparisons, win/retry conditions and an **unrun** prototype test.
 
 - [GM03 — Fair Clues and Puzzle Quality](docs/research/GM03_PUZZLE_QUALITY_AND_CLUE_DESIGN_RESEARCH.md): research into real deductions, puzzle uniqueness, difficulty, answer-leak prevention and future quality checks. **Research only.**
+
+- [GM03 — Puzzle quality and fairness research](docs/research/GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md): constraints for solvable, fair, interesting grid puzzles before generating them; includes 20 planned tests, no code built.

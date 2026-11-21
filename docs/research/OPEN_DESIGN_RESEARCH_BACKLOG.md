@@ -144,3 +144,8 @@ Added [GM01–GM08 dedicated game-mechanics research](GAMEPLAY_MECHANICS_RESEARC
 ## Game mechanics progress — GM03 (2026-11-21)
 
 [GM03 clue and puzzle quality study](GM03_PUZZLE_QUALITY_AND_CLUE_DESIGN_RESEARCH.md) is documented: objective-specific hard constraints plus human quality validation, with examples and an **unexecuted 20-case test matrix**. **No game/content generator has been built or tested.** [GM research track](GAMEPLAY_MECHANICS_RESEARCH_TRACK.md) advances to **GM04**; R07 seeded generation remains pending actual rules and quality validation.
+
+
+## Game-mechanics research — GM03 progress (2026-11-21)
+
+[GM03 research report](GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md) defines publishable puzzle-quality rules: well-specified answers and clue information, valid unique semantic answer for single-choice clues, meaningful distractors, fairness, novelty and distinct skill dimensions. Includes hypothetical cases and 20 **unrun** test scenarios. This is **design research, not implementation or validated player fun**. **Next GM04:** hints, retries, reward/completion systems. R07 random-generator research remains scheduled after quality rules and playtests.

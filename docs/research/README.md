@@ -51,3 +51,6 @@ These are research/design notes. None of the discussed libraries or code are cur
 
 - [GM02 — Distinct hunt and answer mechanics](GM02_DISTINCT_PUZZLE_MECHANICS_RESEARCH.md) — Coordinate, Reverse, Landmark, Precision and Mixed task contracts; **research only**.
 - [GM03 — What makes a good puzzle?](GM03_PUZZLE_QUALITY_AND_CLUE_DESIGN_RESEARCH.md) — published source review, fair-clue criteria, examples of repaired invalid puzzles, hard/soft quality gates and 20 **unexecuted** tests. **GM04 next.**
+
+- [GM02 — Distinct hunt mechanics](GM02_DISTINCT_PUZZLE_MECHANICS_RESEARCH.md) — different player verbs/answer types and proposed 12-puzzle comparison; unimplemented.
+- [GM03 — Puzzle quality, fairness and difficulty](GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md) — source-backed research on clue sufficiency, unambiguous answers, meaningful distractors, difficulty dimensions, hard/soft quality gates and 20 **planned** tests. **GM04 next.**
