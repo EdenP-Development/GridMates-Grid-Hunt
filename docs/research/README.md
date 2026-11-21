@@ -33,3 +33,8 @@ These are research/design notes. None of the discussed libraries or code are cur
 - [R02 — Making Coordinate Hunt fun and replayable](R02_GAME_FEEL_AND_REPLAYABILITY_RESEARCH.md) — evidence review, Classic Find vs Discovery Hunt comparison, difficulty/feedback hypotheses and unrun playtest; **R03 is next**.
 
 - [R03 — Friendly and technically accurate coordinate clues](R03_COORDINATE_PRESENTATION_AND_GRID_LABELS_RESEARCH.md) — FGDC/USGS-backed grid-label rules, progressive display proposals, error taxonomy, accessibility and an unrun comparison test. **R04 is next.**
+
+
+## Focused research sequence — R04
+
+- [R04 — Map creation and artwork research](R04_MAP_CREATION_AND_ARTWORK_RESEARCH.md): compares code-first, illustration-first and hybrid maps; includes a controlled five-landmark 6×6 test fixture, art QA criteria, licensing safeguards and a proposed phone comparison. **Research documented; no prototypes or art style approved.** Next: R05 landmark geometry, anchors and answer integrity.
