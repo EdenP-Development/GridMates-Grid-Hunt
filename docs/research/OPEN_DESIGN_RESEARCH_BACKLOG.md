@@ -139,3 +139,8 @@ No feature, art pipeline, lesson, or SDK is marked implemented by this document.
 ## Owner-requested priority shift — gameplay mechanics first (2026-11-21)
 
 Added [GM01–GM08 dedicated game-mechanics research](GAMEPLAY_MECHANICS_RESEARCH_TRACK.md). [GM01 rules and core loop](GM01_CORE_GAMEPLAY_MECHANICS_RESEARCH.md) is documented but not built/tested. This work defines meaningful actions, objective state, win/retry policy and baseline Find & Mark vs Discovery Hunt comparison; it does **not** close map-art or gesture research. **NEXT: GM02 objective/mode rule grammar**, then GM03 puzzle challenge quality. **R07 seeded generator remains open but moves after GM02/GM03**—otherwise we risk generating hundreds of mechanically uninteresting puzzles.
+
+
+## Game mechanics progress — GM03 (2026-11-21)
+
+[GM03 clue and puzzle quality study](GM03_PUZZLE_QUALITY_AND_CLUE_DESIGN_RESEARCH.md) is documented: objective-specific hard constraints plus human quality validation, with examples and an **unexecuted 20-case test matrix**. **No game/content generator has been built or tested.** [GM research track](GAMEPLAY_MECHANICS_RESEARCH_TRACK.md) advances to **GM04**; R07 seeded generation remains pending actual rules and quality validation.
