@@ -23,9 +23,9 @@
 
 No implemented code, player tests or app behavior are implied by this research track.
 
-**GM02 report:** [Distinct puzzle mechanics — five hunts, different thinking](GM02_DISTINCT_PUZZLE_MECHANICS_RESEARCH.md) (research documented 2026-11-21; not implemented or tested). GM03 now next.
+**GM02 report:** [Distinct puzzle mechanics — five hunts, different thinking](GM02_DISTINCT_PUZZLE_MECHANICS_RESEARCH.md) (research documented 2026-11-21; not implemented or tested). GM03 documented; GM04 now next.
 
 **GM03 report:** [Fair clues, valid puzzles, and quality gates](GM03_PUZZLE_QUALITY_AND_CLUE_DESIGN_RESEARCH.md), researched 2026-11-21. Distinguishes strict semantic/solvability checks from untested human enjoyment; no generator or playtest is built. **GM04 now next.**
 
 
-**GM03 progress (2026-11-21):** [Fairness, deduction and difficulty study](GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md) documents hard quality gates vs soft enjoyment criteria, candidate-uniqueness/distractor rules, difficulty dimensions and 20 **unexecuted** QA cases. **Research documented; GM04 next**. The original GM03 row above is superseded by this progress note; do not infer tests passed.
+**GM03 report:** [Fairness, deduction and difficulty study](GM03_PUZZLE_QUALITY_AND_FAIRNESS_RESEARCH.md) documents hard quality gates vs soft enjoyment criteria, candidate-uniqueness/distractor rules, difficulty dimensions and 20 **unexecuted** QA cases. **GM04 next.**
