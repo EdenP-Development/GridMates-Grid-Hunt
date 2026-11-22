@@ -7,8 +7,11 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,8 +57,6 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -149,7 +151,7 @@ private fun GridHuntScreen() {
         val east = (origin.eastIndex + eastDelta).coerceIn(24, 29)
         val north = (origin.northIndex + northDelta).coerceIn(37, 42)
         selected = GridCell(east, north).reference
-        feedback = "Selected " + selected + ". Adjust or tap Check."
+        feedback = "Selected " + selected + ". Check or change the square."
     }
 
     Column(
@@ -188,7 +190,7 @@ private fun GridHuntScreen() {
                 )
                 Text(
                     if (finished) "Nice work. Replay the same training round, or explore your map."
-                    else "Find the whole square. Easting first, northing second.",
+                    else "Find the square · East first, then north.",
                     fontSize = 12.sp, color = Muted
                 )
             }
@@ -228,23 +230,17 @@ private fun GridHuntScreen() {
                 onSelect = { reference ->
                     if (!finished) {
                         selected = reference
-                        feedback = "Selected " + reference + ". Tap Check or choose another square."
+                        feedback = "Selected " + reference + ". Check or change the square."
                     }
                 }
             )
-            Surface(
-                modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
-                color = Color(0xF5FFFAED),
-                shape = RoundedCornerShape(7.dp)
-            ) {
-                Text(
-                    "N ↑  ·  1 km squares",
-                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp),
-                    color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold
-                )
-            }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            "Tap a square · Drag to pan when zoomed · Pinch to zoom",
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = 10.sp, color = Muted, textAlign = TextAlign.Center
+        )
         Text(
             if (finished) "Complete  •  3 / 3" else "Progress " + step + " / 3   ·   Selected: " + (selected ?: "—"),
             fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Forest
@@ -308,7 +304,7 @@ private fun GridHuntScreen() {
                         selected = null
                         hintStage = 0
                         feedback = if (step == targets.size) "All coordinates checked. Well done!"
-                        else "Correct! That entire square belongs to " + expected.reference + ". Find the next."
+                        else "Correct: " + expected.reference + ". Find the next square."
                     } else {
                         feedback = HuntRules.errorText(expected, selectedCell!!)
                     }
@@ -348,39 +344,76 @@ private fun TrainingMapCanvas(
     onCamera: (MapCamera) -> Unit,
     onSelect: (String) -> Unit
 ) {
+    // Stable pointer coroutine with fresh state. Capturing 'camera' directly in
+    // a long-lived pointerInput(viewport) block can retain the initial null camera.
+    val liveCamera by rememberUpdatedState(camera)
+    val liveOnCamera by rememberUpdatedState(onCamera)
+    val liveOnSelect by rememberUpdatedState(onSelect)
     Canvas(
         modifier = Modifier
             .fillMaxSize()
             .onSizeChanged(onViewport)
             .semantics {
-                contentDescription = "Fictional north-up 6 by 6 training grid. Eastings run right, northings run up. Tap a square or use the Nudge controls."
+                contentDescription = "Fictional north-up 6 by 6 training grid. Eastings right, northings up. Tap to select; drag to pan after zooming; pinch to zoom. Arrow controls offer a touch-free alternative."
             }
-            // Separate detectors: transforms consume drag/pinch, cancelling any pending tap.
+            // A single event loop arbitrates between one-finger taps, drags and
+            // two-finger transforms. Any multi-touch sequence can NEVER select a cell.
             .pointerInput(viewport) {
-                detectTapGestures(onTap = { tap ->
-                    val c = camera
-                    if (c != null && viewport.width > 0 && viewport.height > 0) {
-                        val point = c.screenToWorld(
-                            PixelPoint(tap.x.toDouble(), tap.y.toDouble()),
-                            viewport.width.toDouble(), viewport.height.toDouble()
-                        )
-                        if (bounds.contains(point)) onSelect(GridReference.format(point, 4))
-                    }
-                })
-            }
-            .pointerInput(viewport) {
-                detectTransformGestures(panZoomLock = true) { centroid, pan, zoom, _ ->
-                    val current = camera
-                    if (current != null && viewport.width > 0 && viewport.height > 0) {
-                        onCamera(
-                            current.transform(
-                                bounds, viewport.width.toDouble(), viewport.height.toDouble(),
-                                PixelPoint(centroid.x.toDouble(), centroid.y.toDouble()),
-                                PixelPoint(pan.x.toDouble(), pan.y.toDouble()),
-                                zoom.toDouble()
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    var transformed = false
+                    var usedMultipleFingers = false
+                    var accumulatedPan = Offset.Zero
+                    var lastTapPosition = down.position
+                    var canceled = false
+                    do {
+                        val event = awaitPointerEvent()
+                        val pan = event.calculatePan()
+                        val zoom = event.calculateZoom()
+                        val centroid = event.calculateCentroid(useCurrent = false)
+
+                        if (event.changes.size > 1) usedMultipleFingers = true
+                        if (event.changes.any { it.isConsumed }) canceled = true
+                        if (!transformed) accumulatedPan += pan
+                        if (usedMultipleFingers ||
+                            accumulatedPan.getDistance() > viewConfiguration.touchSlop
+                        ) transformed = true
+
+                        val current = liveCamera
+                        if (transformed && current != null &&
+                            viewport.width > 0 && viewport.height > 0 &&
+                            (pan != Offset.Zero || zoom != 1f)
+                        ) {
+                            liveOnCamera(
+                                current.transform(
+                                    bounds, viewport.width.toDouble(), viewport.height.toDouble(),
+                                    PixelPoint(centroid.x.toDouble(), centroid.y.toDouble()),
+                                    PixelPoint(pan.x.toDouble(), pan.y.toDouble()),
+                                    zoom.toDouble()
+                                )
                             )
-                        )
-                    }
+                            event.changes.forEach { it.consume() }
+                        }
+
+                        if (event.changes.size == 1) {
+                            lastTapPosition = event.changes[0].position
+                        }
+                        val allReleased = event.changes.none { it.pressed }
+                        if (allReleased) {
+                            if (!transformed && !usedMultipleFingers && !canceled &&
+                                viewport.width > 0 && viewport.height > 0
+                            ) {
+                                val point = liveCamera?.screenToWorld(
+                                    PixelPoint(lastTapPosition.x.toDouble(), lastTapPosition.y.toDouble()),
+                                    viewport.width.toDouble(), viewport.height.toDouble()
+                                )
+                                if (point != null && bounds.contains(point)) {
+                                    liveOnSelect(GridReference.format(point, 4))
+                                }
+                            }
+                            break
+                        }
+                    } while (true)
                 }
             }
     ) {
@@ -471,20 +504,28 @@ private fun TrainingMapCanvas(
                 drawRect(Color(0xFFE1A947), topLeft = tl, size = Size(side, side), style = Stroke(3.8f))
             }
         }
-        // Drawing outside the map box would produce confusing tick labels; keep them in bounds.
+        // Separate axis rails prevent the 24/37 overlap seen at the SW corner.
+        // When zoomed, anchor labels near the viewport edge instead of leaving
+        // the only useful ticks far offscreen with the map's original boundary.
         drawIntoCanvas { canvas ->
             val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = android.graphics.Color.rgb(38, 68, 56)
                 textSize = (12f * density).coerceAtMost(18f)
                 isFakeBoldText = true
             }
+            val eastingBaseline = (bottom + 21f).coerceAtMost(size.height - 7f)
+            val northingColumn = (left - 26f).coerceAtLeast(6f)
             for (easting in 24000..29000 step 1000) {
-                val origin = p(easting.toDouble(), bounds.south)
-                canvas.nativeCanvas.drawText((easting / 1000).toString(), origin.x + 4f, bottom - 7f, paint)
+                val x = p(easting.toDouble(), bounds.south).x
+                if (x >= 4f && x + 26f < size.width) {
+                    canvas.nativeCanvas.drawText((easting / 1000).toString(), x + 3f, eastingBaseline, paint)
+                }
             }
             for (northing in 37000..42000 step 1000) {
-                val origin = p(bounds.west, northing.toDouble())
-                canvas.nativeCanvas.drawText((northing / 1000).toString(), left + 6f, origin.y - 6f, paint)
+                val y = p(bounds.west, northing.toDouble()).y
+                if (y >= 12f && y < size.height - 12f) {
+                    canvas.nativeCanvas.drawText((northing / 1000).toString(), northingColumn, y + 5f, paint)
+                }
             }
         }
         drawRect(
