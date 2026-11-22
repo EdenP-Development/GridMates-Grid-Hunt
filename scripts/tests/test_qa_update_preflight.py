@@ -38,7 +38,7 @@ class UpdateGateTests(unittest.TestCase):
 
     def test_badging_parse(self):
         text = ("package: name='com.playereden.gridmates.gridhunt.qa' versionCode='10023' "
-                "versionName='vision23'\n sdkVersion:'26'\n")
+                "versionName='vision23'\nsdkVersion:'26'\n")
         data = parse_badging(text)
         self.assertEqual(data["version_code"], 10023)
         self.assertEqual(data["android_min_sdk"], 26)

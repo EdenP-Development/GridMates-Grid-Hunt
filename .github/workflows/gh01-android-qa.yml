@@ -12,6 +12,8 @@ on:
       - 'gradle.properties'
       - 'settings.gradle.kts'
       - 'build.gradle.kts'
+      - 'scripts/**'
+      - 'distribution/qa-update-baseline.json'
       - '.github/workflows/gh01-android-qa.yml'
   workflow_dispatch:
 
@@ -43,6 +45,8 @@ jobs:
             "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.0'
           fi
       - uses: gradle/actions/setup-gradle@v4
+      - name: Test update-policy parsing and rejection cases
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
       - name: Compile, execute core tests and build debug APK
         run: |
           chmod +x gradlew
@@ -70,6 +74,16 @@ jobs:
           grep -Fq 'Signer #1 certificate SHA-256 digest: 0ff2e763e5667bdfda45aab662639ea6c1c7efa813f82cd4a5cdba8225febd52' SIGNER.txt
           # Do not publish an APK signed with the wrong identity.
           echo 'Expected stable public QA certificate fingerprint verified.'
+      - name: Fail closed unless update matches QA22's fixed identity
+        run: |
+          python3 scripts/qa_update_preflight.py \
+            --baseline distribution/qa-update-baseline.json \
+            --candidate vision-qa-output/GridHunt-VisionLab-QA.apk \
+            --aapt "$ANDROID_HOME/build-tools/35.0.0/aapt" \
+            --apksigner "$ANDROID_HOME/build-tools/35.0.0/apksigner" \
+            --expected-version-code "$((10000 + GITHUB_RUN_NUMBER))" \
+            --source-sha "$GITHUB_SHA" \
+            --output vision-qa-output/UPDATE_PREFLIGHT.json
       - name: Upload QA APK and evidence
         uses: actions/upload-artifact@v4
         with:
