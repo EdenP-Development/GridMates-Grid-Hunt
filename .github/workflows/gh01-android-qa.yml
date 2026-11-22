@@ -50,8 +50,8 @@ jobs:
       - name: Capture exact source, signer and APK checksum
         run: |
           mkdir -p vision-qa-output
-          cp app/build/outputs/apk/debug/app-debug.apk gh02c-qa-output/GridHunt-VisionLab-QA.apk
-          cd gh02c-qa-output
+          cp app/build/outputs/apk/debug/app-debug.apk vision-qa-output/GridHunt-VisionLab-QA.apk
+          cd vision-qa-output
           sha256sum GridHunt-GH02C-stable-QA.apk > APK_SHA256.txt
           git -C .. rev-parse HEAD > SOURCE_SHA.txt
           {
@@ -74,6 +74,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gridhunt-visionlab-${{ github.run_number }}
-          path: gh02c-qa-output/
+          path: vision-qa-output/
           if-no-files-found: error
           retention-days: 14
