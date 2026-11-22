@@ -86,3 +86,8 @@ Owner QA6 screenshots supported shifting GH-02 toward a **larger map and smaller
 ## GH-02B First Bearings mini-chapter — QA10 (2026-11-22)
 
 [QA10 evidence](qa/GH02B_FIRST_BEARINGS_CHAPTER_QA10.md) records source-implemented **three authored four-digit hunts** on one fictional woodland map, explicit Next Hunt/Replay Chapter progression, brief optional guide, and local on-device progress restore. Six additional chapter unit tests (17 authored combined) run under successful GitHub `:core:test` with an APK artifact. **Not yet confirmed physically:** chapter resume after process death, landscape readability, gestures through mission transitions, or whether nine squares feels enjoyable. This is a small content/persistence slice, **not the full GH-02 milestone acceptance**.
+
+
+## GH-02C — fuller phone test and fixed QA update signing (2026-11-22)
+
+[GH-02C QA15 receipt](qa/GH02C_STABLE_UPDATE_QA15.md) documents an additional **Reverse Practice** mechanic with five fresh 4-digit map points; the prior 3×3 curated First Bearings sequence remains. Stable QA signing is supported by a **public throwaway key only**, never a release secret. CI runs #14 and #15 succeeded with **identical cert/package** and versionCode 10014→10015. Android install-over and resume/portrait/landscape gameplay still need physical verification. GH-03 precision and broader chapter content remain further milestones.

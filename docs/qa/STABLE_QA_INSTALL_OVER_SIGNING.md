@@ -23,3 +23,8 @@ If secure GitHub Actions repository secrets become accessible, migrate to a **pr
 Do not rename/recreate the workflow or reset its run numbering without reviewing versionCode monotonicity. See [GitHub workflow](../../.github/workflows/gh01-android-qa.yml).
 
 **Not yet proven:** this change requires a successful Android build and two successive stable-signed installs to confirm update-in-place on a real phone. Source change is not acceptance evidence.
+
+
+## Verification update — QA14 and QA15 (2026-11-22)
+
+Two **successful** GitHub builds now provide direct signature/version evidence: [QA14](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45060724899) and [QA15](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45060871909). Both use certificate `0ff2e763e5667bdfda45aab662639ea6c1c7efa813f82cd4a5cdba8225febd52`, package `com.playereden.gridmates.gridhunt.qa`; versionCode rises **10014→10015**. Both APKs independently hash-verified. [Install-over checklist](GH02C_STABLE_UPDATE_QA15.md). **No actual phone install-over tested yet**. Do not promote the publicly available QA key to release signing.

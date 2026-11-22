@@ -53,3 +53,8 @@ Owner **did complete all three four-digit objectives on QA4** but reported dragg
 ## GH-02B QA10 gameplay beyond three-target demonstration (2026-11-22)
 
 [QA10 mini-chapter report](qa/GH02B_FIRST_BEARINGS_CHAPTER_QA10.md): three authored Hunts on the existing woodland map, saved local progression and an optional grid reading intro are implemented. 17 authored JUnit methods in `core` (11 grid/camera + 6 chapter); CI run #10 successful. APK source/hash/certificate verified. **Owner physical gameplay and resume remain pending**. User QA8 portrait screenshots confirm map-first layout improvement but not landscape or every gesture. This section supersedes earlier docs-only/still-three-target snapshots; no larger chapter content generation is implied.
+
+
+## GH-02C Android two-mode QA15 (2026-11-22)
+
+First Bearings chapter (nine area solves) plus a separate five-point Reverse Practice mode are compiled, [QA15 build verified](qa/GH02C_STABLE_UPDATE_QA15.md). Two sequential CI builds match QA signing certificate and increase version codes, intended for installing updates over the **fixed-key QA** without uninstall. The old QA10 cert is incompatible, requiring one migration uninstall. Key is intentionally public/QA-only, **not a trustworthy publisher identity**; production release key must remain private. QA15 phone test and real install-over still pending.

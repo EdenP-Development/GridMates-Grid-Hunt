@@ -156,3 +156,8 @@ Owner actually installed QA4 and completed three grid objectives but found dragg
 ## GH-02B chapter QA10 awaiting phone test (2026-11-22)
 
 [QA10 build/verification report](qa/GH02B_FIRST_BEARINGS_CHAPTER_QA10.md): three short authored hunts (nine distinct coordinates), explicit Next Hunt/Replay Chapter and optional first-use guide, with saved hunt/objective/selection/hint state. [GH-02B QA10 GitHub artifact](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45059027122/artifacts/14768283897); core JVM tests and APK assembly passed, hash/version/signer verified. **Owner test not yet run**; install likely requires uninstall of QA8 owing to differing debug signer.
+
+
+## GH-02C: new Reverse mode + repeatable QA update chain (2026-11-22)
+
+[GH-02C QA15 evidence](qa/GH02C_STABLE_UPDATE_QA15.md): 9 chapter square tasks + 5 fresh marked-point reverse-reference tasks, on-device state saving, 22 authored JVM test methods, successful CI and independently checked APK hashes. GitHub QA14/QA15 use identical public debug-only signature and package with increasing codes (10014→10015), intended to support install-over. **One uninstall needed from previous ephemeral-key QA builds, then future updates should preserve progress.** Test on Android before claiming compatibility. Public QA key is insecure and never suitable for production.
