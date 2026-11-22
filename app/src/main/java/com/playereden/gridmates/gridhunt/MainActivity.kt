@@ -285,6 +285,7 @@ private fun FirstBearingsScreen(
     mapLook: MapLook,
     hapticsEnabled: Boolean
 ) {
+    val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
     val prefs = remember(context) {
         context.getSharedPreferences("gridhunt_first_bearings_v1", Context.MODE_PRIVATE)
@@ -414,6 +415,7 @@ private fun FirstBearingsScreen(
             val attempt = selectedCell
             if (attempt != null) {
                 if (HuntRules.isCorrect(expected, attempt)) {
+                    if (hapticsEnabled) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     step = FirstBearingsChapter.acceptCorrect(
                         ChapterPosition(huntIndex, step)
                     ).objectiveIndex
@@ -457,7 +459,7 @@ private fun FirstBearingsScreen(
                     viewport = viewport,
                     onViewport = mapSizeChanged,
                     onCamera = ::updateCamera,
-                    onSelect = onMapSelect
+                    onSelect = onMapSelect, mapLook = mapLook
                 )
                 Column(
                     modifier = Modifier
@@ -526,7 +528,7 @@ private fun FirstBearingsScreen(
                     viewport = viewport,
                     onViewport = mapSizeChanged,
                     onCamera = ::updateCamera,
-                    onSelect = onMapSelect
+                    onSelect = onMapSelect, mapLook = mapLook
                 )
                 Spacer(Modifier.height(4.dp))
                 HuntControlPanel(
@@ -558,6 +560,7 @@ private fun ReversePracticeScreen(
     mapLook: MapLook,
     hapticsEnabled: Boolean
 ) {
+    val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
     val prefs = remember(context) {
         context.getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
@@ -625,6 +628,7 @@ private fun ReversePracticeScreen(
         } else {
             val target = active!!
             if (ReverseTraining.check(target, answer)) {
+                if (hapticsEnabled) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 step += 1
                 answer = ""
                 hint = 0
@@ -649,7 +653,8 @@ private fun ReversePracticeScreen(
                     modifier = Modifier.weight(1f).fillMaxHeight(), bounds = bounds,
                     camera = camera, selectedCell = null, completed = emptyList(),
                     viewport = viewport, onViewport = resized, onCamera = ::setCamera,
-                    onSelect = {}, markerPoint = active?.point, enableSelect = false
+                    onSelect = {}, markerPoint = active?.point, enableSelect = false,
+                    mapLook = mapLook
                 )
                 Column(
                     Modifier.width(controlsWidth).fillMaxHeight().verticalScroll(rememberScrollState()),
@@ -674,7 +679,8 @@ private fun ReversePracticeScreen(
                     modifier = Modifier.fillMaxWidth().weight(1f), bounds = bounds,
                     camera = camera, selectedCell = null, completed = emptyList(),
                     viewport = viewport, onViewport = resized, onCamera = ::setCamera,
-                    onSelect = {}, markerPoint = active?.point, enableSelect = false
+                    onSelect = {}, markerPoint = active?.point, enableSelect = false,
+                    mapLook = mapLook
                 )
                 Spacer(Modifier.height(5.dp))
                 ReverseControls(
@@ -729,6 +735,11 @@ private fun ReverseControls(
     Text(
         if (finished) "Reverse practice complete" else "Find the gold point · Read west line, then south line",
         color = Forest, fontWeight = FontWeight.SemiBold, fontSize = 12.sp
+    )
+    LinearProgressIndicator(
+        progress = { if (finished) 1f else answer.length.coerceIn(0, 4) / 4f },
+        modifier = Modifier.fillMaxWidth().height(5.dp),
+        color = Forest, trackColor = Color(0xFFE0E5D8)
     )
     if (!finished) {
         OutlinedTextField(
@@ -891,7 +902,8 @@ private fun HuntMapPanel(
     onCamera: (MapCamera) -> Unit,
     onSelect: (String) -> Unit,
     markerPoint: WorldPoint? = null,
-    enableSelect: Boolean = true
+    enableSelect: Boolean = true,
+    mapLook: MapLook
 ) {
     Box(
         modifier = modifier
@@ -903,7 +915,8 @@ private fun HuntMapPanel(
             bounds = bounds, camera = camera, selectedCell = selectedCell,
             completed = completed, viewport = viewport, onViewport = onViewport,
             onCamera = onCamera, onSelect = onSelect,
-            markerPoint = markerPoint, enableSelect = enableSelect
+            markerPoint = markerPoint, enableSelect = enableSelect,
+            mapLook = mapLook
         )
     }
 }
@@ -944,6 +957,11 @@ private fun HuntControlPanel(
             color = Forest, fontSize = 12.sp, fontWeight = FontWeight.SemiBold
         )
     }
+    LinearProgressIndicator(
+        progress = { step.toFloat() / total.coerceAtLeast(1).toFloat() },
+        modifier = Modifier.fillMaxWidth().height(5.dp),
+        color = Forest, trackColor = Color(0xFFE0E5D8)
+    )
     Text(
         notice,
         color = if (hintStage > 0 && !finished) Forest else Ink,
@@ -1025,7 +1043,8 @@ private fun TrainingMapCanvas(
     onCamera: (MapCamera) -> Unit,
     onSelect: (String) -> Unit,
     markerPoint: WorldPoint? = null,
-    enableSelect: Boolean = true
+    enableSelect: Boolean = true,
+    mapLook: MapLook
 ) {
     // Stable pointer coroutine with fresh state. Capturing 'camera' directly in
     // a long-lived pointerInput(viewport) block can retain the initial null camera.
@@ -1033,6 +1052,14 @@ private fun TrainingMapCanvas(
     val liveOnCamera by rememberUpdatedState(onCamera)
     val liveOnSelect by rememberUpdatedState(onSelect)
     val liveEnableSelect by rememberUpdatedState(enableSelect)
+    val surveyStyle = mapLook == MapLook.SURVEY_TABLE
+    val mapBackdrop = if (surveyStyle) Color(0xFFB1C7C6) else Color(0xFFD1DFCF)
+    val mapPaper = if (surveyStyle) Color(0xFFDCEBE7) else Color(0xFFEDE4CB)
+    val treeDark = if (surveyStyle) Color(0xFF68938F) else Color(0xFF88AA84)
+    val treeLight = if (surveyStyle) Color(0xFF9CBFBA) else Color(0xFFAAC098)
+    val gridInk = if (surveyStyle) Color(0xB74C6F76) else Color(0x88778667)
+    val streamInk = if (surveyStyle) Color(0xFF4E8C9E) else Color(0xFF6F9FA9)
+    val trailInk = if (surveyStyle) Color(0xFF6D8090) else Color(0xFFA68858)
     Canvas(
         modifier = Modifier
             .fillMaxSize()
@@ -1123,12 +1150,13 @@ private fun TrainingMapCanvas(
 
         drawRect(
             brush = Brush.linearGradient(
-                listOf(Color(0xFFCFDBCB), Color(0xFFB4C9B3)),
+                if (surveyStyle) listOf(mapBackdrop, Color(0xFF8EADAE))
+                else listOf(Color(0xFFCFDBCB), Color(0xFFB4C9B3)),
                 start = Offset(0f, 0f), end = Offset(size.width, size.height)
             )
         )
         drawRect(
-            color = Color(0xFFEDE4CB),
+            color = mapPaper,
             topLeft = Offset(left, top), size = Size(right - left, bottom - top)
         )
         clipRect(left, top, right, bottom) {
@@ -1143,11 +1171,12 @@ private fun TrainingMapCanvas(
                 val center = p(pair.first, pair.second)
                 val radius = (270.0 * cam.pixelsPerMeter).toFloat().coerceIn(8f, 48f)
                 drawCircle(
-                    color = if (i % 3 == 0) Color(0xFF88AA84) else Color(0xFFAAC098),
+                    color = if (i % 3 == 0) treeDark else treeLight,
                     center = center, radius = radius
                 )
                 drawCircle(
-                    color = Color(0x557EA079), center = center + Offset(9f, 5f), radius = radius * 0.62f
+                    color = if (surveyStyle) Color(0x55588F8B) else Color(0x557EA079),
+                    center = center + Offset(9f, 5f), radius = radius * 0.62f
                 )
             }
             val stream = Path().apply {
@@ -1159,7 +1188,7 @@ private fun TrainingMapCanvas(
                 cubicTo(b.x, b.y, c.x, c.y, d.x, d.y)
             }
             drawPath(stream, Color(0xFFBCD6D9), style = Stroke(width = 17f))
-            drawPath(stream, Color(0xFF6F9FA9), style = Stroke(width = 7f))
+            drawPath(stream, streamInk, style = Stroke(width = 7f))
             val trail = Path().apply {
                 val a = p(24000.0, 38950.0)
                 moveTo(a.x, a.y)
@@ -1169,17 +1198,17 @@ private fun TrainingMapCanvas(
                 cubicTo(b.x, b.y, c.x, c.y, d.x, d.y)
             }
             drawPath(
-                trail, Color(0xFFA68858),
+                trail, trailInk,
                 style = Stroke(width = 3.5f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 7f)))
             )
             // Labels belong to the kilometer GRID LINES, not cell centers.
             for (easting in 24000..30000 step 1000) {
                 val x = p(easting.toDouble(), bounds.south).x
-                drawLine(Color(0x88778667), Offset(x, top), Offset(x, bottom), strokeWidth = 1.5f)
+                drawLine(gridInk, Offset(x, top), Offset(x, bottom), strokeWidth = 1.5f)
             }
             for (northing in 37000..43000 step 1000) {
                 val y = p(bounds.west, northing.toDouble()).y
-                drawLine(Color(0x88778667), Offset(left, y), Offset(right, y), strokeWidth = 1.5f)
+                drawLine(gridInk, Offset(left, y), Offset(right, y), strokeWidth = 1.5f)
             }
             completed.forEach { cell ->
                 val tl = p(cell.westMeters.toDouble(), (cell.southMeters + 1000).toDouble())
@@ -1205,7 +1234,8 @@ private fun TrainingMapCanvas(
         // the only useful ticks far offscreen with the map's original boundary.
         drawIntoCanvas { canvas ->
             val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = android.graphics.Color.rgb(38, 68, 56)
+                color = if (surveyStyle) android.graphics.Color.rgb(30, 64, 78)
+                else android.graphics.Color.rgb(38, 68, 56)
                 textSize = (12f * density).coerceAtMost(18f)
                 isFakeBoldText = true
             }
