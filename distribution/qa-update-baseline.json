@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "channel": "qa",
+  "application_id": "com.playereden.gridmates.gridhunt.qa",
+  "signer_sha256": "0ff2e763e5667bdfda45aab662639ea6c1c7efa813f82cd4a5cdba8225febd52",
+  "version_code": 10022,
+  "version_name": "0.3.0-gh02c-qa.22",
+  "apk_sha256": "cb85b8b93d3c31f50389065b7ce996b13a0b662d2ddb74c52712f28818ea55ff",
+  "source_commit": "7dfe83cd6f48d33e0b6d7189ef1e2ae3ca30008f",
+  "artifact_run_id": 45065901934,
+  "artifact_name": "gridhunt-visionlab-22",
+  "artifact_apk_file": "GridHunt-VisionLab-QA.apk",
+  "android_min_sdk": 26,
+  "evidence": "docs/qa/GH_V01_VISION_LAB_QA22.md",
+  "purpose": "Exact fixed-QA-key Vision Lab QA22 build. Android install-over on the owner's phone was not verified."
+}
