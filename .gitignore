@@ -10,3 +10,8 @@ local.properties
 *.apk
 *.aab
 captures/
+
+# Keep actual production signing material private; test-only public QA key is
+# deliberately tracked at .github/qa-signing/gridhunt-public-qa.p12.
+*.p12
+!.github/qa-signing/gridhunt-public-qa.p12

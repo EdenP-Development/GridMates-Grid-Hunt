@@ -1,4 +1,4 @@
-name: Grid Hunt GH-02B Android QA
+name: Grid Hunt Stable QA APK / GH-02C
 
 on:
   push:
@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: gridhunt-gh02b-${{ github.ref }}
+  group: gridhunt-stable-qa-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -49,25 +49,30 @@ jobs:
           ./gradlew :core:test :app:assembleDebug --no-daemon --max-workers=2 --stacktrace --console=plain
       - name: Capture exact source, signer and APK checksum
         run: |
-          mkdir -p gh02b-qa-output
-          cp app/build/outputs/apk/debug/app-debug.apk gh02b-qa-output/GridHunt-GH02B-debug.apk
+          mkdir -p gh02c-qa-output
+          cp app/build/outputs/apk/debug/app-debug.apk gh02b-qa-output/GridHunt-GH02C-stable-QA.apk
           cd gh02b-qa-output
-          sha256sum GridHunt-GH02B-debug.apk > APK_SHA256.txt
+          sha256sum GridHunt-GH02C-stable-QA.apk > APK_SHA256.txt
           git -C .. rev-parse HEAD > SOURCE_SHA.txt
           {
-            echo 'GridMates Grid Hunt - GH-02B DEBUG QA'
+            echo 'GridMates Grid Hunt - GH-02C STABLE-SIGNED QA'
             echo 'Package: com.playereden.gridmates.gridhunt.qa'
             echo 'Package and version from built Android manifest:'
-            "${ANDROID_HOME}/build-tools/35.0.0/aapt" dump badging GridHunt-GH02B-debug.apk | grep '^package:'
-            echo 'Signer: ephemeral GitHub-hosted Android DEBUG key; not a stable update signing identity.'
+            "${ANDROID_HOME}/build-tools/35.0.0/aapt" dump badging GridHunt-GH02C-stable-QA.apk | grep '^package:'
+            echo 'Signer: PUBLIC, fixed test-only QA certificate (NOT a production signing key).'
+            echo 'Future QA builds should install over this package when signed with the same key and a greater versionCode.'
             echo 'This is not a release-signed or phone-tested APK.'
-            echo 'Uninstall any differently signed previous Grid Hunt QA app before installing.'
+            echo 'Uninstall older ephemeral-key QA10 and previous versions ONCE before this fixed-key QA build.'
+            echo 'DO NOT install QA packages from unknown or untrusted sources.'
           } > INSTALL_NOTES.txt
-          "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs GridHunt-GH02B-debug.apk > SIGNER.txt
+          "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs GridHunt-GH02C-stable-QA.apk > SIGNER.txt
+          grep -Fq 'Signer #1 certificate SHA-256 digest: 0ff2e763e5667bdfda45aab662639ea6c1c7efa813f82cd4a5cdba8225febd52' SIGNER.txt
+          # Do not publish an APK signed with the wrong identity.
+          echo 'Expected stable public QA certificate fingerprint verified.'
       - name: Upload QA APK and evidence
         uses: actions/upload-artifact@v4
         with:
-          name: gridhunt-gh02b-debug-${{ github.run_number }}
+          name: gridhunt-gh02c-stable-${{ github.run_number }}
           path: gh02b-qa-output/
           if-no-files-found: error
           retention-days: 14

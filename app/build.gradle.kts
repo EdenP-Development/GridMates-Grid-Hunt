@@ -10,12 +10,29 @@ android {
         applicationId = "com.playereden.gridmates.gridhunt"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0-gh02b"
+        // GH Actions run numbers increase for each CI build: versionCode must
+        // rise for Android to allow upgrades without uninstalling.
+        versionCode = 10000 + (System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0)
+        versionName = "0.3.0-gh02c"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    // A deliberately PUBLIC, disposable debug-only key. NEVER use this for release
+    // or sensitive apps. QA package has no network/location permissions.
+    signingConfigs {
+        create("publicQa") {
+            storeFile = file("../.github/qa-signing/gridhunt-public-qa.p12")
+            storePassword = "gridhunt-qa-public"
+            keyAlias = "gridhunt-qa"
+            keyPassword = "gridhunt-qa-public"
+            storeType = "pkcs12"
+        }
+    }
     buildTypes {
-        debug { applicationIdSuffix = ".qa"; versionNameSuffix = "-qa" }
+        debug {
+            applicationIdSuffix = ".qa"
+            versionNameSuffix = "-qa.${System.getenv("GITHUB_RUN_NUMBER") ?: "local"}"
+            signingConfig = signingConfigs.getByName("publicQa")
+        }
         release { isMinifyEnabled = false }
     }
     buildFeatures { compose = true }
