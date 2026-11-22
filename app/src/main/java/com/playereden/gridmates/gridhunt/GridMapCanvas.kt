@@ -1,0 +1,353 @@
+package com.playereden.gridmates.gridhunt
+
+import android.os.Bundle
+import android.content.Context
+import android.graphics.Paint
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.playereden.gridhunt.core.ChapterPosition
+import com.playereden.gridhunt.core.FirstBearingsChapter
+import com.playereden.gridhunt.core.ReverseTraining
+import com.playereden.gridhunt.core.GridCell
+import com.playereden.gridhunt.core.GridReference
+import com.playereden.gridhunt.core.HuntRules
+import com.playereden.gridhunt.core.MapCamera
+import com.playereden.gridhunt.core.PixelPoint
+import com.playereden.gridhunt.core.WoodlandTrainingMap
+import com.playereden.gridhunt.core.WorldBounds
+import com.playereden.gridhunt.core.WorldPoint
+
+@Composable
+internal fun HuntMapPanel(
+    modifier: Modifier,
+    bounds: WorldBounds,
+    camera: MapCamera?,
+    selectedCell: GridCell?,
+    completed: List<GridCell>,
+    viewport: IntSize,
+    onViewport: (IntSize) -> Unit,
+    onCamera: (MapCamera) -> Unit,
+    onSelect: (String) -> Unit,
+    markerPoint: WorldPoint? = null,
+    enableSelect: Boolean = true,
+    mapLook: MapLook
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .border(2.dp, Color(0xFF929D81), RoundedCornerShape(16.dp))
+            .background(Color(0xFFD1DFCF))
+    ) {
+        TrainingMapCanvas(
+            bounds = bounds, camera = camera, selectedCell = selectedCell,
+            completed = completed, viewport = viewport, onViewport = onViewport,
+            onCamera = onCamera, onSelect = onSelect,
+            markerPoint = markerPoint, enableSelect = enableSelect,
+            mapLook = mapLook
+        )
+    }
+}
+
+@Composable
+private fun TrainingMapCanvas(
+    bounds: WorldBounds,
+    camera: MapCamera?,
+    selectedCell: GridCell?,
+    completed: List<GridCell>,
+    viewport: IntSize,
+    onViewport: (IntSize) -> Unit,
+    onCamera: (MapCamera) -> Unit,
+    onSelect: (String) -> Unit,
+    markerPoint: WorldPoint? = null,
+    enableSelect: Boolean = true,
+    mapLook: MapLook
+) {
+    // Stable pointer coroutine with fresh state. Capturing 'camera' directly in
+    // a long-lived pointerInput(viewport) block can retain the initial null camera.
+    val liveCamera by rememberUpdatedState(camera)
+    val liveOnCamera by rememberUpdatedState(onCamera)
+    val liveOnSelect by rememberUpdatedState(onSelect)
+    val liveEnableSelect by rememberUpdatedState(enableSelect)
+    val surveyStyle = mapLook == MapLook.SURVEY_TABLE
+    val mapBackdrop = if (surveyStyle) Color(0xFFB1C7C6) else Color(0xFFD1DFCF)
+    val mapPaper = if (surveyStyle) Color(0xFFDCEBE7) else Color(0xFFEDE4CB)
+    val treeDark = if (surveyStyle) Color(0xFF68938F) else Color(0xFF88AA84)
+    val treeLight = if (surveyStyle) Color(0xFF9CBFBA) else Color(0xFFAAC098)
+    val gridInk = if (surveyStyle) Color(0xB74C6F76) else Color(0x88778667)
+    val streamInk = if (surveyStyle) Color(0xFF4E8C9E) else Color(0xFF6F9FA9)
+    val trailInk = if (surveyStyle) Color(0xFF6D8090) else Color(0xFFA68858)
+    Canvas(
+        modifier = Modifier
+            .fillMaxSize()
+            .onSizeChanged(onViewport)
+            .semantics {
+                contentDescription = if (enableSelect)
+                    "Fictional training grid. Tap a square to select; drag and pinch to navigate."
+                else
+                    "Reverse survey: read the four-digit reference of the marked gold point. Drag and pinch to navigate."
+            }
+            // A single event loop arbitrates between one-finger taps, drags and
+            // two-finger transforms. Any multi-touch sequence can NEVER select a cell.
+            .pointerInput(viewport) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    var transformed = false
+                    var usedMultipleFingers = false
+                    var accumulatedPan = Offset.Zero
+                    // Keep a synchronous camera during rapid pointer events. Compose
+                    // recomposition may not publish the new camera by the next frame.
+                    var gestureCamera = liveCamera
+                    var lastTapPosition = down.position
+                    var canceled = false
+                    do {
+                        val event = awaitPointerEvent()
+                        val pan = event.calculatePan()
+                        val zoom = event.calculateZoom()
+                        val centroid = event.calculateCentroid(useCurrent = false)
+
+                        if (event.changes.size > 1) usedMultipleFingers = true
+                        if (event.changes.any { it.isConsumed }) canceled = true
+                        if (!transformed) accumulatedPan += pan
+                        if (usedMultipleFingers ||
+                            accumulatedPan.getDistance() > viewConfiguration.touchSlop
+                        ) transformed = true
+
+                        val current = gestureCamera
+                        if (transformed && current != null &&
+                            viewport.width > 0 && viewport.height > 0 &&
+                            (pan != Offset.Zero || zoom != 1f)
+                        ) {
+                            val next = current.transform(
+                                bounds, viewport.width.toDouble(), viewport.height.toDouble(),
+                                PixelPoint(centroid.x.toDouble(), centroid.y.toDouble()),
+                                PixelPoint(pan.x.toDouble(), pan.y.toDouble()),
+                                zoom.toDouble()
+                            )
+                            gestureCamera = next
+                            liveOnCamera(next)
+                            event.changes.forEach { it.consume() }
+                        }
+
+                        if (event.changes.size == 1) {
+                            lastTapPosition = event.changes[0].position
+                        }
+                        val allReleased = event.changes.none { it.pressed }
+                        if (allReleased) {
+                            if (!transformed && !usedMultipleFingers && !canceled &&
+                                viewport.width > 0 && viewport.height > 0
+                            ) {
+                                val point = liveCamera?.screenToWorld(
+                                    PixelPoint(lastTapPosition.x.toDouble(), lastTapPosition.y.toDouble()),
+                                    viewport.width.toDouble(), viewport.height.toDouble()
+                                )
+                                if (liveEnableSelect && point != null && bounds.contains(point)) {
+                                    liveOnSelect(GridReference.format(point, 4))
+                                }
+                            }
+                            break
+                        }
+                    } while (true)
+                }
+            }
+    ) {
+        val cam = camera ?: return@Canvas
+        val width = size.width.toDouble()
+        val height = size.height.toDouble()
+        fun p(e: Double, n: Double): Offset {
+            val result = cam.worldToScreen(WorldPoint(e, n), width, height)
+            return Offset(result.x.toFloat(), result.y.toFloat())
+        }
+        val northWest = p(bounds.west, bounds.north)
+        val southEast = p(bounds.east, bounds.south)
+        val left = northWest.x
+        val top = northWest.y
+        val right = southEast.x
+        val bottom = southEast.y
+
+        drawRect(
+            brush = Brush.linearGradient(
+                if (surveyStyle) listOf(mapBackdrop, Color(0xFF8EADAE))
+                else listOf(Color(0xFFCFDBCB), Color(0xFFB4C9B3)),
+                start = Offset(0f, 0f), end = Offset(size.width, size.height)
+            )
+        )
+        drawRect(
+            color = mapPaper,
+            topLeft = Offset(left, top), size = Size(right - left, bottom - top)
+        )
+        clipRect(left, top, right, bottom) {
+            // Decorative woodland: never used for answer grading.
+            val trees = listOf(
+                24600.0 to 42250.0, 25150.0 to 41900.0, 25700.0 to 42500.0,
+                27750.0 to 41950.0, 28350.0 to 41500.0, 29400.0 to 42300.0,
+                24450.0 to 39600.0, 24900.0 to 40200.0, 27200.0 to 38500.0,
+                29350.0 to 37450.0, 28700.0 to 38100.0, 26500.0 to 37650.0
+            )
+            trees.forEachIndexed { i, pair ->
+                val center = p(pair.first, pair.second)
+                val radius = (270.0 * cam.pixelsPerMeter).toFloat().coerceIn(8f, 48f)
+                drawCircle(
+                    color = if (i % 3 == 0) treeDark else treeLight,
+                    center = center, radius = radius
+                )
+                drawCircle(
+                    color = if (surveyStyle) Color(0x55588F8B) else Color(0x557EA079),
+                    center = center + Offset(9f, 5f), radius = radius * 0.62f
+                )
+            }
+            val stream = Path().apply {
+                val a = p(24900.0, 43000.0)
+                moveTo(a.x, a.y)
+                val b = p(25650.0, 40900.0)
+                val c = p(26200.0, 39700.0)
+                val d = p(27900.0, 37800.0)
+                cubicTo(b.x, b.y, c.x, c.y, d.x, d.y)
+            }
+            drawPath(stream, Color(0xFFBCD6D9), style = Stroke(width = 17f))
+            drawPath(stream, streamInk, style = Stroke(width = 7f))
+            val trail = Path().apply {
+                val a = p(24000.0, 38950.0)
+                moveTo(a.x, a.y)
+                val b = p(26100.0, 38600.0)
+                val c = p(27900.0, 39800.0)
+                val d = p(30000.0, 40700.0)
+                cubicTo(b.x, b.y, c.x, c.y, d.x, d.y)
+            }
+            drawPath(
+                trail, trailInk,
+                style = Stroke(width = 3.5f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 7f)))
+            )
+            // Labels belong to the kilometer GRID LINES, not cell centers.
+            for (easting in 24000..30000 step 1000) {
+                val x = p(easting.toDouble(), bounds.south).x
+                drawLine(gridInk, Offset(x, top), Offset(x, bottom), strokeWidth = 1.5f)
+            }
+            for (northing in 37000..43000 step 1000) {
+                val y = p(bounds.west, northing.toDouble()).y
+                drawLine(gridInk, Offset(left, y), Offset(right, y), strokeWidth = 1.5f)
+            }
+            completed.forEach { cell ->
+                val tl = p(cell.westMeters.toDouble(), (cell.southMeters + 1000).toDouble())
+                val side = (1000 * cam.pixelsPerMeter).toFloat()
+                drawRect(Color(0x3C397C65), topLeft = tl, size = Size(side, side))
+                drawRect(Color(0xFF4E7D60), topLeft = tl, size = Size(side, side), style = Stroke(2f))
+            }
+            selectedCell?.let { cell ->
+                val tl = p(cell.westMeters.toDouble(), (cell.southMeters + 1000).toDouble())
+                val side = (1000 * cam.pixelsPerMeter).toFloat()
+                drawRect(Color(0x66E8BD63), topLeft = tl, size = Size(side, side))
+                drawRect(Color(0xFFE1A947), topLeft = tl, size = Size(side, side), style = Stroke(3.8f))
+            }
+            markerPoint?.let { point ->
+                val center = p(point.easting, point.northing)
+                drawCircle(Color(0xFFFFF8E5), radius = 20f, center = center)
+                drawCircle(Color(0xFFBF8331), radius = 14f, center = center)
+                drawCircle(Color(0xFF244236), radius = 5f, center = center)
+            }
+        }
+        // Separate axis rails prevent the 24/37 overlap seen at the SW corner.
+        // When zoomed, anchor labels near the viewport edge instead of leaving
+        // the only useful ticks far offscreen with the map's original boundary.
+        drawIntoCanvas { canvas ->
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = if (surveyStyle) android.graphics.Color.rgb(30, 64, 78)
+                else android.graphics.Color.rgb(38, 68, 56)
+                textSize = (12f * density).coerceAtMost(18f)
+                isFakeBoldText = true
+            }
+            val eastingBaseline = (bottom + 21f).coerceAtMost(size.height - 7f)
+            val northingColumn = (left - 26f).coerceAtLeast(6f)
+            for (easting in 24000..29000 step 1000) {
+                val x = p(easting.toDouble(), bounds.south).x
+                if (x >= 4f && x + 26f < size.width) {
+                    canvas.nativeCanvas.drawText((easting / 1000).toString(), x + 3f, eastingBaseline, paint)
+                }
+            }
+            for (northing in 37000..42000 step 1000) {
+                val y = p(bounds.west, northing.toDouble()).y
+                if (y >= 12f && y < size.height - 12f) {
+                    canvas.nativeCanvas.drawText((northing / 1000).toString(), northingColumn, y + 5f, paint)
+                }
+            }
+        }
+        drawRect(
+            color = Color(0xFF67785F), topLeft = Offset(left, top),
+            size = Size(right - left, bottom - top), style = Stroke(2.2f)
+        )
+    }
+}

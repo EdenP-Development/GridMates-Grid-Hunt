@@ -1,0 +1,309 @@
+package com.playereden.gridmates.gridhunt
+
+import android.os.Bundle
+import android.content.Context
+import android.graphics.Paint
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.playereden.gridhunt.core.ChapterPosition
+import com.playereden.gridhunt.core.FirstBearingsChapter
+import com.playereden.gridhunt.core.ReverseTraining
+import com.playereden.gridhunt.core.GridCell
+import com.playereden.gridhunt.core.GridReference
+import com.playereden.gridhunt.core.HuntRules
+import com.playereden.gridhunt.core.MapCamera
+import com.playereden.gridhunt.core.PixelPoint
+import com.playereden.gridhunt.core.WoodlandTrainingMap
+import com.playereden.gridhunt.core.WorldBounds
+import com.playereden.gridhunt.core.WorldPoint
+
+@Composable
+internal fun HuntHeader(
+    compact: Boolean,
+    huntName: String,
+    huntNumber: Int,
+    huntTotal: Int,
+    onGuide: () -> Unit,
+    onHome: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text("GRIDMATES / GRID HUNT", color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Text(
+                "First Bearings", color = Ink,
+                fontSize = if (compact) 19.sp else 21.sp,
+                fontWeight = FontWeight.Bold, lineHeight = 24.sp
+            )
+            Text(
+                "HUNT $huntNumber / $huntTotal  ·  $huntName",
+                fontSize = 10.sp, color = Muted, maxLines = 1
+            )
+        }
+        Text("N ↑", color = Forest, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        TextButton(
+            onClick = onHome,
+            contentPadding = PaddingValues(horizontal = 3.dp, vertical = 2.dp)
+        ) { Text("Home", color = Forest, fontSize = 11.sp) }
+        TextButton(
+            onClick = onGuide,
+            modifier = Modifier.semantics { contentDescription = "Show or hide grid reading guide" },
+            contentPadding = PaddingValues(horizontal = 5.dp, vertical = 2.dp)
+        ) {
+            Text("?", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Forest)
+        }
+    }
+}
+
+@Composable
+internal fun ObjectiveRibbon(
+    step: Int, total: Int, active: GridCell?,
+    huntName: String, chapterFinished: Boolean
+) {
+    val done = active == null
+    Surface(
+        color = Color(0xFFFFFBF1), shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    when {
+                        chapterFinished -> "CHAPTER COMPLETE"
+                        done -> "HUNT COMPLETE"
+                        else -> "FIND SQUARE  " + (step + 1) + " / " + total
+                    },
+                    fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Forest
+                )
+                Text(
+                    if (done) "Nice work. Survey recorded."
+                    else "East first, then north  ·  $huntName",
+                    fontSize = 11.sp, maxLines = 2, color = Muted
+                )
+            }
+            Text(
+                if (done) "✓" else active.reference,
+                fontSize = if (done) 32.sp else 33.sp,
+                color = Ink, fontWeight = FontWeight.ExtraBold
+            )
+        }
+    }
+}
+
+@Composable
+internal fun GridReadingGuide(onDismiss: () -> Unit) {
+    Surface(
+        color = Color(0xFFE8EEDC),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "HOW TO PLAY · Read 24 on the bottom, then 37 on the side. " +
+                    "For 2437, tap the square above-right of their crossing. " +
+                    "Preview and Check; hints are free.",
+                fontSize = 11.sp, lineHeight = 14.sp, color = Ink,
+                modifier = Modifier.weight(1f)
+            )
+            TextButton(onClick = onDismiss) { Text("Got it", fontSize = 11.sp) }
+        }
+    }
+}
+
+
+@Composable
+internal fun HuntControlPanel(
+    step: Int,
+    total: Int,
+    selected: String?,
+    feedback: String,
+    hintStage: Int,
+    finished: Boolean,
+    onMove: (Int, Int) -> Unit,
+    onZoom: (Double) -> Unit,
+    onUndo: () -> Unit,
+    onHint: () -> Unit,
+    onFit: () -> Unit,
+    onCheck: () -> Unit,
+    actionLabel: String
+) {
+    val notice = when {
+        finished -> feedback
+        hintStage == 1 -> "Hint 1: First two digits are eastings; last two are northings."
+        hintStage >= 2 -> "Hint 2: Choose the square above-right of those grid lines."
+        else -> feedback
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            if (finished) "COMPLETE  " + total + " / " + total
+            else "FOUND  " + step + " / " + total,
+            color = Forest, fontWeight = FontWeight.Bold, fontSize = 12.sp
+        )
+        Text(
+            if (finished) "✓ ALL SITES" else "SELECTED  " + (selected ?: "—"),
+            color = Forest, fontSize = 12.sp, fontWeight = FontWeight.SemiBold
+        )
+    }
+    LinearProgressIndicator(
+        progress = { step.toFloat() / total.coerceAtLeast(1).toFloat() },
+        modifier = Modifier.fillMaxWidth().height(5.dp),
+        color = Forest, trackColor = Color(0xFFE0E5D8)
+    )
+    Text(
+        notice,
+        color = if (hintStage > 0 && !finished) Forest else Ink,
+        fontSize = 11.sp,
+        lineHeight = 15.sp,
+        maxLines = 3,
+        modifier = Modifier.fillMaxWidth().heightIn(min = 30.dp)
+    )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text("SELECT SQUARE", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
+        Text("ZOOM", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        GridStepButton("←", "Move selected square west") { onMove(-1, 0) }
+        GridStepButton("→", "Move selected square east") { onMove(1, 0) }
+        GridStepButton("↑", "Move selected square north") { onMove(0, 1) }
+        GridStepButton("↓", "Move selected square south") { onMove(0, -1) }
+        Spacer(Modifier.width(6.dp))
+        GridStepButton("+", "Zoom in") { onZoom(1.6) }
+        GridStepButton("−", "Zoom out") { onZoom(1.0 / 1.6) }
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        OutlinedButton(
+            onClick = onUndo, enabled = !finished,
+            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) { Text("Undo", fontSize = 12.sp) }
+        OutlinedButton(
+            onClick = onHint, enabled = !finished,
+            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) { Text("Hint", fontSize = 12.sp) }
+        OutlinedButton(
+            onClick = onFit,
+            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) { Text("Fit map", fontSize = 12.sp) }
+    }
+    Button(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
+        enabled = finished || selected != null,
+        onClick = onCheck,
+        colors = ButtonDefaults.buttonColors(containerColor = Forest)
+    ) {
+        Text(actionLabel, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+private fun GridStepButton(label: String, description: String, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.size(48.dp).semantics { contentDescription = description },
+        contentPadding = PaddingValues(0.dp),
+        shape = RoundedCornerShape(9.dp)
+    ) {
+        Text(label, fontSize = 17.sp, color = Forest)
+    }
+}
+
