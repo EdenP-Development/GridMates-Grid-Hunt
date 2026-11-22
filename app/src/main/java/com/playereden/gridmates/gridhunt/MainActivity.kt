@@ -71,6 +71,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.semantics.contentDescription
@@ -210,7 +211,8 @@ private fun GridHuntHome(
                     fontSize = 12.sp, color = Muted)
                 Spacer(Modifier.height(7.dp))
                 Button(
-                    onClick = onChapter, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
+                    onClick = onChapter,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("openChapter"),
                     colors = ButtonDefaults.buttonColors(containerColor = Forest)
                 ) { Text(if (chapterCompleted > 0) "Continue chapter" else "Start chapter") }
             }
@@ -223,7 +225,7 @@ private fun GridHuntHome(
                     fontSize = 12.sp, color = Muted)
                 Spacer(Modifier.height(7.dp))
                 OutlinedButton(onClick = onReverse,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)) {
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("openReverse")) {
                     Text(if (reverseCompleted > 0) "Continue reverse practice" else "Try reverse practice")
                 }
             }
@@ -237,7 +239,7 @@ private fun GridHuntHome(
                 val chosen = mapLook == look
                 OutlinedButton(
                     onClick = { onLook(look) },
-                    modifier = Modifier.weight(1f).heightIn(min = 64.dp),
+                    modifier = Modifier.weight(1f).heightIn(min = 64.dp).testTag("style_" + look.name),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = if (chosen) Color(0xFFDDE7D6) else Color(0xFFFFFBF1)
                     ),

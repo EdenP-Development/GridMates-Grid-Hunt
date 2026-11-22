@@ -1,4 +1,4 @@
-name: Grid Hunt Stable QA APK / GH-02C
+name: Grid Hunt Vision Lab QA
 
 on:
   push:
@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   android-qa:
-    name: Test coordinate core and assemble signed debug APK
+    name: JVM tests, instrumentation-test compile and stable QA APK
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -46,16 +46,16 @@ jobs:
       - name: Compile, execute core tests and build debug APK
         run: |
           chmod +x gradlew
-          ./gradlew :core:test :app:assembleDebug --no-daemon --max-workers=2 --stacktrace --console=plain
+          ./gradlew :core:test :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon --max-workers=2 --stacktrace --console=plain
       - name: Capture exact source, signer and APK checksum
         run: |
-          mkdir -p gh02c-qa-output
-          cp app/build/outputs/apk/debug/app-debug.apk gh02c-qa-output/GridHunt-GH02C-stable-QA.apk
+          mkdir -p vision-qa-output
+          cp app/build/outputs/apk/debug/app-debug.apk gh02c-qa-output/GridHunt-VisionLab-QA.apk
           cd gh02c-qa-output
           sha256sum GridHunt-GH02C-stable-QA.apk > APK_SHA256.txt
           git -C .. rev-parse HEAD > SOURCE_SHA.txt
           {
-            echo 'GridMates Grid Hunt - GH-02C STABLE-SIGNED QA'
+            echo 'GridMates Grid Hunt - VISION LAB STABLE-SIGNED QA'
             echo 'Package: com.playereden.gridmates.gridhunt.qa'
             echo 'Package and version from built Android manifest:'
             "${ANDROID_HOME}/build-tools/35.0.0/aapt" dump badging GridHunt-GH02C-stable-QA.apk | grep '^package:'
@@ -73,7 +73,7 @@ jobs:
       - name: Upload QA APK and evidence
         uses: actions/upload-artifact@v4
         with:
-          name: gridhunt-gh02c-stable-${{ github.run_number }}
+          name: gridhunt-visionlab-${{ github.run_number }}
           path: gh02c-qa-output/
           if-no-files-found: error
           retention-days: 14

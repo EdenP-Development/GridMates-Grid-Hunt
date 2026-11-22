@@ -71,6 +71,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.semantics.contentDescription
@@ -243,7 +244,9 @@ private fun ReverseHeader(onBack: () -> Unit) {
             Text("REVERSE SURVEY · PRACTICE", fontSize = 10.sp, color = Muted)
         }
         Text("N ↑", fontSize = 16.sp, color = Forest)
-        TextButton(onClick = onBack) { Text("Home", fontSize = 12.sp) }
+        TextButton(onClick = onBack, modifier = Modifier.testTag("reverseHome")) {
+            Text("Home", fontSize = 12.sp)
+        }
     }
 }
 

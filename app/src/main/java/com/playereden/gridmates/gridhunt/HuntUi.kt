@@ -71,6 +71,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.semantics.contentDescription
@@ -121,6 +122,7 @@ internal fun HuntHeader(
         Text("N ↑", color = Forest, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         TextButton(
             onClick = onHome,
+            modifier = Modifier.testTag("chapterHome"),
             contentPadding = PaddingValues(horizontal = 3.dp, vertical = 2.dp)
         ) { Text("Home", color = Forest, fontSize = 11.sp) }
         TextButton(
