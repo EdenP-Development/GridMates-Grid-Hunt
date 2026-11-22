@@ -93,12 +93,36 @@ import com.playereden.gridhunt.core.WoodlandTrainingMap
 import com.playereden.gridhunt.core.WorldBounds
 import com.playereden.gridhunt.core.WorldPoint
 
+/**
+ * Compact A/B control in the header, deliberately leaving map height untouched.
+ * Theme changes are purely visual: grid math, selection and camera are retained.
+ */
+@Composable
+internal fun QuickMapLookButton(mapLook: MapLook, onLook: (MapLook) -> Unit) {
+    val next = if (mapLook == MapLook.FIELD_GUIDE) MapLook.SURVEY_TABLE else MapLook.FIELD_GUIDE
+    TextButton(
+        onClick = { onLook(next) },
+        modifier = Modifier.testTag("mapLookToggle").semantics {
+            contentDescription = "Switch map look from ${mapLook.label} to ${next.label}"
+        },
+        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)
+    ) {
+        Text(
+            if (mapLook == MapLook.FIELD_GUIDE) "Field ↔" else "Survey ↔",
+            color = Forest, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+            maxLines = 1
+        )
+    }
+}
+
 @Composable
 internal fun HuntHeader(
     compact: Boolean,
     huntName: String,
     huntNumber: Int,
     huntTotal: Int,
+    mapLook: MapLook,
+    onLook: (MapLook) -> Unit,
     onGuide: () -> Unit,
     onHome: () -> Unit
 ) {
@@ -120,6 +144,7 @@ internal fun HuntHeader(
             )
         }
         Text("N ↑", color = Forest, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        QuickMapLookButton(mapLook = mapLook, onLook = onLook)
         TextButton(
             onClick = onHome,
             modifier = Modifier.testTag("chapterHome"),
