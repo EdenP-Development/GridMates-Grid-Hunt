@@ -1,6 +1,7 @@
 package com.playereden.gridmates.gridhunt
 
 import android.os.Bundle
+import android.content.Context
 import android.graphics.Paint
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,10 +39,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -63,12 +66,15 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.playereden.gridhunt.core.ChapterPosition
+import com.playereden.gridhunt.core.FirstBearingsChapter
 import com.playereden.gridhunt.core.GridCell
 import com.playereden.gridhunt.core.GridReference
 import com.playereden.gridhunt.core.HuntRules
@@ -106,18 +112,54 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun GridHuntScreen() {
-    val targets = WoodlandTrainingMap.objectives
-    var step by rememberSaveable { mutableIntStateOf(0) }
-    var selected by rememberSaveable { mutableStateOf<String?>(null) }
-    var hintStage by rememberSaveable { mutableIntStateOf(0) }
+    val context = LocalContext.current
+    val prefs = remember(context) {
+        context.getSharedPreferences("gridhunt_first_bearings_v1", Context.MODE_PRIVATE)
+    }
+    val initial = remember(prefs) {
+        FirstBearingsChapter.restore(
+            prefs.getInt("hunt_index", 0),
+            prefs.getInt("objective_index", 0)
+        )
+    }
+    var huntIndex by rememberSaveable { mutableIntStateOf(initial.huntIndex) }
+    var step by rememberSaveable { mutableIntStateOf(initial.objectiveIndex) }
+    var selected by rememberSaveable {
+        mutableStateOf(prefs.getString("selected", null)?.takeIf { ref ->
+            runCatching {
+                val cell = GridReference.parse(ref)
+                cell.digits == 4 && WoodlandTrainingMap.bounds.contains(
+                    WorldPoint(cell.westMeters.toDouble(), cell.southMeters.toDouble())
+                )
+            }.getOrDefault(false)
+        })
+    }
+    var hintStage by rememberSaveable { mutableIntStateOf(prefs.getInt("hint_stage", 0).coerceIn(0, 2)) }
     var feedback by rememberSaveable {
-        mutableStateOf("Read right to the easting, then up to the northing.")
+        mutableStateOf("Read eastings first, then northings. Your chapter saves automatically.")
+    }
+    var showGuide by rememberSaveable {
+        mutableStateOf(!prefs.getBoolean("guide_seen", false))
     }
 
+    val hunt = FirstBearingsChapter.hunts[huntIndex]
+    val targets = hunt.objectives
     val finished = step >= targets.size
+    val chapterFinished = finished && huntIndex == FirstBearingsChapter.hunts.lastIndex
     val active = targets.getOrNull(step)
     val selectedCell = selected?.let(GridReference::parse)
     val bounds = WoodlandTrainingMap.bounds
+
+    // Save objective/hunt progress promptly, including hints and pending selection,
+    // so returning after Android closes the activity resumes the same authored task.
+    LaunchedEffect(huntIndex, step, selected, hintStage) {
+        prefs.edit()
+            .putInt("hunt_index", huntIndex)
+            .putInt("objective_index", step)
+            .putString("selected", selected)
+            .putInt("hint_stage", hintStage)
+            .apply()
+    }
 
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
@@ -185,22 +227,32 @@ private fun GridHuntScreen() {
 
     val onCheck: () -> Unit = {
         if (finished) {
-            step = 0
+            val next = FirstBearingsChapter.nextHuntOrReplay(ChapterPosition(huntIndex, step))
+            val replayed = next.huntIndex == 0
+            huntIndex = next.huntIndex
+            step = next.objectiveIndex
             selected = null
             hintStage = 0
-            feedback = "Find three woodland grid squares. East first, then north."
+            feedback = if (replayed) "Chapter restarted. Find the first grid square."
+            else "Next hunt ready. New references, same woodland map."
             resetView()
         } else {
             val expected = active!!
             val attempt = selectedCell
             if (attempt != null) {
                 if (HuntRules.isCorrect(expected, attempt)) {
-                    step += 1
+                    step = FirstBearingsChapter.acceptCorrect(
+                        ChapterPosition(huntIndex, step)
+                    ).objectiveIndex
                     selected = null
                     hintStage = 0
-                    feedback = if (step >= targets.size)
-                        "All three coordinates checked. Nice work!"
-                    else "Correct: " + expected.reference + ". Find the next square."
+                    feedback = when {
+                        step >= targets.size && huntIndex == FirstBearingsChapter.hunts.lastIndex ->
+                            "Chapter complete! The woodland survey is finished."
+                        step >= targets.size ->
+                            "Hunt complete! Your next survey is ready."
+                        else -> "Correct: " + expected.reference + ". Find the next square."
+                    }
                 } else {
                     feedback = HuntRules.errorText(expected, attempt)
                 }
@@ -241,8 +293,19 @@ private fun GridHuntScreen() {
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    HuntHeader(compact = true)
-                    ObjectiveRibbon(step = step, total = targets.size, active = active)
+                    HuntHeader(
+                        compact = true, huntName = hunt.name,
+                        huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
+                        onGuide = { showGuide = !showGuide }
+                    )
+                    ObjectiveRibbon(
+                        step = step, total = targets.size, active = active,
+                        huntName = hunt.name, chapterFinished = chapterFinished
+                    )
+                    if (showGuide) GridReadingGuide {
+                        showGuide = false
+                        prefs.edit().putBoolean("guide_seen", true).apply()
+                    }
                     HuntControlPanel(
                         step = step, total = targets.size, selected = selected,
                         feedback = feedback, hintStage = hintStage, finished = finished,
@@ -253,15 +316,31 @@ private fun GridHuntScreen() {
                         },
                         onHint = { hintStage = (hintStage + 1).coerceAtMost(2) },
                         onFit = ::resetView,
-                        onCheck = onCheck
+                        onCheck = onCheck,
+                        actionLabel = when {
+                            chapterFinished -> "Replay chapter  ↻"
+                            finished -> "Next hunt  →"
+                            else -> "Check square"
+                        }
                     )
                 }
             }
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
-                HuntHeader(compact = false)
+                HuntHeader(
+                    compact = false, huntName = hunt.name,
+                    huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
+                    onGuide = { showGuide = !showGuide }
+                )
                 Spacer(Modifier.height(5.dp))
-                ObjectiveRibbon(step = step, total = targets.size, active = active)
+                ObjectiveRibbon(
+                    step = step, total = targets.size, active = active,
+                    huntName = hunt.name, chapterFinished = chapterFinished
+                )
+                if (showGuide) GridReadingGuide {
+                    showGuide = false
+                    prefs.edit().putBoolean("guide_seen", true).apply()
+                }
                 Spacer(Modifier.height(6.dp))
                 HuntMapPanel(
                     modifier = Modifier.fillMaxWidth().weight(1f),
@@ -285,7 +364,12 @@ private fun GridHuntScreen() {
                     },
                     onHint = { hintStage = (hintStage + 1).coerceAtMost(2) },
                     onFit = ::resetView,
-                    onCheck = onCheck
+                    onCheck = onCheck,
+                    actionLabel = when {
+                        chapterFinished -> "Replay chapter  ↻"
+                        finished -> "Next hunt  →"
+                        else -> "Check square"
+                    }
                 )
             }
         }
@@ -293,24 +377,46 @@ private fun GridHuntScreen() {
 }
 
 @Composable
-private fun HuntHeader(compact: Boolean) {
+private fun HuntHeader(
+    compact: Boolean,
+    huntName: String,
+    huntNumber: Int,
+    huntTotal: Int,
+    onGuide: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text("GRIDMATES / GRID HUNT", color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-            Text("First Bearings", color = Ink, fontSize = if (compact) 19.sp else 21.sp,
-                fontWeight = FontWeight.Bold, lineHeight = 24.sp)
-            Text("WOODLAND  ·  FICTIONAL TRAINING GRID", fontSize = 9.sp, color = Muted)
+            Text(
+                "First Bearings", color = Ink,
+                fontSize = if (compact) 19.sp else 21.sp,
+                fontWeight = FontWeight.Bold, lineHeight = 24.sp
+            )
+            Text(
+                "HUNT $huntNumber / $huntTotal  ·  $huntName",
+                fontSize = 10.sp, color = Muted, maxLines = 1
+            )
         }
-        Text("N ↑", color = Forest, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text("N ↑", color = Forest, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        TextButton(
+            onClick = onGuide,
+            modifier = Modifier.semantics { contentDescription = "Show or hide grid reading guide" },
+            contentPadding = PaddingValues(horizontal = 5.dp, vertical = 2.dp)
+        ) {
+            Text("?", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Forest)
+        }
     }
 }
 
 @Composable
-private fun ObjectiveRibbon(step: Int, total: Int, active: GridCell?) {
+private fun ObjectiveRibbon(
+    step: Int, total: Int, active: GridCell?,
+    huntName: String, chapterFinished: Boolean
+) {
     val done = active == null
     Surface(
         color = Color(0xFFFFFBF1), shape = RoundedCornerShape(14.dp),
@@ -323,22 +429,51 @@ private fun ObjectiveRibbon(step: Int, total: Int, active: GridCell?) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    if (done) "EXPEDITION COMPLETE" else "FIND SQUARE  " + (step + 1) + " / " + total,
+                    when {
+                        chapterFinished -> "CHAPTER COMPLETE"
+                        done -> "HUNT COMPLETE"
+                        else -> "FIND SQUARE  " + (step + 1) + " / " + total
+                    },
                     fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Forest
                 )
                 Text(
-                    if (done) "All three sites found" else "Read east, then north",
-                    fontSize = 12.sp, color = Muted
+                    if (done) "Nice work. Survey recorded."
+                    else "East first, then north  ·  $huntName",
+                    fontSize = 11.sp, maxLines = 2, color = Muted
                 )
             }
             Text(
                 if (done) "✓" else active.reference,
-                fontSize = if (done) 32.sp else 33.sp, color = Ink,
-                fontWeight = FontWeight.ExtraBold
+                fontSize = if (done) 32.sp else 33.sp,
+                color = Ink, fontWeight = FontWeight.ExtraBold
             )
         }
     }
 }
+
+@Composable
+private fun GridReadingGuide(onDismiss: () -> Unit) {
+    Surface(
+        color = Color(0xFFE8EEDC),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "HOW TO PLAY · Read 24 on the bottom, then 37 on the side. " +
+                    "For 2437, tap the square above-right of their crossing. " +
+                    "Preview and Check; hints are free.",
+                fontSize = 11.sp, lineHeight = 14.sp, color = Ink,
+                modifier = Modifier.weight(1f)
+            )
+            TextButton(onClick = onDismiss) { Text("Got it", fontSize = 11.sp) }
+        }
+    }
+}
+
 
 @Composable
 private fun HuntMapPanel(
@@ -379,7 +514,8 @@ private fun HuntControlPanel(
     onUndo: () -> Unit,
     onHint: () -> Unit,
     onFit: () -> Unit,
-    onCheck: () -> Unit
+    onCheck: () -> Unit,
+    actionLabel: String
 ) {
     val notice = when {
         finished -> feedback
@@ -455,7 +591,7 @@ private fun HuntControlPanel(
         onClick = onCheck,
         colors = ButtonDefaults.buttonColors(containerColor = Forest)
     ) {
-        Text(if (finished) "New hunt  ↻" else "Check square", fontWeight = FontWeight.Bold)
+        Text(actionLabel, fontWeight = FontWeight.Bold)
     }
 }
 
