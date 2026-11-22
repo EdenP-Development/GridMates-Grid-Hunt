@@ -66,6 +66,7 @@ jobs:
             echo 'DO NOT install QA packages from unknown or untrusted sources.'
           } > INSTALL_NOTES.txt
           "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs GridHunt-GH02C-stable-QA.apk > SIGNER.txt
+          cat SIGNER.txt
           grep -Fq 'Signer #1 certificate SHA-256 digest: 0ff2e763e5667bdfda45aab662639ea6c1c7efa813f82cd4a5cdba8225febd52' SIGNER.txt
           # Do not publish an APK signed with the wrong identity.
           echo 'Expected stable public QA certificate fingerprint verified.'
