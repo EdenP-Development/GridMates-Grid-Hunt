@@ -166,3 +166,8 @@ Owner actually installed QA4 and completed three grid objectives but found dragg
 ## GH-V01 Vision Lab — visual foundation source (2026-11-22)
 
 [GH-V01 vision/playtest plan](vision/GH_V01_FOUNDATION_AND_PHONE_PLAYTEST.md) describes the new hub (First Bearings + Look Again), two switchable map treatments, optional completion vibration, progress UI and refactored Compose components. Underlying references/validators remain unchanged; local progress and fixed public QA test signing continue. Source alone is not phone verification. The immediate gate is **CI compile plus owner visual/A-B/interaction test**, before mass visual production or new puzzle modes.
+
+
+## GH-V01 Vision Lab QA22 verified (2026-11-22)
+
+[Vision Lab QA22 receipt](qa/GH_V01_VISION_LAB_QA22.md) verifies successful Android workflow, APK hash/signature, package and version, and compilation of three UI instrumentation scenarios (not run). The playtest hub and aesthetic A/B baseline are now ready for *owner evaluation*. This build is signed with the same public test-only QA certificate as QA15, so higher-code QA22 should update over QA15 without uninstalling; confirm on device. [Phone test guide](vision/GH_V01_FOUNDATION_AND_PHONE_PLAYTEST.md).

@@ -60,3 +60,8 @@ Earlier owner-installed QA builds demonstrated that the three-reference chapter 
 If owner approves the hub and overall flow, a **visual polish arc** can prioritize (1) consistent illustration language and a grid/map asset design bible, (2) richer but non-spoiling map features/decoration, (3) component-level typography, responsive layouts and contrast, (4) small correct-answer animation and optional short original sounds, (5) delightful small mission completion/stamp screen, before adding more modes and hundreds of puzzles.
 
 Never claim real-device pass from a green build or compiled UI instrumentation tests. **GH-V01 is a *playtest foundation*, not the final UI/art approval.**
+
+
+## QA22 verified build (2026-11-22)
+
+[QA22 source-matched receipt](../qa/GH_V01_VISION_LAB_QA22.md): GitHub run #22 SUCCESS, `:core:test` and Android app + UI-test *assembly* successful, certified QA APK SHA-256 `cb85b8b93d3c31f50389065b7ce996b13a0b662d2ddb74c52712f28818ea55ff`. APK can be downloaded [from this GitHub run](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45065901934/artifacts/14771287081). **No physical vision/playtest, UI instrumentation execution or install-over has yet been performed for QA22.**
