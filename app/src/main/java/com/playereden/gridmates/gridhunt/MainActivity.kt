@@ -11,6 +11,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroid
@@ -39,6 +40,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -68,6 +70,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
@@ -75,6 +78,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.ChapterPosition
 import com.playereden.gridhunt.core.FirstBearingsChapter
+import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.GridCell
 import com.playereden.gridhunt.core.GridReference
 import com.playereden.gridhunt.core.HuntRules
@@ -112,6 +116,16 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun GridHuntScreen() {
+    var reverseMode by rememberSaveable { mutableStateOf(false) }
+    if (reverseMode) {
+        ReversePracticeScreen(onBack = { reverseMode = false })
+    } else {
+        FirstBearingsScreen(onReverse = { reverseMode = true })
+    }
+}
+
+@Composable
+private fun FirstBearingsScreen(onReverse: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember(context) {
         context.getSharedPreferences("gridhunt_first_bearings_v1", Context.MODE_PRIVATE)
@@ -296,7 +310,8 @@ private fun GridHuntScreen() {
                     HuntHeader(
                         compact = true, huntName = hunt.name,
                         huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
-                        onGuide = { showGuide = !showGuide }
+                        onGuide = { showGuide = !showGuide },
+                        onReverse = onReverse
                     )
                     ObjectiveRibbon(
                         step = step, total = targets.size, active = active,
@@ -330,7 +345,8 @@ private fun GridHuntScreen() {
                 HuntHeader(
                     compact = false, huntName = hunt.name,
                     huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
-                    onGuide = { showGuide = !showGuide }
+                    onGuide = { showGuide = !showGuide },
+                    onReverse = onReverse
                 )
                 Spacer(Modifier.height(5.dp))
                 ObjectiveRibbon(
@@ -376,13 +392,234 @@ private fun GridHuntScreen() {
     }
 }
 
+
+@Composable
+private fun ReversePracticeScreen(onBack: () -> Unit) {
+    val context = LocalContext.current
+    val prefs = remember(context) {
+        context.getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
+    }
+    val targets = ReverseTraining.markers
+    var step by rememberSaveable {
+        mutableIntStateOf(prefs.getInt("step", 0).coerceIn(0, targets.size))
+    }
+    var answer by rememberSaveable {
+        mutableStateOf(prefs.getString("answer", "")?.take(4)?.filter { it in '0'..'9' } ?: "")
+    }
+    var hint by rememberSaveable { mutableIntStateOf(prefs.getInt("hint", 0).coerceIn(0, 2)) }
+    var feedback by rememberSaveable {
+        mutableStateOf("Read the gold survey marker's grid square. Enter its four digits.")
+    }
+    LaunchedEffect(step, answer, hint) {
+        prefs.edit().putInt("step", step).putString("answer", answer)
+            .putInt("hint", hint).apply()
+    }
+    val active = targets.getOrNull(step)
+    val finished = active == null
+    val bounds = WoodlandTrainingMap.bounds
+    var viewport by remember { mutableStateOf(IntSize.Zero) }
+    var camera by remember { mutableStateOf<MapCamera?>(null) }
+    var centerE by rememberSaveable { mutableStateOf(bounds.center.easting) }
+    var centerN by rememberSaveable { mutableStateOf(bounds.center.northing) }
+    var zoom by rememberSaveable { mutableStateOf(1.0) }
+
+    fun setCamera(next: MapCamera) {
+        camera = next
+        centerE = next.center.easting
+        centerN = next.center.northing
+        if (viewport.width > 80 && viewport.height > 80)
+            zoom = next.pixelsPerMeter /
+                MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble()).pixelsPerMeter
+    }
+    fun fit() {
+        if (viewport.width > 80 && viewport.height > 80)
+            setCamera(MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble()))
+    }
+    fun zoomBy(scale: Double) {
+        if (viewport.width > 80 && viewport.height > 80)
+            camera?.transform(
+                bounds, viewport.width.toDouble(), viewport.height.toDouble(),
+                PixelPoint(viewport.width / 2.0, viewport.height / 2.0),
+                PixelPoint(0.0, 0.0), scale
+            )?.let(::setCamera)
+    }
+    val resized: (IntSize) -> Unit = { size ->
+        if (size != viewport) {
+            viewport = size
+            if (size.width > 80 && size.height > 80) {
+                val fitCamera = MapCamera.fit(bounds, size.width.toDouble(), size.height.toDouble())
+                camera = MapCamera(WorldPoint(centerE, centerN), fitCamera.pixelsPerMeter * zoom)
+                    .transform(bounds, size.width.toDouble(), size.height.toDouble(),
+                        PixelPoint(size.width / 2.0, size.height / 2.0), PixelPoint(0.0, 0.0), 1.0)
+            }
+        }
+    }
+    val check: () -> Unit = {
+        if (finished) {
+            step = 0; answer = ""; hint = 0
+            feedback = "Reverse practice restarted. Read the gold survey point."
+            fit()
+        } else {
+            val target = active!!
+            if (ReverseTraining.check(target, answer)) {
+                step += 1
+                answer = ""
+                hint = 0
+                feedback = if (step == targets.size)
+                    "All five survey points recorded. Nice work!"
+                else "Correct! Now read the next marked point."
+            } else {
+                feedback = ReverseTraining.feedback(target, answer)
+            }
+        }
+    }
+    BoxWithConstraints(
+        Modifier.fillMaxSize().background(Paper)
+            .statusBarsPadding().navigationBarsPadding()
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        val wide = maxWidth > maxHeight
+        val controlsWidth = (maxWidth * 0.43f).coerceAtMost(340.dp)
+        if (wide) {
+            Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                HuntMapPanel(
+                    modifier = Modifier.weight(1f).fillMaxHeight(), bounds = bounds,
+                    camera = camera, selectedCell = null, completed = emptyList(),
+                    viewport = viewport, onViewport = resized, onCamera = ::setCamera,
+                    onSelect = {}, markerPoint = active?.point, enableSelect = false
+                )
+                Column(
+                    Modifier.width(controlsWidth).fillMaxHeight().verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    ReverseHeader(onBack)
+                    ReverseGoal(step, targets.size, active?.title)
+                    ReverseControls(
+                        answer, { answer = it.filter { c -> c in '0'..'9' }.take(4) },
+                        feedback, hint, finished, { hint = (hint + 1).coerceAtMost(2) },
+                        ::fit, ::zoomBy, check
+                    )
+                }
+            }
+        } else {
+            Column(Modifier.fillMaxSize()) {
+                ReverseHeader(onBack)
+                Spacer(Modifier.height(5.dp))
+                ReverseGoal(step, targets.size, active?.title)
+                Spacer(Modifier.height(6.dp))
+                HuntMapPanel(
+                    modifier = Modifier.fillMaxWidth().weight(1f), bounds = bounds,
+                    camera = camera, selectedCell = null, completed = emptyList(),
+                    viewport = viewport, onViewport = resized, onCamera = ::setCamera,
+                    onSelect = {}, markerPoint = active?.point, enableSelect = false
+                )
+                Spacer(Modifier.height(5.dp))
+                ReverseControls(
+                    answer, { answer = it.filter { c -> c in '0'..'9' }.take(4) },
+                    feedback, hint, finished, { hint = (hint + 1).coerceAtMost(2) },
+                    ::fit, ::zoomBy, check
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReverseHeader(onBack: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text("GRIDMATES / GRID HUNT", fontSize = 10.sp, color = Forest, fontWeight = FontWeight.Bold)
+            Text("Look Again", fontSize = 21.sp, color = Ink, fontWeight = FontWeight.Bold)
+            Text("REVERSE SURVEY · PRACTICE", fontSize = 10.sp, color = Muted)
+        }
+        Text("N ↑", fontSize = 16.sp, color = Forest)
+        TextButton(onClick = onBack) { Text("Chapter", fontSize = 12.sp) }
+    }
+}
+
+@Composable
+private fun ReverseGoal(step: Int, total: Int, title: String?) {
+    Surface(color = Color(0xFFFFFBF1), shape = RoundedCornerShape(14.dp)) {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 13.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(if (title == null) "PRACTICE COMPLETE" else "READ THE MARKER · " + (step + 1) + "/" + total,
+                    fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Forest)
+                Text(title ?: "All five points recorded", fontSize = 12.sp, color = Muted)
+            }
+            Text(if (title == null) "✓" else "?", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Ink)
+        }
+    }
+}
+
+@Composable
+private fun ReverseControls(
+    answer: String, onAnswer: (String) -> Unit,
+    feedback: String, hint: Int, finished: Boolean, onHint: () -> Unit,
+    onFit: () -> Unit, onZoom: (Double) -> Unit, onCheck: () -> Unit
+) {
+    Text(
+        if (finished) "Reverse practice complete" else "Find the gold point · Read west line, then south line",
+        color = Forest, fontWeight = FontWeight.SemiBold, fontSize = 12.sp
+    )
+    if (!finished) {
+        OutlinedTextField(
+            value = answer, onValueChange = onAnswer,
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true, label = { Text("Four-digit grid reference") },
+            placeholder = { Text("0000") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+    }
+    Text(
+        if (hint == 1 && !finished) "Hint: Read the easting line LEFT of the gold point."
+        else if (hint >= 2 && !finished) "Hint: Then read the northing line BELOW the gold point; keep 4 digits."
+        else feedback,
+        fontSize = 11.sp, color = Ink, lineHeight = 15.sp,
+        maxLines = 3, modifier = Modifier.fillMaxWidth().heightIn(min = 26.dp)
+    )
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        OutlinedButton(
+            onClick = onHint, enabled = !finished,
+            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) { Text("Hint") }
+        OutlinedButton(
+            onClick = { onZoom(1.6) },
+            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) { Text("+") }
+        OutlinedButton(
+            onClick = { onZoom(1.0 / 1.6) },
+            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) { Text("−") }
+        OutlinedButton(
+            onClick = onFit,
+            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) { Text("Fit") }
+    }
+    Button(
+        onClick = onCheck, enabled = finished || answer.length == 4,
+        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Forest)
+    ) { Text(if (finished) "Replay Reverse Practice" else "Check reference", fontWeight = FontWeight.Bold) }
+}
+
 @Composable
 private fun HuntHeader(
     compact: Boolean,
     huntName: String,
     huntNumber: Int,
     huntTotal: Int,
-    onGuide: () -> Unit
+    onGuide: () -> Unit,
+    onReverse: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -402,6 +639,10 @@ private fun HuntHeader(
             )
         }
         Text("N ↑", color = Forest, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        TextButton(
+            onClick = onReverse,
+            contentPadding = PaddingValues(horizontal = 3.dp, vertical = 2.dp)
+        ) { Text("Reverse", color = Forest, fontSize = 11.sp) }
         TextButton(
             onClick = onGuide,
             modifier = Modifier.semantics { contentDescription = "Show or hide grid reading guide" },
@@ -485,7 +726,9 @@ private fun HuntMapPanel(
     viewport: IntSize,
     onViewport: (IntSize) -> Unit,
     onCamera: (MapCamera) -> Unit,
-    onSelect: (String) -> Unit
+    onSelect: (String) -> Unit,
+    markerPoint: WorldPoint? = null,
+    enableSelect: Boolean = true
 ) {
     Box(
         modifier = modifier
@@ -496,7 +739,8 @@ private fun HuntMapPanel(
         TrainingMapCanvas(
             bounds = bounds, camera = camera, selectedCell = selectedCell,
             completed = completed, viewport = viewport, onViewport = onViewport,
-            onCamera = onCamera, onSelect = onSelect
+            onCamera = onCamera, onSelect = onSelect,
+            markerPoint = markerPoint, enableSelect = enableSelect
         )
     }
 }
@@ -616,19 +860,25 @@ private fun TrainingMapCanvas(
     viewport: IntSize,
     onViewport: (IntSize) -> Unit,
     onCamera: (MapCamera) -> Unit,
-    onSelect: (String) -> Unit
+    onSelect: (String) -> Unit,
+    markerPoint: WorldPoint? = null,
+    enableSelect: Boolean = true
 ) {
     // Stable pointer coroutine with fresh state. Capturing 'camera' directly in
     // a long-lived pointerInput(viewport) block can retain the initial null camera.
     val liveCamera by rememberUpdatedState(camera)
     val liveOnCamera by rememberUpdatedState(onCamera)
     val liveOnSelect by rememberUpdatedState(onSelect)
+    val liveEnableSelect by rememberUpdatedState(enableSelect)
     Canvas(
         modifier = Modifier
             .fillMaxSize()
             .onSizeChanged(onViewport)
             .semantics {
-                contentDescription = "Fictional north-up 6 by 6 training grid. Eastings right, northings up. Tap to select; drag to pan after zooming; pinch to zoom. Arrow controls offer a touch-free alternative."
+                contentDescription = if (enableSelect)
+                    "Fictional training grid. Tap a square to select; drag and pinch to navigate."
+                else
+                    "Reverse survey: read the four-digit reference of the marked gold point. Drag and pinch to navigate."
             }
             // A single event loop arbitrates between one-finger taps, drags and
             // two-finger transforms. Any multi-touch sequence can NEVER select a cell.
@@ -684,7 +934,7 @@ private fun TrainingMapCanvas(
                                     PixelPoint(lastTapPosition.x.toDouble(), lastTapPosition.y.toDouble()),
                                     viewport.width.toDouble(), viewport.height.toDouble()
                                 )
-                                if (point != null && bounds.contains(point)) {
+                                if (liveEnableSelect && point != null && bounds.contains(point)) {
                                     liveOnSelect(GridReference.format(point, 4))
                                 }
                             }
@@ -779,6 +1029,12 @@ private fun TrainingMapCanvas(
                 val side = (1000 * cam.pixelsPerMeter).toFloat()
                 drawRect(Color(0x66E8BD63), topLeft = tl, size = Size(side, side))
                 drawRect(Color(0xFFE1A947), topLeft = tl, size = Size(side, side), style = Stroke(3.8f))
+            }
+            markerPoint?.let { point ->
+                val center = p(point.easting, point.northing)
+                drawCircle(Color(0xFFFFF8E5), radius = 20f, center = center)
+                drawCircle(Color(0xFFBF8331), radius = 14f, center = center)
+                drawCircle(Color(0xFF244236), radius = 5f, center = center)
             }
         }
         // Separate axis rails prevent the 24/37 overlap seen at the SW corner.
