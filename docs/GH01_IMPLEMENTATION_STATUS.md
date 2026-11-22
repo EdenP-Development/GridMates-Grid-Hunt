@@ -43,3 +43,8 @@ Git commit SHA, workflow run ID and conclusion, core test run counts, compiled A
 ## QA6 touch repair after first actual device test — 2026-11-22
 
 Owner **did complete all three four-digit objectives on QA4** but reported dragging/pinching inconsistent and shared screenshots with map overlay and edge-label crowding. Tracked in [Issue #10](https://github.com/PlayerEden/GridMates-Grid-Hunt/issues/10). [QA6 receipt](qa/GH01_QA_RUN_6_GESTURE_FIX.md): CI run #6 successful, same 11 core tests invoked, APK SHA-256 verified. Gesture recognizers unified with up-to-date/synchronous camera state and map overlay removed. **QA6 physical gesture retest pending; not a confirmed fix.** The runner debug signing certificate changed; QA4 may need uninstall before QA6.
+
+
+## GH-02A follows QA6 phone feedback — 2026-11-22
+
+[GH-02A QA8 receipt](qa/GH02A_MAP_FIRST_QA8.md) documents the first map-first HUD redesign with successful automated Android build and verified debug artifact. Source and CI are real; **new portrait/landscape presentation has not been accepted by the owner**. The previously working three-target GH-01 logic and QA6 gesture engine were left intact. Next device test should validate map size, 4-digit answers, all controls, screen rotation and feedback before expanding into GH-02B.

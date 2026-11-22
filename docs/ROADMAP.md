@@ -76,3 +76,8 @@ Android/Compose skeleton and Kotlin grid engine, fixed three-target hunt UI, tes
 ## GH-01 first automated build milestone (2026-11-22)
 
 [Android Actions run #3](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45028853252) compiled the app, executed `:core:test`, packaged and signer-verified a debug APK, and uploaded the artifact. Exact receipt: [GH01_QA_RUN_3.md](qa/GH01_QA_RUN_3.md). **GH-01 is NOT accepted yet:** physical Android install/interaction/owner feedback remains outstanding; no emulator instrumentation test run yet. Further work must validate gesture arbitration and map usability before expanding content.
+
+
+## GH-02A Map-first interface — QA8 built (2026-11-22)
+
+Owner QA6 screenshots supported shifting GH-02 toward a **larger map and smaller objective chrome**. [GH-02A QA8 report](qa/GH02A_MAP_FIRST_QA8.md) documents the compact objective ribbon, weighted portrait map, landscape side panel, preserved gesture engine, successful Android compilation/coordinate tests and verified downloadable QA8 artifact. **No actual QA8 device visual/landscape test has occurred.** GH-02A awaits owner acceptance before GH-02B chapter missions and persisted progress. This section supersedes the old opening “all milestones planned” claim for GH-01/GH-02A only; broader roadmap milestones remain proposed.

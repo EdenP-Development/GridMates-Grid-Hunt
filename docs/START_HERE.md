@@ -146,3 +146,8 @@ The [GH-01 status](GH01_IMPLEMENTATION_STATUS.md) now links to [verified Android
 ## First owner QA feedback and QA6 candidate fix (2026-11-22)
 
 Owner actually installed QA4 and completed three grid objectives but found dragging and pinch zoom unreliable, and screenshots showed small map/overlapping labels. [Issue #10](https://github.com/PlayerEden/GridMates-Grid-Hunt/issues/10) remains open. [QA6 Android receipt](qa/GH01_QA_RUN_6_GESTURE_FIX.md) documents fresh touch-input arbitration, camera-state fixes, axis label improvements, passing CI and checksum-verified debug APK. **Owner QA6 phone retest is next, not story mode or content expansion.** Note different debug signature may require uninstall of QA4.
+
+
+## GH-02A — Map-first Android layout QA8 ready (2026-11-22)
+
+[GH-02A build receipt](qa/GH02A_MAP_FIRST_QA8.md) records source `f9c4f8e`, QA run #8 SUCCESS, compact objective ribbon, map-centered portrait design and landscape side panel. APK SHA-256 and debug signer were verified from artifact archive. **This version hasn't been visually or gesture-tested by the owner**; ask for screenshots/feedback before extending gameplay. Next suggested slice if accepted: GH-02B First Bearings curated chapter, onboarding and reliable progress/resume.
