@@ -94,3 +94,8 @@ The [GM05 source-backed report](research/GM05_CHAPTER_PROGRESSION_SPACED_PRACTIC
 ## GM06 story and discovery research note (2026-11-21)
 
 [GM06 micro-mission narrative report](research/GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md) recommends **prototyping** one-sentence map-grounded mission purposes, small optional discovery/stamp rewards, and a short cohesive end card while preserving the existing no-story puzzle baseline. Story wording must not give away canonical grid answers or invent geography. No journal, narrative assets, level content or player study has been implemented; user approval remains open. **Next GM07 Quick/Custom Hunt choice research.**
+
+
+## GM07 Quick vs Custom Hunt research note — 2026-11-21
+
+[GM07 report](research/GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md) proposes the same objective-validator engine for **Quick Hunt** (one-action, short, supported familiar tasks) and **Custom Hunt** (Mode, Length, Map, Challenge; optional more settings). Explicit Custom constraints should never be silently weakened when a combination is invalid. This is untested research, **not** an implemented menu or proof of preferred defaults. Next GM08 formal gameplay evaluation.

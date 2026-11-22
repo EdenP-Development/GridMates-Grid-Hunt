@@ -68,3 +68,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [GM05 — Chapters, spaced practice and skill transfer](docs/research/GM05_CHAPTER_PROGRESSION_SPACED_PRACTICE_AND_TRANSFER.md): source-backed progression hypothesis and proposed separate gameplay/retention/transfer tests; no implemented levels.
 
 - [GM06 — Environmental storytelling and mini-mission design](docs/research/GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md): researched mission templates, narrative/map consistency requirements and unrun A/B player tests; no story systems implemented.
+
+- [GM07 — Quick Hunt and Custom Hunt design research](docs/research/GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md): progressive settings, user agency and strict setup compatibility proposals, with unrun testing plans.

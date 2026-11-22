@@ -121,3 +121,8 @@ The owner asked to study *game rules, decisions and mechanics* more deeply inste
 ## GM06 research: story-light expeditions (2026-11-21)
 
 [GM06 mission themes and environmental storytelling](research/GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md) reviews map-driven storytelling, intrinsic gameplay integration and narrative distraction risks. Proposal: test a **one-sentence Mini Expedition** and optional discovery journal against a clean no-story puzzle, with the **same exact map and answers**. Research only: **no story system, illustrations, Android code or playtests built**. Next GM07 Quick vs Custom choices.
+
+
+## GM07 research — instant Quick, reliable Custom (2026-11-21)
+
+[GM07 Quick Hunt vs Custom Hunt research](research/GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md) proposes one-action Quick using supported familiar puzzle types; Custom Hunt with Mode, Length, Map and Challenge upfront and secondary controls on request. Crucially, Custom must **explain incompatible setups instead of silently replacing explicit choices**. Source-backed options and 20 planned test cases only; **no generator, presets, configuration UI, code or phone test built**. **Next GM08 structured gameplay playtesting research.**

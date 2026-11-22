@@ -164,3 +164,8 @@ Added [GM01–GM08 dedicated game-mechanics research](GAMEPLAY_MECHANICS_RESEARC
 ## GM06 game-story research progress (2026-11-21)
 
 [GM06 research](GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md) studies map-driven environmental storytelling vs learning attention. It proposes **tiny contextual Mini Expeditions**, an optional field journal, six content templates and safeguards against map-art answer leaks, subjective clues and required information trapped behind skippable story rewards. This is **unvalidated design research, not playable features**. **GM07 Quick/Custom Hunt user choice research is next**, with R07 seeded procedural mission generation still later.
+
+
+## GM07 Quick/Custom research (2026-11-21)
+
+[GM07](GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md) documents a **single validated hunt engine** behind both a one-action Quick entry and an optional deeply configurable Custom entry. Choice-overload findings are mixed; use progressive disclosure to simplify the novice path but keep meaningful agency. Invalid map/mode/count/precision combinations should get actionable explanations, not silently altered puzzle types. **No settings UI, generator or playtest implemented. GM08 playtest methodology next. R07 generator research remains separate and later.**
