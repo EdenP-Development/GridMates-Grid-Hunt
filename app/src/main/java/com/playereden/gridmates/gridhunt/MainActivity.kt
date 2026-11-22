@@ -7,6 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroid
@@ -14,18 +17,20 @@ import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -60,7 +65,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -106,16 +110,16 @@ private fun GridHuntScreen() {
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
     var hintStage by rememberSaveable { mutableIntStateOf(0) }
     var feedback by rememberSaveable {
-        mutableStateOf("Read RIGHT to the easting, then UP to the northing.")
+        mutableStateOf("Read right to the easting, then up to the northing.")
     }
+
     val finished = step >= targets.size
     val active = targets.getOrNull(step)
-    val selectedCell = selected?.let { GridReference.parse(it) }
+    val selectedCell = selected?.let(GridReference::parse)
+    val bounds = WoodlandTrainingMap.bounds
+
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
-    val bounds = WoodlandTrainingMap.bounds
-    // Persist the *world* viewpoint and relative zoom, not pixel coordinates,
-    // so rotation or a new viewport does not reset the user's map exploration.
     var savedCenterE by rememberSaveable { mutableStateOf(bounds.center.easting) }
     var savedCenterN by rememberSaveable { mutableStateOf(bounds.center.northing) }
     var savedZoom by rememberSaveable { mutableStateOf(1.0) }
@@ -125,8 +129,8 @@ private fun GridHuntScreen() {
         savedCenterE = next.center.easting
         savedCenterN = next.center.northing
         if (viewport.width > 80 && viewport.height > 80) {
-            val fit = MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble())
-            savedZoom = next.pixelsPerMeter / fit.pixelsPerMeter
+            savedZoom = next.pixelsPerMeter /
+                MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble()).pixelsPerMeter
         }
     }
 
@@ -137,187 +141,319 @@ private fun GridHuntScreen() {
     }
 
     fun zoomBy(factor: Double) {
-        if (viewport.width <= 0 || viewport.height <= 0) return
+        if (viewport.width <= 80 || viewport.height <= 80) return
         camera?.transform(
-            bounds = bounds, width = viewport.width.toDouble(), height = viewport.height.toDouble(),
-            centroid = PixelPoint(viewport.width / 2.0, viewport.height / 2.0),
-            pan = PixelPoint(0.0, 0.0), zoom = factor
+            bounds, viewport.width.toDouble(), viewport.height.toDouble(),
+            PixelPoint(viewport.width / 2.0, viewport.height / 2.0),
+            PixelPoint(0.0, 0.0), factor
         )?.let(::updateCamera)
     }
 
-    fun stepSelection(eastDelta: Int, northDelta: Int) {
+    fun moveSelected(eastDelta: Int, northDelta: Int) {
         if (finished) return
         val origin = selectedCell ?: GridCell(26, 40)
-        val east = (origin.eastIndex + eastDelta).coerceIn(24, 29)
-        val north = (origin.northIndex + northDelta).coerceIn(37, 42)
-        selected = GridCell(east, north).reference
-        feedback = "Selected " + selected + ". Check or change the square."
+        selected = GridCell(
+            (origin.eastIndex + eastDelta).coerceIn(24, 29),
+            (origin.northIndex + northDelta).coerceIn(37, 42)
+        ).reference
+        feedback = "Selected " + selected + ". Check or adjust the square."
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
+    val mapSizeChanged: (IntSize) -> Unit = { size ->
+        if (size != viewport) {
+            viewport = size
+            if (size.width > 80 && size.height > 80) {
+                val fit = MapCamera.fit(bounds, size.width.toDouble(), size.height.toDouble())
+                val desired = MapCamera(
+                    WorldPoint(savedCenterE, savedCenterN), fit.pixelsPerMeter * savedZoom
+                )
+                camera = desired.transform(
+                    bounds, size.width.toDouble(), size.height.toDouble(),
+                    PixelPoint(size.width / 2.0, size.height / 2.0),
+                    PixelPoint(0.0, 0.0), 1.0
+                )
+            }
+        }
+    }
+    val onMapSelect: (String) -> Unit = { ref ->
+        if (!finished) {
+            selected = ref
+            feedback = "Selected " + ref + ". Check or choose another square."
+        }
+    }
+
+    val onCheck: () -> Unit = {
+        if (finished) {
+            step = 0
+            selected = null
+            hintStage = 0
+            feedback = "Find three woodland grid squares. East first, then north."
+            resetView()
+        } else {
+            val expected = active!!
+            val attempt = selectedCell
+            if (attempt != null) {
+                if (HuntRules.isCorrect(expected, attempt)) {
+                    step += 1
+                    selected = null
+                    hintStage = 0
+                    feedback = if (step >= targets.size)
+                        "All three coordinates checked. Nice work!"
+                    else "Correct: " + expected.reference + ". Find the next square."
+                } else {
+                    feedback = HuntRules.errorText(expected, attempt)
+                }
+            }
+        }
+    }
+
+    val completed = targets.take(step.coerceIn(0, targets.size))
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize()
             .background(Paper)
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 14.dp, vertical = 8.dp)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
-        Text("GRIDMATES  /  GRID HUNT", color = Forest, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        val wide = maxWidth > maxHeight
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                HuntMapPanel(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    bounds = bounds,
+                    camera = camera,
+                    selectedCell = selectedCell,
+                    completed = completed,
+                    viewport = viewport,
+                    onViewport = mapSizeChanged,
+                    onCamera = ::updateCamera,
+                    onSelect = onMapSelect
+                )
+                Column(
+                    modifier = Modifier
+                        .width((maxWidth * 0.43f).coerceAtMost(340.dp))
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    HuntHeader(compact = true)
+                    ObjectiveRibbon(step = step, total = targets.size, active = active)
+                    HuntControlPanel(
+                        step = step, total = targets.size, selected = selected,
+                        feedback = feedback, hintStage = hintStage, finished = finished,
+                        onMove = ::moveSelected, onZoom = ::zoomBy,
+                        onUndo = {
+                            selected = null
+                            feedback = "Selection cleared. Choose another square."
+                        },
+                        onHint = { hintStage = (hintStage + 1).coerceAtMost(2) },
+                        onFit = ::resetView,
+                        onCheck = onCheck
+                    )
+                }
+            }
+        } else {
+            Column(modifier = Modifier.fillMaxSize()) {
+                HuntHeader(compact = false)
+                Spacer(Modifier.height(5.dp))
+                ObjectiveRibbon(step = step, total = targets.size, active = active)
+                Spacer(Modifier.height(6.dp))
+                HuntMapPanel(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    bounds = bounds,
+                    camera = camera,
+                    selectedCell = selectedCell,
+                    completed = completed,
+                    viewport = viewport,
+                    onViewport = mapSizeChanged,
+                    onCamera = ::updateCamera,
+                    onSelect = onMapSelect
+                )
+                Spacer(Modifier.height(4.dp))
+                HuntControlPanel(
+                    step = step, total = targets.size, selected = selected,
+                    feedback = feedback, hintStage = hintStage, finished = finished,
+                    onMove = ::moveSelected, onZoom = ::zoomBy,
+                    onUndo = {
+                        selected = null
+                        feedback = "Selection cleared. Choose another square."
+                    },
+                    onHint = { hintStage = (hintStage + 1).coerceAtMost(2) },
+                    onFit = ::resetView,
+                    onCheck = onCheck
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HuntHeader(compact: Boolean) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text("GRIDMATES / GRID HUNT", color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Text("First Bearings", color = Ink, fontSize = if (compact) 19.sp else 21.sp,
+                fontWeight = FontWeight.Bold, lineHeight = 24.sp)
+            Text("WOODLAND  ·  FICTIONAL TRAINING GRID", fontSize = 9.sp, color = Muted)
+        }
+        Text("N ↑", color = Forest, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+private fun ObjectiveRibbon(step: Int, total: Int, active: GridCell?) {
+    val done = active == null
+    Surface(
+        color = Color(0xFFFFFBF1), shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 2.dp, bottom = 7.dp),
+            modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
-                Text("First Bearings", fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Ink)
-                Text("Woodland training grid  ·  GH-01", fontSize = 12.sp, color = Muted)
-            }
-            Text("N  ↑", color = Forest, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        }
-        Surface(
-            color = Color(0xFFFFFBF1), shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(modifier = Modifier.padding(12.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    if (finished) "HUNT COMPLETE" else "FIND  •  " + (step + 1) + " OF " + targets.size,
-                    fontSize = 11.sp, color = Forest, fontWeight = FontWeight.Bold
+                    if (done) "EXPEDITION COMPLETE" else "FIND SQUARE  " + (step + 1) + " / " + total,
+                    fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Forest
                 )
                 Text(
-                    if (finished) "All three sites found!" else active!!.reference,
-                    color = Ink, fontSize = if (finished) 23.sp else 34.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Text(
-                    if (finished) "Nice work. Replay the same training round, or explore your map."
-                    else "Find the square · East first, then north.",
+                    if (done) "All three sites found" else "Read east, then north",
                     fontSize = 12.sp, color = Muted
                 )
             }
-        }
-        Spacer(modifier = Modifier.height(9.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .heightIn(min = 190.dp)
-                .clip(RoundedCornerShape(18.dp))
-                .border(2.dp, Color(0xFFA19D80), RoundedCornerShape(18.dp))
-                .background(Color(0xFFDADFCB))
-        ) {
-            TrainingMapCanvas(
-                bounds = bounds, camera = camera, selectedCell = selectedCell,
-                completed = targets.take(step.coerceAtMost(targets.size)),
-                viewport = viewport,
-                onViewport = { size ->
-                    if (size != viewport) {
-                        viewport = size
-                        if (size.width > 80 && size.height > 80) {
-                            val fit = MapCamera.fit(bounds, size.width.toDouble(), size.height.toDouble())
-                            val desired = MapCamera(
-                                WorldPoint(savedCenterE, savedCenterN),
-                                fit.pixelsPerMeter * savedZoom
-                            )
-                            camera = desired.transform(
-                                bounds, size.width.toDouble(), size.height.toDouble(),
-                                PixelPoint(size.width / 2.0, size.height / 2.0),
-                                PixelPoint(0.0, 0.0), 1.0
-                            )
-                        }
-                    }
-                },
-                onCamera = ::updateCamera,
-                onSelect = { reference ->
-                    if (!finished) {
-                        selected = reference
-                        feedback = "Selected " + reference + ". Check or change the square."
-                    }
-                }
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            "Tap a square · Drag to pan when zoomed · Pinch to zoom",
-            modifier = Modifier.fillMaxWidth(),
-            fontSize = 10.sp, color = Muted, textAlign = TextAlign.Center
-        )
-        Text(
-            if (finished) "Complete  •  3 / 3" else "Progress " + step + " / 3   ·   Selected: " + (selected ?: "—"),
-            fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Forest
-        )
-        Text(feedback, fontSize = 12.sp, color = Ink, modifier = Modifier.padding(vertical = 3.dp))
-        if (!finished && hintStage > 0) {
             Text(
-                if (hintStage == 1) "Hint: The first two digits name a vertical easting line. The last two name a horizontal northing line."
-                else "Hint: Find their crossing, then select the square immediately above and to the right.",
-                color = Forest, fontSize = 12.sp, modifier = Modifier.padding(bottom = 2.dp)
+                if (done) "✓" else active.reference,
+                fontSize = if (done) 32.sp else 33.sp, color = Ink,
+                fontWeight = FontWeight.ExtraBold
             )
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            GridStepButton("←", "Move selected square west") { stepSelection(-1, 0) }
-            GridStepButton("→", "Move selected square east") { stepSelection(1, 0) }
-            GridStepButton("↑", "Move selected square north") { stepSelection(0, 1) }
-            GridStepButton("↓", "Move selected square south") { stepSelection(0, -1) }
-            Spacer(modifier = Modifier.weight(1f))
-            GridStepButton("+", "Zoom in") { zoomBy(1.6) }
-            GridStepButton("−", "Zoom out") { zoomBy(1.0 / 1.6) }
-        }
-        Spacer(modifier = Modifier.height(5.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(
-                modifier = Modifier.weight(1f), contentPadding = PaddingValues(0.dp),
-                onClick = {
-                    selected = null
-                    feedback = "Selection cleared. Pick another square."
-                },
-                enabled = !finished
-            ) { Text("Undo", fontSize = 12.sp) }
-            OutlinedButton(
-                modifier = Modifier.weight(1f), contentPadding = PaddingValues(0.dp),
-                onClick = { hintStage = (hintStage + 1).coerceAtMost(2) },
-                enabled = !finished
-            ) { Text("Hint", fontSize = 12.sp) }
-            OutlinedButton(
-                modifier = Modifier.weight(1f), contentPadding = PaddingValues(0.dp),
-                onClick = ::resetView
-            ) { Text("Fit map", fontSize = 12.sp) }
-        }
-        Button(
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(top = 4.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Forest),
-            enabled = finished || selectedCell != null,
-            onClick = {
-                if (finished) {
-                    step = 0
-                    selected = null
-                    hintStage = 0
-                    feedback = "New training round. Read right, then up."
-                    resetView()
-                } else {
-                    val expected = active!!
-                    if (HuntRules.isCorrect(expected, selectedCell)) {
-                        step++
-                        selected = null
-                        hintStage = 0
-                        feedback = if (step == targets.size) "All coordinates checked. Well done!"
-                        else "Correct: " + expected.reference + ". Find the next square."
-                    } else {
-                        feedback = HuntRules.errorText(expected, selectedCell!!)
-                    }
-                }
-            }
-        ) {
-            Text(if (finished) "New hunt  ↻" else "Check square", fontWeight = FontWeight.Bold)
-        }
-        Text(
-            "Fictional MGRS-style practice  ·  Offline proof of concept",
-            modifier = Modifier.fillMaxWidth().padding(top = 3.dp),
-            fontSize = 9.sp, color = Muted, textAlign = TextAlign.Center
+    }
+}
+
+@Composable
+private fun HuntMapPanel(
+    modifier: Modifier,
+    bounds: WorldBounds,
+    camera: MapCamera?,
+    selectedCell: GridCell?,
+    completed: List<GridCell>,
+    viewport: IntSize,
+    onViewport: (IntSize) -> Unit,
+    onCamera: (MapCamera) -> Unit,
+    onSelect: (String) -> Unit
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .border(2.dp, Color(0xFF929D81), RoundedCornerShape(16.dp))
+            .background(Color(0xFFD1DFCF))
+    ) {
+        TrainingMapCanvas(
+            bounds = bounds, camera = camera, selectedCell = selectedCell,
+            completed = completed, viewport = viewport, onViewport = onViewport,
+            onCamera = onCamera, onSelect = onSelect
         )
+    }
+}
+
+@Composable
+private fun HuntControlPanel(
+    step: Int,
+    total: Int,
+    selected: String?,
+    feedback: String,
+    hintStage: Int,
+    finished: Boolean,
+    onMove: (Int, Int) -> Unit,
+    onZoom: (Double) -> Unit,
+    onUndo: () -> Unit,
+    onHint: () -> Unit,
+    onFit: () -> Unit,
+    onCheck: () -> Unit
+) {
+    val notice = when {
+        finished -> feedback
+        hintStage == 1 -> "Hint 1: First two digits are eastings; last two are northings."
+        hintStage >= 2 -> "Hint 2: Choose the square above-right of those grid lines."
+        else -> feedback
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            if (finished) "COMPLETE  " + total + " / " + total
+            else "FOUND  " + step + " / " + total,
+            color = Forest, fontWeight = FontWeight.Bold, fontSize = 12.sp
+        )
+        Text(
+            if (finished) "✓ ALL SITES" else "SELECTED  " + (selected ?: "—"),
+            color = Forest, fontSize = 12.sp, fontWeight = FontWeight.SemiBold
+        )
+    }
+    Text(
+        notice,
+        color = if (hintStage > 0 && !finished) Forest else Ink,
+        fontSize = 11.sp,
+        lineHeight = 15.sp,
+        maxLines = 3,
+        modifier = Modifier.fillMaxWidth().heightIn(min = 30.dp)
+    )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text("SELECT SQUARE", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
+        Text("ZOOM", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        GridStepButton("←", "Move selected square west") { onMove(-1, 0) }
+        GridStepButton("→", "Move selected square east") { onMove(1, 0) }
+        GridStepButton("↑", "Move selected square north") { onMove(0, 1) }
+        GridStepButton("↓", "Move selected square south") { onMove(0, -1) }
+        Spacer(Modifier.width(6.dp))
+        GridStepButton("+", "Zoom in") { onZoom(1.6) }
+        GridStepButton("−", "Zoom out") { onZoom(1.0 / 1.6) }
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        OutlinedButton(
+            onClick = onUndo, enabled = !finished,
+            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) { Text("Undo", fontSize = 12.sp) }
+        OutlinedButton(
+            onClick = onHint, enabled = !finished,
+            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) { Text("Hint", fontSize = 12.sp) }
+        OutlinedButton(
+            onClick = onFit,
+            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
+            contentPadding = PaddingValues(0.dp)
+        ) { Text("Fit map", fontSize = 12.sp) }
+    }
+    Button(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
+        enabled = finished || selected != null,
+        onClick = onCheck,
+        colors = ButtonDefaults.buttonColors(containerColor = Forest)
+    ) {
+        Text(if (finished) "New hunt  ↻" else "Check square", fontWeight = FontWeight.Bold)
     }
 }
 
