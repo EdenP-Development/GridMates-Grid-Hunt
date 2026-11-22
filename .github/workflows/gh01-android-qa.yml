@@ -1,6 +1,12 @@
 name: Grid Hunt Vision Lab QA
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'core/**'
+      - '.github/workflows/gh01-android-qa.yml'
   push:
     branches: [main]
     paths:
