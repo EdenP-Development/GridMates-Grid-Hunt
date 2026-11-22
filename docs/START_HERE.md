@@ -141,3 +141,8 @@ The [GH-01 status](GH01_IMPLEMENTATION_STATUS.md) now links to [verified Android
 ## GH-01 unattended QA pass #4 (2026-11-22)
 
 [QA run #4](qa/GH01_QA_RUN_4.md) passed `:core:test` (11 authored JUnit cases) and APK build. Camera re-fit after rotation and 48dp directional/zoom controls were improved in source. **Newest APK is debug QA run #4; run #3 may not install-over due to different signing certificates.** Still no emulator/device use or real player feedback. Continue with actual phone tests when practical; resist expanding maps or game modes beforehand.
+
+
+## First owner QA feedback and QA6 candidate fix (2026-11-22)
+
+Owner actually installed QA4 and completed three grid objectives but found dragging and pinch zoom unreliable, and screenshots showed small map/overlapping labels. [Issue #10](https://github.com/PlayerEden/GridMates-Grid-Hunt/issues/10) remains open. [QA6 Android receipt](qa/GH01_QA_RUN_6_GESTURE_FIX.md) documents fresh touch-input arbitration, camera-state fixes, axis label improvements, passing CI and checksum-verified debug APK. **Owner QA6 phone retest is next, not story mode or content expansion.** Note different debug signature may require uninstall of QA4.

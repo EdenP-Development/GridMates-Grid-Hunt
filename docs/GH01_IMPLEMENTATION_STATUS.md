@@ -38,3 +38,8 @@ Git commit SHA, workflow run ID and conclusion, core test run counts, compiled A
 ## Unattended quality pass after first APK (2026-11-22)
 
 [Run #4 QA receipt](qa/GH01_QA_RUN_4.md): source `92b11463`, 11 authored JVM unit tests executed via `:core:test`, Android `:app:assembleDebug` succeeded, artifact checksum and signer verified. Camera center/relative zoom are now saved across screen resize and the six direction/zoom controls are 48dp. **Physical phone/emulator instrumentation and force-stop persistence still not validated.** New debug signer differs from run #3; don't install over a differently signed APK. Owner phone testing remains the milestone gate.
+
+
+## QA6 touch repair after first actual device test — 2026-11-22
+
+Owner **did complete all three four-digit objectives on QA4** but reported dragging/pinching inconsistent and shared screenshots with map overlay and edge-label crowding. Tracked in [Issue #10](https://github.com/PlayerEden/GridMates-Grid-Hunt/issues/10). [QA6 receipt](qa/GH01_QA_RUN_6_GESTURE_FIX.md): CI run #6 successful, same 11 core tests invoked, APK SHA-256 verified. Gesture recognizers unified with up-to-date/synchronous camera state and map overlay removed. **QA6 physical gesture retest pending; not a confirmed fix.** The runner debug signing certificate changed; QA4 may need uninstall before QA6.
