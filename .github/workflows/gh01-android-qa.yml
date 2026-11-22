@@ -52,20 +52,20 @@ jobs:
           mkdir -p vision-qa-output
           cp app/build/outputs/apk/debug/app-debug.apk vision-qa-output/GridHunt-VisionLab-QA.apk
           cd vision-qa-output
-          sha256sum GridHunt-GH02C-stable-QA.apk > APK_SHA256.txt
+          sha256sum GridHunt-VisionLab-QA.apk > APK_SHA256.txt
           git -C .. rev-parse HEAD > SOURCE_SHA.txt
           {
             echo 'GridMates Grid Hunt - VISION LAB STABLE-SIGNED QA'
             echo 'Package: com.playereden.gridmates.gridhunt.qa'
             echo 'Package and version from built Android manifest:'
-            "${ANDROID_HOME}/build-tools/35.0.0/aapt" dump badging GridHunt-GH02C-stable-QA.apk | grep '^package:'
+            "${ANDROID_HOME}/build-tools/35.0.0/aapt" dump badging GridHunt-VisionLab-QA.apk | grep '^package:'
             echo 'Signer: PUBLIC, fixed test-only QA certificate (NOT a production signing key).'
             echo 'Future QA builds should install over this package when signed with the same key and a greater versionCode.'
             echo 'This is not a release-signed or phone-tested APK.'
             echo 'Uninstall older ephemeral-key QA10 and previous versions ONCE before this fixed-key QA build.'
             echo 'DO NOT install QA packages from unknown or untrusted sources.'
           } > INSTALL_NOTES.txt
-          "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs GridHunt-GH02C-stable-QA.apk > SIGNER.txt
+          "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs GridHunt-VisionLab-QA.apk > SIGNER.txt
           cat SIGNER.txt
           grep -Fq 'Signer #1 certificate SHA-256 digest: 0ff2e763e5667bdfda45aab662639ea6c1c7efa813f82cd4a5cdba8225febd52' SIGNER.txt
           # Do not publish an APK signed with the wrong identity.
