@@ -32,6 +32,17 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openChapter").assertExists()
     }
 
+    @Test fun mapLookSwitchKeepsBothPuzzlesOpen() {
+        compose.onNodeWithTag("openChapter").performClick()
+        compose.onNodeWithTag("mapLookToggle").assertExists().performClick()
+        compose.onNodeWithText("First Bearings").assertExists()
+        compose.onNodeWithTag("chapterHome").performClick()
+
+        compose.onNodeWithTag("openReverse").performClick()
+        compose.onNodeWithTag("mapLookToggle").assertExists().performClick()
+        compose.onNodeWithText("Look Again").assertExists()
+    }
+
     @Test fun visualMapChoiceIsReachable() {
         compose.onNodeWithTag("style_SURVEY_TABLE").performScrollTo().performClick()
         compose.onNodeWithTag("style_FIELD_GUIDE").assertExists()
