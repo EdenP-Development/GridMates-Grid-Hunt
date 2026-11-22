@@ -95,4 +95,52 @@ class GridMathTest {
             HuntRules.errorText(correct, GridReference.parse("2537"))
         )
     }
+
+    @Test fun viewportResizeKeepsSavedWorldViewAndZoom() {
+        val b = WoodlandTrainingMap.bounds
+        val firstWidth = 400.0
+        val firstHeight = 680.0
+        val original = MapCamera.fit(b, firstWidth, firstHeight)
+        val zoomed = original.transform(
+            b, firstWidth, firstHeight, PixelPoint(200.0, 340.0),
+            PixelPoint(0.0, 0.0), 2.5
+        )
+        val panned = zoomed.transform(
+            b, firstWidth, firstHeight, PixelPoint(200.0, 340.0),
+            PixelPoint(-28.0, 22.0), 1.0
+        )
+        val savedCenter = panned.center
+        val savedZoom = panned.pixelsPerMeter / original.pixelsPerMeter
+
+        val newWidth = 680.0
+        val newHeight = 400.0
+        val resizedFit = MapCamera.fit(b, newWidth, newHeight)
+        val restored = MapCamera(savedCenter, resizedFit.pixelsPerMeter * savedZoom)
+            .transform(b, newWidth, newHeight, PixelPoint(340.0, 200.0), PixelPoint(0.0, 0.0), 1.0)
+        assertEquals(savedZoom, restored.pixelsPerMeter / resizedFit.pixelsPerMeter, 1e-9)
+        // The center remains within visible map bounds even after rotation.
+        assertTrue(b.contains(restored.center))
+        val roundtrip = restored.screenToWorld(
+            restored.worldToScreen(savedCenter, newWidth, newHeight), newWidth, newHeight
+        )
+        assertEquals(savedCenter.easting, roundtrip.easting, 1e-8)
+        assertEquals(savedCenter.northing, roundtrip.northing, 1e-8)
+    }
+
+    @Test fun cameraDoesNotPanOutsideMapAtHighZoom() {
+        val b = WoodlandTrainingMap.bounds
+        val c = MapCamera.fit(b, 360.0, 580.0)
+            .transform(b, 360.0, 580.0, PixelPoint(180.0, 290.0), PixelPoint(0.0, 0.0), 4.0)
+        val extreme = c.transform(
+            b, 360.0, 580.0,
+            PixelPoint(180.0, 290.0), PixelPoint(100000.0, -100000.0), 1.0
+        )
+        val halfEast = (360.0 / extreme.pixelsPerMeter) / 2.0
+        val halfNorth = (580.0 / extreme.pixelsPerMeter) / 2.0
+        assertTrue(extreme.center.easting >= b.west + halfEast)
+        assertTrue(extreme.center.easting <= b.east - halfEast)
+        assertTrue(extreme.center.northing >= b.south + halfNorth)
+        assertTrue(extreme.center.northing <= b.north - halfNorth)
+    }
+
 }

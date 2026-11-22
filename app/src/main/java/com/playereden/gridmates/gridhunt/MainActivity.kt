@@ -112,20 +112,35 @@ private fun GridHuntScreen() {
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
     val bounds = WoodlandTrainingMap.bounds
+    // Persist the *world* viewpoint and relative zoom, not pixel coordinates,
+    // so rotation or a new viewport does not reset the user's map exploration.
+    var savedCenterE by rememberSaveable { mutableStateOf(bounds.center.easting) }
+    var savedCenterN by rememberSaveable { mutableStateOf(bounds.center.northing) }
+    var savedZoom by rememberSaveable { mutableStateOf(1.0) }
+
+    fun updateCamera(next: MapCamera) {
+        camera = next
+        savedCenterE = next.center.easting
+        savedCenterN = next.center.northing
+        if (viewport.width > 80 && viewport.height > 80) {
+            val fit = MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble())
+            savedZoom = next.pixelsPerMeter / fit.pixelsPerMeter
+        }
+    }
 
     fun resetView() {
         if (viewport.width > 80 && viewport.height > 80) {
-            camera = MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble())
+            updateCamera(MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble()))
         }
     }
 
     fun zoomBy(factor: Double) {
         if (viewport.width <= 0 || viewport.height <= 0) return
-        camera = camera?.transform(
+        camera?.transform(
             bounds = bounds, width = viewport.width.toDouble(), height = viewport.height.toDouble(),
             centroid = PixelPoint(viewport.width / 2.0, viewport.height / 2.0),
             pan = PixelPoint(0.0, 0.0), zoom = factor
-        )
+        )?.let(::updateCamera)
     }
 
     fun stepSelection(eastDelta: Int, northDelta: Int) {
@@ -196,11 +211,20 @@ private fun GridHuntScreen() {
                     if (size != viewport) {
                         viewport = size
                         if (size.width > 80 && size.height > 80) {
-                            camera = MapCamera.fit(bounds, size.width.toDouble(), size.height.toDouble())
+                            val fit = MapCamera.fit(bounds, size.width.toDouble(), size.height.toDouble())
+                            val desired = MapCamera(
+                                WorldPoint(savedCenterE, savedCenterN),
+                                fit.pixelsPerMeter * savedZoom
+                            )
+                            camera = desired.transform(
+                                bounds, size.width.toDouble(), size.height.toDouble(),
+                                PixelPoint(size.width / 2.0, size.height / 2.0),
+                                PixelPoint(0.0, 0.0), 1.0
+                            )
                         }
                     }
                 },
-                onCamera = { camera = it },
+                onCamera = ::updateCamera,
                 onSelect = { reference ->
                     if (!finished) {
                         selected = reference
@@ -238,7 +262,6 @@ private fun GridHuntScreen() {
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Nudge", color = Muted, fontSize = 11.sp)
             GridStepButton("←", "Move selected square west") { stepSelection(-1, 0) }
             GridStepButton("→", "Move selected square east") { stepSelection(1, 0) }
             GridStepButton("↑", "Move selected square north") { stepSelection(0, 1) }
@@ -306,7 +329,7 @@ private fun GridHuntScreen() {
 private fun GridStepButton(label: String, description: String, onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
-        modifier = Modifier.size(43.dp).semantics { contentDescription = description },
+        modifier = Modifier.size(48.dp).semantics { contentDescription = description },
         contentPadding = PaddingValues(0.dp),
         shape = RoundedCornerShape(9.dp)
     ) {
