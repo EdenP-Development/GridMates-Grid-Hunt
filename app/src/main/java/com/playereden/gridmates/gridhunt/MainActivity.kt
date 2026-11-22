@@ -136,11 +136,13 @@ private fun GridHuntScreen() {
         "chapter" -> FirstBearingsScreen(
             onHome = { screen = "home" },
             mapLook = mapLook,
+            onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled
         )
         "reverse" -> ReversePracticeScreen(
             onBack = { screen = "home" },
             mapLook = mapLook,
+            onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled
         )
         else -> GridHuntHome(
@@ -269,6 +271,7 @@ private fun GridHuntHome(
 private fun FirstBearingsScreen(
     onHome: () -> Unit,
     mapLook: MapLook,
+    onLook: (MapLook) -> Unit,
     hapticsEnabled: Boolean
 ) {
     val haptic = LocalHapticFeedback.current
@@ -457,6 +460,8 @@ private fun FirstBearingsScreen(
                     HuntHeader(
                         compact = true, huntName = hunt.name,
                         huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
+                        mapLook = mapLook,
+                        onLook = onLook,
                         onGuide = { showGuide = !showGuide },
                         onHome = onHome
                     )
@@ -492,6 +497,8 @@ private fun FirstBearingsScreen(
                 HuntHeader(
                     compact = false, huntName = hunt.name,
                     huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
+                    mapLook = mapLook,
+                    onLook = onLook,
                     onGuide = { showGuide = !showGuide },
                     onHome = onHome
                 )
