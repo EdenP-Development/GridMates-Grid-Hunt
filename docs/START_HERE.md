@@ -161,3 +161,8 @@ Owner actually installed QA4 and completed three grid objectives but found dragg
 ## GH-02C: new Reverse mode + repeatable QA update chain (2026-11-22)
 
 [GH-02C QA15 evidence](qa/GH02C_STABLE_UPDATE_QA15.md): 9 chapter square tasks + 5 fresh marked-point reverse-reference tasks, on-device state saving, 22 authored JVM test methods, successful CI and independently checked APK hashes. GitHub QA14/QA15 use identical public debug-only signature and package with increasing codes (10014→10015), intended to support install-over. **One uninstall needed from previous ephemeral-key QA builds, then future updates should preserve progress.** Test on Android before claiming compatibility. Public QA key is insecure and never suitable for production.
+
+
+## GH-V01 Vision Lab — visual foundation source (2026-11-22)
+
+[GH-V01 vision/playtest plan](vision/GH_V01_FOUNDATION_AND_PHONE_PLAYTEST.md) describes the new hub (First Bearings + Look Again), two switchable map treatments, optional completion vibration, progress UI and refactored Compose components. Underlying references/validators remain unchanged; local progress and fixed public QA test signing continue. Source alone is not phone verification. The immediate gate is **CI compile plus owner visual/A-B/interaction test**, before mass visual production or new puzzle modes.

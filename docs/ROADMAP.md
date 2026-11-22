@@ -91,3 +91,8 @@ Owner QA6 screenshots supported shifting GH-02 toward a **larger map and smaller
 ## GH-02C — fuller phone test and fixed QA update signing (2026-11-22)
 
 [GH-02C QA15 receipt](qa/GH02C_STABLE_UPDATE_QA15.md) documents an additional **Reverse Practice** mechanic with five fresh 4-digit map points; the prior 3×3 curated First Bearings sequence remains. Stable QA signing is supported by a **public throwaway key only**, never a release secret. CI runs #14 and #15 succeeded with **identical cert/package** and versionCode 10014→10015. Android install-over and resume/portrait/landscape gameplay still need physical verification. GH-03 precision and broader chapter content remain further milestones.
+
+
+## GH-V01 visual / game-feel foundation (2026-11-22)
+
+This [GH-V01 milestone](vision/GH_V01_FOUNDATION_AND_PHONE_PLAYTEST.md) is a controlled Android visual playtest hub and code architecture checkpoint, **not** GH-03 six-digit precision: two modes (9 authored map finds, 5 Reverse tasks), Field Guide / Survey Table palette comparison on identical real puzzles, optional haptic completion, more explicit progress and modular screen/rendering source. Android CI is being extended to **compile** Compose UI smoke tests; no actual emulator/phone instrumentation is implied. Owner acceptance is still required for art/readability/navigation/game feel.
