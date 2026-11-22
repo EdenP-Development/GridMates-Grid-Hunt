@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Paint
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,6 +39,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -69,6 +71,8 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.semantics.semantics
@@ -114,18 +118,173 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-private fun GridHuntScreen() {
-    var reverseMode by rememberSaveable { mutableStateOf(false) }
-    if (reverseMode) {
-        ReversePracticeScreen(onBack = { reverseMode = false })
-    } else {
-        FirstBearingsScreen(onReverse = { reverseMode = true })
+private enum class MapLook(val label: String, val detail: String) {
+    FIELD_GUIDE("Field Guide", "Warm paper, natural woodland tones"),
+    SURVEY_TABLE("Survey Table", "Cool drafting board, crisp grid");
+    companion object {
+        fun restore(name: String?): MapLook =
+            entries.firstOrNull { it.name == name } ?: FIELD_GUIDE
     }
 }
 
 @Composable
-private fun FirstBearingsScreen(onReverse: () -> Unit) {
+private fun GridHuntScreen() {
+    val context = LocalContext.current
+    val prefs = remember(context) {
+        context.getSharedPreferences("gridhunt_visual_lab_v1", Context.MODE_PRIVATE)
+    }
+    var screen by rememberSaveable { mutableStateOf("home") }
+    var lookName by rememberSaveable {
+        mutableStateOf(MapLook.restore(prefs.getString("map_look", null)).name)
+    }
+    var hapticsEnabled by rememberSaveable {
+        mutableStateOf(prefs.getBoolean("haptics", true))
+    }
+    val mapLook = MapLook.restore(lookName)
+    LaunchedEffect(lookName, hapticsEnabled) {
+        prefs.edit().putString("map_look", lookName)
+            .putBoolean("haptics", hapticsEnabled).apply()
+    }
+    BackHandler(enabled = screen != "home") { screen = "home" }
+
+    when (screen) {
+        "chapter" -> FirstBearingsScreen(
+            onHome = { screen = "home" },
+            mapLook = mapLook,
+            hapticsEnabled = hapticsEnabled
+        )
+        "reverse" -> ReversePracticeScreen(
+            onBack = { screen = "home" },
+            mapLook = mapLook,
+            hapticsEnabled = hapticsEnabled
+        )
+        else -> GridHuntHome(
+            mapLook = mapLook,
+            onLook = { lookName = it.name },
+            hapticsEnabled = hapticsEnabled,
+            onHaptics = { hapticsEnabled = it },
+            onChapter = { screen = "chapter" },
+            onReverse = { screen = "reverse" }
+        )
+    }
+}
+
+/** A small playtest hub, not a promise of all future modes. */
+@Composable
+private fun GridHuntHome(
+    mapLook: MapLook,
+    onLook: (MapLook) -> Unit,
+    hapticsEnabled: Boolean,
+    onHaptics: (Boolean) -> Unit,
+    onChapter: () -> Unit,
+    onReverse: () -> Unit
+) {
+    val context = LocalContext.current
+    val chapterPrefs = remember(context) {
+        context.getSharedPreferences("gridhunt_first_bearings_v1", Context.MODE_PRIVATE)
+    }
+    val reversePrefs = remember(context) {
+        context.getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
+    }
+    val chapterState = FirstBearingsChapter.restore(
+        chapterPrefs.getInt("hunt_index", 0), chapterPrefs.getInt("objective_index", 0)
+    )
+    val chapterCompleted = FirstBearingsChapter.hunts.take(chapterState.huntIndex)
+        .sumOf { it.objectives.size } + chapterState.objectiveIndex
+    val reverseCompleted = reversePrefs.getInt("step", 0).coerceIn(0, ReverseTraining.markers.size)
+
+    Column(
+        modifier = Modifier.fillMaxSize().background(Paper)
+            .statusBarsPadding().navigationBarsPadding()
+            .verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text("GRIDMATES  /  FIELD NOTES", fontWeight = FontWeight.Bold,
+            color = Forest, fontSize = 11.sp)
+        Text("Grid Hunt", fontWeight = FontWeight.ExtraBold,
+            color = Ink, fontSize = 34.sp)
+        Text("Good puzzles. Good company.", color = Muted, fontSize = 13.sp)
+        Surface(shape = RoundedCornerShape(18.dp), color = Color(0xFFDFE7D7)) {
+            Column(Modifier.fillMaxWidth().padding(16.dp)) {
+                Text("YOUR FIELD JOURNAL", fontWeight = FontWeight.Bold,
+                    color = Forest, fontSize = 10.sp)
+                Spacer(Modifier.height(5.dp))
+                Text("The woodland survey", fontWeight = FontWeight.SemiBold,
+                    color = Ink, fontSize = 20.sp)
+                Text("Find landmarks by reading the grid — no timer, no pressure.",
+                    fontSize = 12.sp, color = Muted)
+                Spacer(Modifier.height(9.dp))
+                Text("$chapterCompleted / 9 chapter squares  ·  $reverseCompleted / 5 reverse markers",
+                    fontSize = 12.sp, color = Forest, fontWeight = FontWeight.Medium)
+            }
+        }
+        Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFFBF1)) {
+            Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                Text("01   FIRST BEARINGS", color = Forest, fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold)
+                Text("Three short woodland hunts · 9 grid squares",
+                    fontSize = 12.sp, color = Muted)
+                Spacer(Modifier.height(7.dp))
+                Button(
+                    onClick = onChapter, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Forest)
+                ) { Text(if (chapterCompleted > 0) "Continue chapter" else "Start chapter") }
+            }
+        }
+        Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFFBF1)) {
+            Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                Text("02   LOOK AGAIN", color = Forest, fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold)
+                Text("Reverse practice · 5 marked locations, read the reference",
+                    fontSize = 12.sp, color = Muted)
+                Spacer(Modifier.height(7.dp))
+                OutlinedButton(onClick = onReverse,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)) {
+                    Text(if (reverseCompleted > 0) "Continue reverse practice" else "Try reverse practice")
+                }
+            }
+        }
+        Text("VISUAL PLAYTEST", color = Forest, fontSize = 11.sp,
+            fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+        Text("Compare two map treatments using the same real puzzle rules.",
+            fontSize = 12.sp, color = Muted)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            MapLook.entries.forEach { look ->
+                val chosen = mapLook == look
+                OutlinedButton(
+                    onClick = { onLook(look) },
+                    modifier = Modifier.weight(1f).heightIn(min = 64.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = if (chosen) Color(0xFFDDE7D6) else Color(0xFFFFFBF1)
+                    ),
+                    contentPadding = PaddingValues(6.dp)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(if (chosen) "✓  "+look.label else look.label,
+                            fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                        Text(if (look == MapLook.FIELD_GUIDE) "Warm" else "Cool",
+                            fontSize = 10.sp)
+                    }
+                }
+            }
+        }
+        OutlinedButton(
+            onClick = { onHaptics(!hapticsEnabled) },
+            modifier = Modifier.fillMaxWidth().heightIn(min = 46.dp)
+        ) {
+            Text("Completion vibration: " + if (hapticsEnabled) "On" else "Off")
+        }
+        Text("Design preview · Offline · Fictional grid · Progress saves on this device",
+            fontSize = 10.sp, color = Muted)
+    }
+}
+
+@Composable
+private fun FirstBearingsScreen(
+    onHome: () -> Unit,
+    mapLook: MapLook,
+    hapticsEnabled: Boolean
+) {
     val context = LocalContext.current
     val prefs = remember(context) {
         context.getSharedPreferences("gridhunt_first_bearings_v1", Context.MODE_PRIVATE)
@@ -311,7 +470,7 @@ private fun FirstBearingsScreen(onReverse: () -> Unit) {
                         compact = true, huntName = hunt.name,
                         huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
                         onGuide = { showGuide = !showGuide },
-                        onReverse = onReverse
+                        onHome = onHome
                     )
                     ObjectiveRibbon(
                         step = step, total = targets.size, active = active,
@@ -346,7 +505,7 @@ private fun FirstBearingsScreen(onReverse: () -> Unit) {
                     compact = false, huntName = hunt.name,
                     huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
                     onGuide = { showGuide = !showGuide },
-                    onReverse = onReverse
+                    onHome = onHome
                 )
                 Spacer(Modifier.height(5.dp))
                 ObjectiveRibbon(
@@ -394,7 +553,11 @@ private fun FirstBearingsScreen(onReverse: () -> Unit) {
 
 
 @Composable
-private fun ReversePracticeScreen(onBack: () -> Unit) {
+private fun ReversePracticeScreen(
+    onBack: () -> Unit,
+    mapLook: MapLook,
+    hapticsEnabled: Boolean
+) {
     val context = LocalContext.current
     val prefs = remember(context) {
         context.getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
@@ -536,7 +699,7 @@ private fun ReverseHeader(onBack: () -> Unit) {
             Text("REVERSE SURVEY · PRACTICE", fontSize = 10.sp, color = Muted)
         }
         Text("N ↑", fontSize = 16.sp, color = Forest)
-        TextButton(onClick = onBack) { Text("Chapter", fontSize = 12.sp) }
+        TextButton(onClick = onBack) { Text("Home", fontSize = 12.sp) }
     }
 }
 
@@ -619,7 +782,7 @@ private fun HuntHeader(
     huntNumber: Int,
     huntTotal: Int,
     onGuide: () -> Unit,
-    onReverse: () -> Unit
+    onHome: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -640,9 +803,9 @@ private fun HuntHeader(
         }
         Text("N ↑", color = Forest, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         TextButton(
-            onClick = onReverse,
+            onClick = onHome,
             contentPadding = PaddingValues(horizontal = 3.dp, vertical = 2.dp)
-        ) { Text("Reverse", color = Forest, fontSize = 11.sp) }
+        ) { Text("Home", color = Forest, fontSize = 11.sp) }
         TextButton(
             onClick = onGuide,
             modifier = Modifier.semantics { contentDescription = "Show or hide grid reading guide" },
