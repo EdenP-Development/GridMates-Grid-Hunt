@@ -1,0 +1,85 @@
+name: Grid Hunt QA22 to QA23 real emulator install-over
+
+# Exact archived APKs; no recomputation of earlier build, no uninstall and no key rotation.
+# Intentionally scoped, not run for every source commit; update pins when accepting a new baseline.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qa-install-over-emulator.yml'
+      - 'scripts/qa_update_emulator.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: gridhunt-qa22-to-qa23-emulator
+  cancel-in-progress: true
+
+jobs:
+  android-real-install-over:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: SDK build tools and Android 35 image prerequisites
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Download the EXACT archived owner QA22 APK
+        uses: actions/download-artifact@v4
+        with:
+          repository: PlayerEden/GridMates-Grid-Hunt
+          run-id: 45065901934
+          name: gridhunt-visionlab-22
+          path: prior-qa22
+          github-token: ${{ github.token }}
+      - name: Download the EXACT archived QA23 candidate
+        uses: actions/download-artifact@v4
+        with:
+          repository: PlayerEden/GridMates-Grid-Hunt
+          run-id: 45067543280
+          name: gridhunt-visionlab-23
+          path: candidate-qa23
+          github-token: ${{ github.token }}
+      - name: Compare archived actual APK certs, package, version and SHA-256
+        run: |
+          set -euo pipefail
+          mkdir -p update-evidence
+          python3 scripts/qa_update_preflight.py \
+            --baseline distribution/qa-update-baseline.json \
+            --previous prior-qa22/GridHunt-VisionLab-QA.apk \
+            --candidate candidate-qa23/GridHunt-VisionLab-QA.apk \
+            --aapt "$ANDROID_HOME/build-tools/35.0.0/aapt" \
+            --apksigner "$ANDROID_HOME/build-tools/35.0.0/apksigner" \
+            --expected-version-code 10023 \
+            --source-sha 6dc3f5c79ee6b9861ec43f83b8b5d03b19186812 \
+            --output update-evidence/preflight.json
+      - name: Enable emulator KVM acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install QA22, update to QA23, confirm saved data and launch
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_5
+          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -camera-back none -camera-front none
+          disable-animations: true
+          script: bash scripts/qa_update_emulator.sh
+      - name: Archive read-only evidence (never signing keys)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gridhunt-qa22-qa23-install-over-evidence
+          path: update-evidence/
+          if-no-files-found: warn
+          retention-days: 14
