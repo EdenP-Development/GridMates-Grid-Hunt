@@ -151,3 +151,8 @@ Owner actually installed QA4 and completed three grid objectives but found dragg
 ## GH-02A — Map-first Android layout QA8 ready (2026-11-22)
 
 [GH-02A build receipt](qa/GH02A_MAP_FIRST_QA8.md) records source `f9c4f8e`, QA run #8 SUCCESS, compact objective ribbon, map-centered portrait design and landscape side panel. APK SHA-256 and debug signer were verified from artifact archive. **This version hasn't been visually or gesture-tested by the owner**; ask for screenshots/feedback before extending gameplay. Next suggested slice if accepted: GH-02B First Bearings curated chapter, onboarding and reliable progress/resume.
+
+
+## GH-02B chapter QA10 awaiting phone test (2026-11-22)
+
+[QA10 build/verification report](qa/GH02B_FIRST_BEARINGS_CHAPTER_QA10.md): three short authored hunts (nine distinct coordinates), explicit Next Hunt/Replay Chapter and optional first-use guide, with saved hunt/objective/selection/hint state. [GH-02B QA10 GitHub artifact](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45059027122/artifacts/14768283897); core JVM tests and APK assembly passed, hash/version/signer verified. **Owner test not yet run**; install likely requires uninstall of QA8 owing to differing debug signer.

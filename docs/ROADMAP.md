@@ -81,3 +81,8 @@ Android/Compose skeleton and Kotlin grid engine, fixed three-target hunt UI, tes
 ## GH-02A Map-first interface — QA8 built (2026-11-22)
 
 Owner QA6 screenshots supported shifting GH-02 toward a **larger map and smaller objective chrome**. [GH-02A QA8 report](qa/GH02A_MAP_FIRST_QA8.md) documents the compact objective ribbon, weighted portrait map, landscape side panel, preserved gesture engine, successful Android compilation/coordinate tests and verified downloadable QA8 artifact. **No actual QA8 device visual/landscape test has occurred.** GH-02A awaits owner acceptance before GH-02B chapter missions and persisted progress. This section supersedes the old opening “all milestones planned” claim for GH-01/GH-02A only; broader roadmap milestones remain proposed.
+
+
+## GH-02B First Bearings mini-chapter — QA10 (2026-11-22)
+
+[QA10 evidence](qa/GH02B_FIRST_BEARINGS_CHAPTER_QA10.md) records source-implemented **three authored four-digit hunts** on one fictional woodland map, explicit Next Hunt/Replay Chapter progression, brief optional guide, and local on-device progress restore. Six additional chapter unit tests (17 authored combined) run under successful GitHub `:core:test` with an APK artifact. **Not yet confirmed physically:** chapter resume after process death, landscape readability, gestures through mission transitions, or whether nine squares feels enjoyable. This is a small content/persistence slice, **not the full GH-02 milestone acceptance**.

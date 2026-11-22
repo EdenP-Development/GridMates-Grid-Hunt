@@ -48,3 +48,8 @@ Owner **did complete all three four-digit objectives on QA4** but reported dragg
 ## GH-02A follows QA6 phone feedback — 2026-11-22
 
 [GH-02A QA8 receipt](qa/GH02A_MAP_FIRST_QA8.md) documents the first map-first HUD redesign with successful automated Android build and verified debug artifact. Source and CI are real; **new portrait/landscape presentation has not been accepted by the owner**. The previously working three-target GH-01 logic and QA6 gesture engine were left intact. Next device test should validate map size, 4-digit answers, all controls, screen rotation and feedback before expanding into GH-02B.
+
+
+## GH-02B QA10 gameplay beyond three-target demonstration (2026-11-22)
+
+[QA10 mini-chapter report](qa/GH02B_FIRST_BEARINGS_CHAPTER_QA10.md): three authored Hunts on the existing woodland map, saved local progression and an optional grid reading intro are implemented. 17 authored JUnit methods in `core` (11 grid/camera + 6 chapter); CI run #10 successful. APK source/hash/certificate verified. **Owner physical gameplay and resume remain pending**. User QA8 portrait screenshots confirm map-first layout improvement but not landscape or every gesture. This section supersedes earlier docs-only/still-three-target snapshots; no larger chapter content generation is implied.
