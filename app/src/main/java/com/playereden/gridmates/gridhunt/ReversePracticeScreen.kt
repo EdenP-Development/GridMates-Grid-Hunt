@@ -97,6 +97,7 @@ import com.playereden.gridhunt.core.WorldPoint
 internal fun ReversePracticeScreen(
     onBack: () -> Unit,
     mapLook: MapLook,
+    onLook: (MapLook) -> Unit,
     hapticsEnabled: Boolean
 ) {
     val haptic = LocalHapticFeedback.current
@@ -199,7 +200,7 @@ internal fun ReversePracticeScreen(
                     Modifier.width(controlsWidth).fillMaxHeight().verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    ReverseHeader(onBack)
+                    ReverseHeader(onBack, mapLook, onLook)
                     ReverseGoal(step, targets.size, active?.title)
                     ReverseControls(
                         answer, { answer = it.filter { c -> c in '0'..'9' }.take(4) },
@@ -210,7 +211,7 @@ internal fun ReversePracticeScreen(
             }
         } else {
             Column(Modifier.fillMaxSize()) {
-                ReverseHeader(onBack)
+                ReverseHeader(onBack, mapLook, onLook)
                 Spacer(Modifier.height(5.dp))
                 ReverseGoal(step, targets.size, active?.title)
                 Spacer(Modifier.height(6.dp))
@@ -233,7 +234,11 @@ internal fun ReversePracticeScreen(
 }
 
 @Composable
-private fun ReverseHeader(onBack: () -> Unit) {
+private fun ReverseHeader(
+    onBack: () -> Unit,
+    mapLook: MapLook,
+    onLook: (MapLook) -> Unit
+) {
     Row(
         Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -244,6 +249,7 @@ private fun ReverseHeader(onBack: () -> Unit) {
             Text("REVERSE SURVEY · PRACTICE", fontSize = 10.sp, color = Muted)
         }
         Text("N ↑", fontSize = 16.sp, color = Forest)
+        QuickMapLookButton(mapLook = mapLook, onLook = onLook)
         TextButton(onClick = onBack, modifier = Modifier.testTag("reverseHome")) {
             Text("Home", fontSize = 12.sp)
         }
