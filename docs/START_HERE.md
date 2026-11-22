@@ -171,3 +171,8 @@ Owner actually installed QA4 and completed three grid objectives but found dragg
 ## GH-V01 Vision Lab QA22 verified (2026-11-22)
 
 [Vision Lab QA22 receipt](qa/GH_V01_VISION_LAB_QA22.md) verifies successful Android workflow, APK hash/signature, package and version, and compilation of three UI instrumentation scenarios (not run). The playtest hub and aesthetic A/B baseline are now ready for *owner evaluation*. This build is signed with the same public test-only QA certificate as QA15, so higher-code QA22 should update over QA15 without uninstalling; confirm on device. [Phone test guide](vision/GH_V01_FOUNDATION_AND_PHONE_PLAYTEST.md).
+
+
+## Exact Android QA22→QA23 upgrade verified in emulator (2026-11-22)
+
+[Full update investigation/acceptance gate](qa/GH_QA22_TO_QA23_REAL_UPDATE_REHEARSAL.md). Archived QA22/QA23 binaries were installed sequentially using `adb install -r` on Android 35: **Success**, app launched, app-private canary and actual First Bearings SharedPreferences survived. Main CI now blocks wrong signer/version against pinned QA22 policy. The owner reported QA22 was rejected as an update on their phone, but prior installed version and exact error are unknown; **physical QA22→QA23 test remains open**. Retain the same public QA key for this test lineage only; plan separate private release signing.

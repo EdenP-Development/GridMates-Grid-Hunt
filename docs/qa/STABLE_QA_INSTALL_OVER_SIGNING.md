@@ -28,3 +28,8 @@ Do not rename/recreate the workflow or reset its run numbering without reviewing
 ## Verification update — QA14 and QA15 (2026-11-22)
 
 Two **successful** GitHub builds now provide direct signature/version evidence: [QA14](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45060724899) and [QA15](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45060871909). Both use certificate `0ff2e763e5667bdfda45aab662639ea6c1c7efa813f82cd4a5cdba8225febd52`, package `com.playereden.gridmates.gridhunt.qa`; versionCode rises **10014→10015**. Both APKs independently hash-verified. [Install-over checklist](GH02C_STABLE_UPDATE_QA15.md). **No actual phone install-over tested yet**. Do not promote the publicly available QA key to release signing.
+
+
+## First real install-over test succeeded on Android emulator (2026-11-22)
+
+[QA22→QA23 exact-binary emulator report](GH_QA22_TO_QA23_REAL_UPDATE_REHEARSAL.md) proves an actual Android 35 `adb install -r` upgrade, successful new app launch, and byte-identical chapter preferences/private canary before/after. [Run #1 evidence](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45067741823). **This does NOT prove the user's OEM Android installer behavior**; their initial QA22 update failure lacked the installed version/cert and error text. Same public QA test key retained to avoid another forced uninstall. For future production use a private signing key; do not use this public QA key.
