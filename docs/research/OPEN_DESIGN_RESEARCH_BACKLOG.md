@@ -169,3 +169,8 @@ Added [GM01–GM08 dedicated game-mechanics research](GAMEPLAY_MECHANICS_RESEARC
 ## GM07 Quick/Custom research (2026-11-21)
 
 [GM07](GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md) documents a **single validated hunt engine** behind both a one-action Quick entry and an optional deeply configurable Custom entry. Choice-overload findings are mixed; use progressive disclosure to simplify the novice path but keep meaningful agency. Invalid map/mode/count/precision combinations should get actionable explanations, not silently altered puzzle types. **No settings UI, generator or playtest implemented. GM08 playtest methodology next. R07 generator research remains separate and later.**
+
+
+## GM08 research complete; implementation evidence pending (2026-11-22)
+
+[GM08 report](GM08_PLAYTEST_EVIDENCE_AND_PROTOTYPE_DECISIONS.md) defines observed human and automated testing, four distinct evidence areas, a neutral [session script](GM08_FIRST_PHONE_PLAYTEST_SCRIPT.md), hard-stop bug categories and build/phone QA identity. **All GM01–GM08 topics are now documented but NOT validated, implemented or playtested.** Recommended next slice is **GH-01** with one map/three authentic four-digit area puzzles. R07 seeded generation remains separately open; game-first testing should precede mass content output.

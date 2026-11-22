@@ -126,3 +126,8 @@ The owner asked to study *game rules, decisions and mechanics* more deeply inste
 ## GM07 research — instant Quick, reliable Custom (2026-11-21)
 
 [GM07 Quick Hunt vs Custom Hunt research](research/GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md) proposes one-action Quick using supported familiar puzzle types; Custom Hunt with Mode, Length, Map and Challenge upfront and secondary controls on request. Crucially, Custom must **explain incompatible setups instead of silently replacing explicit choices**. Source-backed options and 20 planned test cases only; **no generator, presets, configuration UI, code or phone test built**. **Next GM08 structured gameplay playtesting research.**
+
+
+## All eight gameplay research topics documented — GM08, November 22, 2026
+
+[GM08 playtesting methodology](research/GM08_PLAYTEST_EVIDENCE_AND_PROTOTYPE_DECISIONS.md) and [one-page first Android session sheet](research/GM08_FIRST_PHONE_PLAYTEST_SCRIPT.md) close the GM01–GM08 research track *as documentation*. Separate canonical correctness, novice usability, enjoyment/replay and observed grid skill; no human test, APK, Kotlin engine or UI has been produced. **Recommended next tangible milestone: GH-01 tiny offline Android four-digit hunt and source-matched signed APK for owner playtest**, before a large procedural map/mission system. R07 seeded-generator research remains open.

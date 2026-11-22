@@ -62,3 +62,5 @@ These are research/design notes. None of the discussed libraries or code are cur
 - [GM06 — Small missions, environmental storytelling and discovery](GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md) — Jenkins/intrinsic-integration/story-attention evidence, six optional thematic mission templates, narrative-validity rules, A/B comparison, and 20 **unrun** QA scenarios. **GM07 next.**
 
 - [GM07 — Quick vs Custom Hunt settings and player agency](GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md) — primary Android/NNg sources, choice-overload/agency research, valid option combinations, three UX variants and 20 **unexecuted** test cases. **GM08 next.**
+
+- [GM08 — Game playtesting methods, evidence and next-build gate](GM08_PLAYTEST_EVIDENCE_AND_PROTOTYPE_DECISIONS.md) — research on observation/interviews, four evidence domains, exact build/source integrity, test error taxonomy and 20 **unexecuted** cases. [One-page Android test script](GM08_FIRST_PHONE_PLAYTEST_SCRIPT.md) ready for use when a real APK exists. **GM01–GM08 research complete; GH-01 prototype proposed next.**

@@ -15,7 +15,7 @@
 | **GM05** | P1 | How do levels build, revisit and combine skills for **continued practice**? | Skill layering, beginner-to-expert learning curve, retention and transfer test concepts | **Research documented; untested** |
 | **GM06** | P1 | What gives a mission a personality: theme, small story, discoveries or a collection? | Narrative wrappers with minimal reading and low authoring burden | **Research documented; untested** |
 | **GM07** | P1 | How much choice belongs in Quick Hunt and Custom Hunt? | Presets, valid options, compatible constraints, easy defaults | **Research documented; untested** |
-| **GM08** | P1 | How do actual playtests tell us if mechanics are enjoyable and fair? | Playtest protocol, observations, objective and experience acceptance criteria | **NEXT** |
+| **GM08** | P1 | How do actual playtests tell us if mechanics are enjoyable and fair? | Playtest protocol, observations, objective and experience acceptance criteria | **Research documented; untested** |
 
 **Sources to consult:** [MDA](https://aaai.org/papers/ws04-04-001-mda-a-formal-approach-to-game-design-and-game-research/), [Sicart mechanics](https://www.gamestudies.org/0802/articles/sicart/), [GameFlow](https://doi.org/10.1145/1077246.1077253), [2024 gameplay loop method](https://intellectdiscover.com/content/journals/10.1386/jgvw_00094_1), [Patrick's Parabox GDC design talk](https://www.gdcvault.com/play/1034415/System-Centric-Puzzle-Design-in), [player agency study](https://doi.org/10.1016/j.entcom.2024.100754).
 
@@ -37,3 +37,7 @@ No implemented code, player tests or app behavior are implied by this research t
 **GM06 report:** [Mission themes and environmental storytelling](GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md) source-backed narrative research, six reusable motifs and **unrun** validation/A-B tests. GM07 is next.
 
 **GM07 report:** [Quick vs Custom player choice](GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md) documents one-tap Quick, progressive Custom settings, mandatory compatibility checks and **20 unexecuted tests**. **GM08 next.**
+
+## Research complete / prototype gate (2026-11-22)
+
+[GM08 — Player research and prototype decisions](GM08_PLAYTEST_EVIDENCE_AND_PROTOTYPE_DECISIONS.md) plus the [first-phone session sheet](GM08_FIRST_PHONE_PLAYTEST_SCRIPT.md) document how to distinguish correctness, usability, enjoyment and learning observations; **all GM01–GM08 are research-only, untested**. Recommended next evidence: build a source-matched **GH-01 one-map three-reference Android prototype** and watch real players. [R07 seeded generation](OPEN_DESIGN_RESEARCH_BACKLOG.md) remains open as a separate research topic.

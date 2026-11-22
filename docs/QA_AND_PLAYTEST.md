@@ -47,3 +47,7 @@ For every candidate: source SHA, branch, Android package ID/version code, build 
 6. Note font/grid readability, finger occlusion, UI clutter, map aesthetics and anything frustrating.
 
 **Required release statement:** only claim the game is functional after a real device verifies the same build. Record failures as issues with repro, expected/actual and screenshot/video when available.
+
+## GM08 human gameplay evidence plan (2026-11-22)
+
+Use [full GM08 source-backed methods and quality gates](research/GM08_PLAYTEST_EVIDENCE_AND_PROTOTYPE_DECISIONS.md) and [single-session Android script](research/GM08_FIRST_PHONE_PLAYTEST_SCRIPT.md) after a source-matched GH-01 APK exists. Track **correctness, usability, fun/replay and demonstrated grid reasoning independently**; classify MATH/CONTENT/GESTURE/VISUAL/TEACHING/PUZZLE/FLOW/MOTIVATION/ACCESS/TECH issues before fixing them. The protocols are **not completed test evidence**.

@@ -99,3 +99,8 @@ The [GM05 source-backed report](research/GM05_CHAPTER_PROGRESSION_SPACED_PRACTIC
 ## GM07 Quick vs Custom Hunt research note — 2026-11-21
 
 [GM07 report](research/GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md) proposes the same objective-validator engine for **Quick Hunt** (one-action, short, supported familiar tasks) and **Custom Hunt** (Mode, Length, Map, Challenge; optional more settings). Explicit Custom constraints should never be silently weakened when a combination is invalid. This is untested research, **not** an implemented menu or proof of preferred defaults. Next GM08 formal gameplay evaluation.
+
+
+## GM08 research closure — planned GH-01 game proof (2026-11-22)
+
+[GM08 evaluation plan](research/GM08_PLAYTEST_EVIDENCE_AND_PROTOTYPE_DECISIONS.md) and [phone session script](research/GM08_FIRST_PHONE_PLAYTEST_SCRIPT.md) complete the eight-topic *research* track; not a functional build. Four independent checks: math/content truth, human usability, desire to replay and genuine use of map-reading reasoning. Recommended small first GH-01 Android proof: one map, three four-digit tasks, accurate area selection, undo/confirm, helpful feedback, actual owner phone test. **No code, APK, UI regression run or user observation has been done in this research task.**

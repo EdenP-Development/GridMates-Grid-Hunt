@@ -70,3 +70,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [GM06 — Environmental storytelling and mini-mission design](docs/research/GM06_MISSION_THEMES_AND_ENVIRONMENTAL_STORYTELLING.md): researched mission templates, narrative/map consistency requirements and unrun A/B player tests; no story systems implemented.
 
 - [GM07 — Quick Hunt and Custom Hunt design research](docs/research/GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md): progressive settings, user agency and strict setup compatibility proposals, with unrun testing plans.
+
+- [GM08 — Playtest evidence and decision gates](docs/research/GM08_PLAYTEST_EVIDENCE_AND_PROTOTYPE_DECISIONS.md): four separate evaluation domains, controlled tests, error taxonomy and source-matched phone QA plan. [First phone session sheet](docs/research/GM08_FIRST_PHONE_PLAYTEST_SCRIPT.md) included. **Neither is executed.**
