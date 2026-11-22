@@ -71,3 +71,8 @@ Map renderer/SDK comparison, viewport math, offline map formats/rights and coord
 ## GH-01 implementation started (2026-11-22)
 
 Android/Compose skeleton and Kotlin grid engine, fixed three-target hunt UI, test source and Android QA workflow are now committed. The milestone remains **not accepted** until real GitHub CI results, an installable APK, and owner physical phone results are documented. [Source-vs-evidence report](GH01_IMPLEMENTATION_STATUS.md). R07 remains open; do not generate masses of objectives before validating the first experience.
+
+
+## GH-01 first automated build milestone (2026-11-22)
+
+[Android Actions run #3](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45028853252) compiled the app, executed `:core:test`, packaged and signer-verified a debug APK, and uploaded the artifact. Exact receipt: [GH01_QA_RUN_3.md](qa/GH01_QA_RUN_3.md). **GH-01 is NOT accepted yet:** physical Android install/interaction/owner feedback remains outstanding; no emulator instrumentation test run yet. Further work must validate gesture arbitration and map usability before expanding content.

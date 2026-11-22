@@ -1,7 +1,7 @@
 # GH-01 — First Playable Android Slice
 
 **Started:** 2026-11-22  
-**Status:** CODE IMPLEMENTED ON MAIN; CI/build/device evidence MUST be checked independently. Do not infer a passing test or APK from source commit alone.  
+**Status:** GH-01 source and **CI-built debug APK verified** as of [run #3](qa/GH01_QA_RUN_3.md). **No emulator instrumentation or owner physical-phone test yet.**  
 **Scope:** one offline fictional north-up 6×6 km woodland grid and three 4-digit coordinate tasks.
 
 ## Implemented in source
@@ -28,3 +28,8 @@ Git commit SHA, workflow run ID and conclusion, core test run counts, compiled A
 2. Source matched sideload APK installs on Android in airplane mode.
 3. Actual owner check: plotting at boundaries, N/E order, pinch/pan ghost taps, selection recovery, readability, hints, replay, background/resume, portrait/landscape.
 4. Observe actual enjoyment and desire for another hunt before making many generated levels.
+
+
+## First successful build evidence — 2026-11-22
+
+[GH-01 Run #3 full receipt](qa/GH01_QA_RUN_3.md): built source `6b65a1a`, Gradle `:core:test` (nine authored JUnit methods) and `:app:assembleDebug` successful, APK SHA-256 `0c3c00dea6ff06fe46941765859da7a7b4bcbdbdff48430b433c650b5a54ae50`, signer certificate `f1cfce66e90b0de77aa45dba8aa503ecfe1585b7440979afc182985546294f59`. [GitHub artifact ZIP](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45028853252/artifacts/14756424559). **Physical Android acceptance remains pending.**

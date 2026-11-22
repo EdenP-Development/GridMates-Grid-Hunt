@@ -1,6 +1,6 @@
 # GridMates: Grid Hunt
 
-**Status: GH-01 source implementation in progress — November 22, 2026.** Native Android and pure Kotlin coordinate-game source now exists; **build/CI/APK installation and player enjoyment remain separate unverified milestones until tested**.
+**Status: GH-01 Android debug build passed CI — November 22, 2026.** The pure Kotlin coordinate engine and native Compose game code have compiled, **nine authored core JUnit tests ran**, and a debug-signed APK artifact was uploaded. **Physical Android installation, gameplay feel and accessibility remain untested by the owner.**
 
 **Premise:** A welcoming, offline-first map-grid puzzle hunt that teaches transferable land-navigation habits through play. Find grid references on illustrated maps, reverse-read coordinates from landmarks, and eventually complete multi-step hunts. Fun first; technically honest coordinate rules underneath.
 
@@ -79,3 +79,8 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [GH-01 actual implementation status and limits](docs/GH01_IMPLEMENTATION_STATUS.md).
 - [Android source](app/src/main/java/com/playereden/gridmates/gridhunt/MainActivity.kt), [pure Kotlin grid engine](core/src/main/kotlin/com/playereden/gridhunt/core/GridMath.kt) and [grid tests](core/src/test/kotlin/com/playereden/gridhunt/core/GridMathTest.kt).
 - [GH-01 Android Actions workflow](.github/workflows/gh01-android-qa.yml): runs core JVM tests and, if successful, uploads a debug-signed QA APK with SHA/source/signer evidence. **The debug signing identity may change between runs**; don't claim install-over compatibility or production signing.
+
+
+### First GH-01 APK (debug QA)
+
+[Download APK archive from successful GitHub Actions run #3](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45028853252/artifacts/14756424559) · [Full build receipt (source SHA, APK hash, signing certificate)](docs/qa/GH01_QA_RUN_3.md). This is **debug-signed per GitHub runner** and may not install over a later differently signed QA build; no physical phone testing yet.

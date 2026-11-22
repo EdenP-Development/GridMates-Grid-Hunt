@@ -131,3 +131,8 @@ The owner asked to study *game rules, decisions and mechanics* more deeply inste
 ## All eight gameplay research topics documented — GM08, November 22, 2026
 
 [GM08 playtesting methodology](research/GM08_PLAYTEST_EVIDENCE_AND_PROTOTYPE_DECISIONS.md) and [one-page first Android session sheet](research/GM08_FIRST_PHONE_PLAYTEST_SCRIPT.md) close the GM01–GM08 research track *as documentation*. Separate canonical correctness, novice usability, enjoyment/replay and observed grid skill; no human test, APK, Kotlin engine or UI has been produced. **Recommended next tangible milestone: GH-01 tiny offline Android four-digit hunt and source-matched signed APK for owner playtest**, before a large procedural map/mission system. R07 seeded-generator research remains open.
+
+
+## GH-01 actual build: first QA APK ready, not phone-tested (2026-11-22)
+
+The [GH-01 status](GH01_IMPLEMENTATION_STATUS.md) now links to [verified Android QA run #3 receipt](qa/GH01_QA_RUN_3.md). Source built at `6b65a1a`, `:core:test` and `:app:assembleDebug` succeeded, signed debug APK archived with checksum and cert. **Next: install and review on physical Android** before calling the prototype accepted or scaling maps. This is the first implemented gameplay code; it supersedes older statements in this file that the repo is docs-only.
