@@ -364,6 +364,9 @@ private fun TrainingMapCanvas(
                     var transformed = false
                     var usedMultipleFingers = false
                     var accumulatedPan = Offset.Zero
+                    // Keep a synchronous camera during rapid pointer events. Compose
+                    // recomposition may not publish the new camera by the next frame.
+                    var gestureCamera = liveCamera
                     var lastTapPosition = down.position
                     var canceled = false
                     do {
@@ -379,19 +382,19 @@ private fun TrainingMapCanvas(
                             accumulatedPan.getDistance() > viewConfiguration.touchSlop
                         ) transformed = true
 
-                        val current = liveCamera
+                        val current = gestureCamera
                         if (transformed && current != null &&
                             viewport.width > 0 && viewport.height > 0 &&
                             (pan != Offset.Zero || zoom != 1f)
                         ) {
-                            liveOnCamera(
-                                current.transform(
-                                    bounds, viewport.width.toDouble(), viewport.height.toDouble(),
-                                    PixelPoint(centroid.x.toDouble(), centroid.y.toDouble()),
-                                    PixelPoint(pan.x.toDouble(), pan.y.toDouble()),
-                                    zoom.toDouble()
-                                )
+                            val next = current.transform(
+                                bounds, viewport.width.toDouble(), viewport.height.toDouble(),
+                                PixelPoint(centroid.x.toDouble(), centroid.y.toDouble()),
+                                PixelPoint(pan.x.toDouble(), pan.y.toDouble()),
+                                zoom.toDouble()
                             )
+                            gestureCamera = next
+                            liveOnCamera(next)
                             event.changes.forEach { it.consume() }
                         }
 
