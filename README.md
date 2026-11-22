@@ -84,3 +84,5 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 ### First GH-01 APK (debug QA)
 
 [Download APK archive from successful GitHub Actions run #3](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45028853252/artifacts/14756424559) · [Full build receipt (source SHA, APK hash, signing certificate)](docs/qa/GH01_QA_RUN_3.md). This is **debug-signed per GitHub runner** and may not install over a later differently signed QA build; no physical phone testing yet.
+
+- [GH-01 unattended QA pass #4](docs/qa/GH01_QA_RUN_4.md) — 11 core unit tests, camera/rotation state and 48dp control improvements, successful Android build, verified artifact, and outstanding physical-device validation. **New debug signer differs from #3; uninstall older QA before installing.**

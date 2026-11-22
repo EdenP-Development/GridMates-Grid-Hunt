@@ -136,3 +136,8 @@ The owner asked to study *game rules, decisions and mechanics* more deeply inste
 ## GH-01 actual build: first QA APK ready, not phone-tested (2026-11-22)
 
 The [GH-01 status](GH01_IMPLEMENTATION_STATUS.md) now links to [verified Android QA run #3 receipt](qa/GH01_QA_RUN_3.md). Source built at `6b65a1a`, `:core:test` and `:app:assembleDebug` succeeded, signed debug APK archived with checksum and cert. **Next: install and review on physical Android** before calling the prototype accepted or scaling maps. This is the first implemented gameplay code; it supersedes older statements in this file that the repo is docs-only.
+
+
+## GH-01 unattended QA pass #4 (2026-11-22)
+
+[QA run #4](qa/GH01_QA_RUN_4.md) passed `:core:test` (11 authored JUnit cases) and APK build. Camera re-fit after rotation and 48dp directional/zoom controls were improved in source. **Newest APK is debug QA run #4; run #3 may not install-over due to different signing certificates.** Still no emulator/device use or real player feedback. Continue with actual phone tests when practical; resist expanding maps or game modes beforehand.

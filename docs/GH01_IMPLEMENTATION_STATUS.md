@@ -33,3 +33,8 @@ Git commit SHA, workflow run ID and conclusion, core test run counts, compiled A
 ## First successful build evidence — 2026-11-22
 
 [GH-01 Run #3 full receipt](qa/GH01_QA_RUN_3.md): built source `6b65a1a`, Gradle `:core:test` (nine authored JUnit methods) and `:app:assembleDebug` successful, APK SHA-256 `0c3c00dea6ff06fe46941765859da7a7b4bcbdbdff48430b433c650b5a54ae50`, signer certificate `f1cfce66e90b0de77aa45dba8aa503ecfe1585b7440979afc182985546294f59`. [GitHub artifact ZIP](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45028853252/artifacts/14756424559). **Physical Android acceptance remains pending.**
+
+
+## Unattended quality pass after first APK (2026-11-22)
+
+[Run #4 QA receipt](qa/GH01_QA_RUN_4.md): source `92b11463`, 11 authored JVM unit tests executed via `:core:test`, Android `:app:assembleDebug` succeeded, artifact checksum and signer verified. Camera center/relative zoom are now saved across screen resize and the six direction/zoom controls are 48dp. **Physical phone/emulator instrumentation and force-stop persistence still not validated.** New debug signer differs from run #3; don't install over a differently signed APK. Owner phone testing remains the milestone gate.
