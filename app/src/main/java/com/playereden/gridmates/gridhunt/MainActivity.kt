@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -216,6 +217,7 @@ private fun GridHuntScreen() {
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         val wide = maxWidth > maxHeight
+        val sidePanelWidth = (maxWidth * 0.43f).coerceAtMost(340.dp)
         if (wide) {
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -234,7 +236,7 @@ private fun GridHuntScreen() {
                 )
                 Column(
                     modifier = Modifier
-                        .width((maxWidth * 0.43f).coerceAtMost(340.dp))
+                        .width(sidePanelWidth)
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(5.dp)
