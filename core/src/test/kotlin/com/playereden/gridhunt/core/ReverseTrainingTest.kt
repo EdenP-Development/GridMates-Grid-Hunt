@@ -6,7 +6,7 @@ import org.junit.Test
 class ReverseTrainingTest {
     @Test fun allMarkersHaveUniqueCanonicalAnswers() {
         assertEquals(5, ReverseTraining.markers.size)
-        assertEquals(listOf("2437", "2539", "2741", "2838", "2940"),
+        assertEquals(listOf("2440", "2742", "2838", "2541", "2942"),
             ReverseTraining.markers.map { it.cell.reference })
     }
 
@@ -17,23 +17,23 @@ class ReverseTrainingTest {
 
     @Test fun exactFourDigitResponsesRequired() {
         val cabin = ReverseTraining.markers.first()
-        assertTrue(ReverseTraining.check(cabin, "2437"))
+        assertTrue(ReverseTraining.check(cabin, "2440"))
         assertFalse(ReverseTraining.check(cabin, "243"))
         assertFalse(ReverseTraining.check(cabin, "02437"))
-        assertFalse(ReverseTraining.check(cabin, "2438"))
+        assertFalse(ReverseTraining.check(cabin, "2441"))
         assertFalse(ReverseTraining.check(cabin, "24 7"))
         assertFalse(ReverseTraining.check(cabin, "abcd"))
     }
 
     @Test fun mistakenAxisGetsActionableCorrection() {
-        val bridge = ReverseTraining.markers[1]
+        val markerB = ReverseTraining.markers[1]
         assertEquals(
             "Right easting. Check the northing going up the map.",
-            ReverseTraining.feedback(bridge, "2538")
+            ReverseTraining.feedback(markerB, "2741")
         )
         assertEquals(
             "Right northing. Check the easting along the bottom.",
-            ReverseTraining.feedback(bridge, "2639")
+            ReverseTraining.feedback(markerB, "2842")
         )
     }
 
