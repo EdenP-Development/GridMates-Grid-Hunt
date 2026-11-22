@@ -1,6 +1,6 @@
 # GridMates: Grid Hunt
 
-**Status: PRE-PRODUCTION / DESIGN ONLY — November 21, 2026.** This repository currently contains planning and research documents; it does **not** contain a playable Android game, validated puzzle engine, or APK.
+**Status: GH-01 source implementation in progress — November 22, 2026.** Native Android and pure Kotlin coordinate-game source now exists; **build/CI/APK installation and player enjoyment remain separate unverified milestones until tested**.
 
 **Premise:** A welcoming, offline-first map-grid puzzle hunt that teaches transferable land-navigation habits through play. Find grid references on illustrated maps, reverse-read coordinates from landmarks, and eventually complete multi-step hunts. Fun first; technically honest coordinate rules underneath.
 
@@ -27,7 +27,7 @@
 - **Make the map usable:** readable labels, generous touch targets, zoom/pan, and an uncluttered play screen.
 - **Respect separate apps:** no shared package identifiers, secrets, saves or assumed drop-in Sudoku/Word Search engine.
 
-**Next implementation target:** an isolated native Android proof-of-concept that renders one deterministic training grid and accepts/verifies three four-digit square selections. See [GH-01](docs/ROADMAP.md).
+**Current implementation target:** verify the first GH-01 native Android proof-of-concept (one fixed fictional grid, three validated four-digit reference tasks). See [implementation status](docs/GH01_IMPLEMENTATION_STATUS.md) and [CI workflow](.github/workflows/gh01-android-qa.yml). **A GitHub commit alone is not a working APK or phone test.**
 
 ## Research library (2026-11-21)
 
@@ -35,7 +35,7 @@
 - [2010 UK military map-reading manual — annotated source review](docs/research/MILITARY_MAP_READING_2010_SOURCE_NOTES.md) — page-linked insights from the owner-provided 44-page reference.
 - [Skill-to-puzzle matrix](docs/research/SKILL_TO_PUZZLE_MATRIX.md) — how real map-reading techniques become game objectives.
 
-The full source PDF is **linked, not republished**, because it contains third-party Ordnance Survey maps requiring a separate rights check. No PDF figures or map images have been imported. The game remains in the **design** stage.
+The full source PDF is **linked, not republished**, because it contains third-party Ordnance Survey maps requiring a separate rights check. No PDF figures or map images have been imported. The first GH-01 code has been added; narrative/art/gameplay expansions remain design proposals.
 
 
 ## Mapping technology research (2026-11-21)
@@ -72,3 +72,10 @@ The [mapping technical reference index](docs/research/MAPPING_TECHNICAL_REFERENC
 - [GM07 — Quick Hunt and Custom Hunt design research](docs/research/GM07_QUICK_AND_CUSTOM_HUNT_PLAYER_CHOICE_RESEARCH.md): progressive settings, user agency and strict setup compatibility proposals, with unrun testing plans.
 
 - [GM08 — Playtest evidence and decision gates](docs/research/GM08_PLAYTEST_EVIDENCE_AND_PROTOTYPE_DECISIONS.md): four separate evaluation domains, controlled tests, error taxonomy and source-matched phone QA plan. [First phone session sheet](docs/research/GM08_FIRST_PHONE_PLAYTEST_SCRIPT.md) included. **Neither is executed.**
+
+
+## GH-01 code & QA (2026-11-22)
+
+- [GH-01 actual implementation status and limits](docs/GH01_IMPLEMENTATION_STATUS.md).
+- [Android source](app/src/main/java/com/playereden/gridmates/gridhunt/MainActivity.kt), [pure Kotlin grid engine](core/src/main/kotlin/com/playereden/gridhunt/core/GridMath.kt) and [grid tests](core/src/test/kotlin/com/playereden/gridhunt/core/GridMathTest.kt).
+- [GH-01 Android Actions workflow](.github/workflows/gh01-android-qa.yml): runs core JVM tests and, if successful, uploads a debug-signed QA APK with SHA/source/signer evidence. **The debug signing identity may change between runs**; don't claim install-over compatibility or production signing.

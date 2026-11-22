@@ -66,3 +66,8 @@ Map renderer/SDK comparison, viewport math, offline map formats/rights and coord
 ## GM01–GM08 research handoff (2026-11-22)
 
 [Gameplay mechanics research track](research/GAMEPLAY_MECHANICS_RESEARCH_TRACK.md) is **documented, not implemented or playtested**. [GM08 playtest gate](research/GM08_PLAYTEST_EVIDENCE_AND_PROTOTYPE_DECISIONS.md) recommends starting with existing **GH-01** minimal offline 6×6 four-digit Coordinate Hunt, correct whole-area math, three objectives, forgiving touch and reproducible signed APK, then actual owner Android playtest. **R07 seed/generator research is still open**; don't assume mass-generation is necessary to verify the basic game loop. All milestones above remain planned.
+
+
+## GH-01 implementation started (2026-11-22)
+
+Android/Compose skeleton and Kotlin grid engine, fixed three-target hunt UI, test source and Android QA workflow are now committed. The milestone remains **not accepted** until real GitHub CI results, an installable APK, and owner physical phone results are documented. [Source-vs-evidence report](GH01_IMPLEMENTATION_STATUS.md). R07 remains open; do not generate masses of objectives before validating the first experience.

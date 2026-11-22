@@ -1,0 +1,66 @@
+name: Grid Hunt GH-01 Android QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'core/**'
+      - 'app/**'
+      - 'gradle/**'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'gradle.properties'
+      - 'settings.gradle.kts'
+      - 'build.gradle.kts'
+      - '.github/workflows/gh01-android-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gridhunt-gh01-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android-qa:
+    name: Test coordinate core and assemble signed debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android platform
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Compile, execute core tests and build debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew :core:test :app:assembleDebug --no-daemon --max-workers=2 --stacktrace --console=plain
+      - name: Capture exact source, signer and APK checksum
+        run: |
+          mkdir -p gh01-qa-output
+          cp app/build/outputs/apk/debug/app-debug.apk gh01-qa-output/GridHunt-GH01-debug.apk
+          cd gh01-qa-output
+          sha256sum GridHunt-GH01-debug.apk > APK_SHA256.txt
+          git -C .. rev-parse HEAD > SOURCE_SHA.txt
+          {
+            echo 'GridMates Grid Hunt - GH-01 DEBUG QA'
+            echo 'Package: com.playereden.gridmates.gridhunt.qa'
+            echo 'Version: 0.1.0-gh01-qa (versionCode 1)'
+            echo 'Signer: ephemeral GitHub-hosted Android DEBUG key; not a stable update signing identity.'
+            echo 'This is not a release-signed or phone-tested APK.'
+            echo 'Uninstall any differently signed previous Grid Hunt QA app before installing.'
+          } > INSTALL_NOTES.txt
+          "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs GridHunt-GH01-debug.apk > SIGNER.txt
+      - name: Upload QA APK and evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gridhunt-gh01-debug-${{ github.run_number }}
+          path: gh01-qa-output/
+          if-no-files-found: error
+          retention-days: 14
