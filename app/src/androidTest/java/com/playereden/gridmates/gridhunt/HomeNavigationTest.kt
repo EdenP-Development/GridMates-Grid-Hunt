@@ -9,6 +9,7 @@ import android.content.Context
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
@@ -30,6 +31,7 @@ class HomeNavigationTest {
         compose.onNodeWithText("Grid Hunt").assertExists()
         compose.onNodeWithTag("openChapter").assertExists()
         compose.onNodeWithTag("openReverse").assertExists()
+        compose.onNodeWithTag("openTreasure").assertExists()
         compose.onNodeWithTag("homeIllustration").assertExists()
         compose.onNodeWithText("Choose your next puzzle").assertExists()
     }
@@ -141,6 +143,52 @@ class HomeNavigationTest {
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishContinue").performClick()
         compose.onNodeWithText("GOLDEN SPOT 1 OF 5").assertExists()
+    }
+
+    @Test fun treasureChecklistMarksCorrectLandmarkAndResumes() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_treasure_checklist_v1", Context.MODE_PRIVATE)
+            .edit().clear().commit()
+        compose.activityRule.scenario.recreate()
+
+        compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
+        compose.onNodeWithText("0 of 4 woodland discoveries").assertExists()
+        compose.onNodeWithTag("treasureItem_mushroom-nook").assertExists()
+        compose.onNodeWithTag("treasureCodeInput").performTextInput("2539")
+        compose.onNodeWithTag("checkTreasure").performClick()
+        // A wrong number must not cross off the target.
+        compose.onNodeWithText("0 of 4 woodland discoveries").assertExists()
+        compose.onNodeWithTag("treasureCodeInput").performTextReplacement("2538")
+        compose.onNodeWithTag("checkTreasure").performClick()
+        compose.onNodeWithText("1 of 4 woodland discoveries").assertExists()
+
+        compose.onNodeWithTag("treasureItem_acorn-nook").performClick()
+        compose.onNodeWithTag("treasureCodeInput").performTextInput("2641")
+        compose.onNodeWithTag("checkTreasure").performClick()
+        compose.onNodeWithText("2 of 4 woodland discoveries").assertExists()
+        compose.onNodeWithTag("treasureHome").performClick()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
+        compose.onNodeWithText("2 of 4 woodland discoveries").assertExists()
+    }
+
+    @Test fun treasureChecklistHasAnExplicitReplayAfterFourFinds() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_treasure_checklist_v1", Context.MODE_PRIVATE)
+            .edit().clear().commit()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
+        listOf("2538", "2840", "2641", "2941").forEachIndexed { index, ref ->
+            compose.onNodeWithTag("treasureCodeInput").performTextInput(ref)
+            compose.onNodeWithTag("checkTreasure").performClick()
+            compose.onNodeWithText("${index + 1} of 4 woodland discoveries").assertExists()
+        }
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithTag("finishHome").performClick()
+        compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithTag("finishContinue").performClick()
+        compose.onNodeWithText("0 of 4 woodland discoveries").assertExists()
     }
 
     @Test fun visualMapChoiceIsReachable() {
