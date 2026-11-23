@@ -1,7 +1,8 @@
 # START HERE — GridMates: Grid Hunt
 
 **Current snapshot:** 2026-11-23  
-**Status:** Native Android **prototype implemented and tested**: 9 Trail Treasures clues, 5 Golden Spots and a 4-object Treasure Checklist pilot, with saved progress and an original woodland map. [QA98 passed](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45267677473), including actual Android emulator puzzle tests and visual captures. Latest code lives in draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12), **not yet merged**; owner QA72 screenshots informed phone layout fixes, but QA98 checklist phone acceptance/install-over still requires confirmation.  
+**Status:** Native Android game prototype with **9 Trail Treasures, 5 Golden Spots and a four-item Treasure Checklist**. QA98 owner phone screenshots revealed hard-to-recognize tiny woodland art. The subsequent **Map Guide** reuses the exact landmark drawing functions for both a scrollable symbol reference and an active-target preview. [QA113 passed Android build, core checks, signing/update preflight and executed emulator UI tests with 11 captures](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877). Code remains in draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12); QA113 phone visual acceptance and install-over on the owner's device are **not verified**. Read [Map Symbols & Fair Clues](PUZZLE_SYMBOLS_CLUE_FAIRNESS.md) before adding similar-object puzzles, relation/elevation/road clues or another game mode.  
+
 **Source of truth for next game phase:** [Gameplay, Campaign & UI Blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md) + [Master design](MASTER_GAME_DESIGN.md) + [Roadmap](ROADMAP.md). Historical research notes below record their original time/status; don't treat their old 'no app built' claims as current.
 
 ## Product in one sentence
