@@ -1,6 +1,6 @@
 # Technical Foundation — Android Grid Hunt
 
-**Status:** architecture proposal; no project scaffolding/build yet.
+**Status update (2026-11-23):** This document began as a 2026-11-21 architecture proposal. The Kotlin/Compose Android app, pure Kotlin core and fixed QA test build now **exist** in [draft PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12), with [QA85 CI green](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45261941012). Future mode-neutral objective/landmark/mission contracts are proposed in the [Gameplay, Campaign & UI Blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md); no new checklist/custom engine is implemented merely by documenting it. Historical proposal language below is retained for rationale.
 
 ## Native Android direction
 
