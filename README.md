@@ -1,10 +1,12 @@
 # GridMates: Grid Hunt
 
-**Status: GH-01 Android debug build passed CI — November 22, 2026.** The pure Kotlin coordinate engine and native Compose game code have compiled, **nine authored core JUnit tests ran**, and a debug-signed APK artifact was uploaded. **Physical Android installation, gameplay feel and accessibility remain untested by the owner.**
+**Current development checkpoint (2026-11-23):** The native Android app now has 9 authored Trail Treasures targets, 5 Golden Spots, woodland map visuals, saved progress and executed emulator UI tests. [QA85 Android CI passed](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45261941012); owner QA72 phone screenshots informed the latest polish. The work is in **draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12)**, not yet merged or production-released. Physical QA85 acceptance and install-over proof remain open.
 
 **Premise:** A welcoming, offline-first map-grid puzzle hunt that teaches transferable land-navigation habits through play. Find grid references on illustrated maps, reverse-read coordinates from landmarks, and eventually complete multi-step hunts. Fun first; technically honest coordinate rules underneath.
 
 **Companion GridMates games:** [Sudoku](https://github.com/PlayerEden/SudokuTogether), [Word Search](https://github.com/PlayerEden/GridMates-Word-Search), [Crossroads](https://github.com/PlayerEden/GridMates-Crossroads). Grid Hunt is a **separate app**, repository, package and save space.
+
+**NEW — Campaign/mode/Custom Play/UI plan:** [Grid Hunt Gameplay, Campaign & UI Blueprint](docs/GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md). This is the durable **future-game vision and chat handoff**, including Word Search–like object checklists, identify-by-grid puzzles, mixed chapters, custom play and just-in-time art policy. Proposed modes are **not implemented** by this document.
 
 ## Start here
 
@@ -27,7 +29,7 @@
 - **Make the map usable:** readable labels, generous touch targets, zoom/pan, and an uncluttered play screen.
 - **Respect separate apps:** no shared package identifiers, secrets, saves or assumed drop-in Sudoku/Word Search engine.
 
-**Current implementation target:** verify the first GH-01 native Android proof-of-concept (one fixed fictional grid, three validated four-digit reference tasks). See [implementation status](docs/GH01_IMPLEMENTATION_STATUS.md) and [CI workflow](.github/workflows/gh01-android-qa.yml). **A GitHub commit alone is not a working APK or phone test.**
+**Current next step:** stabilize the latest real-phone layout, then prototype a **3–5-object Treasure Checklist** and **What's at This Grid?** identification on a shared validated landmark/objective model. Use the [new blueprint](docs/GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md), [CI workflow](.github/workflows/gh01-android-qa.yml), and current draft PR for reality checks. **A GitHub commit alone is not a working APK or phone test.**
 
 ## Research library (2026-11-21)
 
