@@ -122,14 +122,11 @@ internal fun HuntHeader(
     huntName: String,
     huntNumber: Int,
     huntTotal: Int,
-    mapLook: MapLook,
-    onLook: (MapLook) -> Unit,
     onGuide: () -> Unit,
     onHome: () -> Unit
 ) {
-    // Owner's QA72 phone screenshot: the old three-line, uppercase eyebrow
-    // wrapped "THE LITTLE WOODLAND" and truncated "A Walk in the Woods".
-    // Use a title/action row plus a single dedicated trail row instead.
+    // Dedicated full-width trail caption: don't make a story title compete with
+    // three navigation buttons. Map appearance now lives on the map surface.
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -141,8 +138,7 @@ internal fun HuntHeader(
                 modifier = Modifier.weight(1f).testTag("trailModeTitle"),
                 fontSize = if (compact) 18.sp else 20.sp,
                 fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                maxLines = 1
             )
             TextButton(
                 onClick = onHome,
@@ -159,19 +155,11 @@ internal fun HuntHeader(
                 Text("?", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Forest)
             }
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                "Trail $huntNumber/$huntTotal  ·  $huntName",
-                modifier = Modifier.weight(1f).testTag("trailLocation"),
-                fontSize = 11.sp, color = Muted, maxLines = 1,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-            )
-            QuickMapLookButton(mapLook = mapLook, onLook = onLook)
-        }
+        Text(
+            "Trail $huntNumber/$huntTotal  ·  $huntName",
+            modifier = Modifier.fillMaxWidth().testTag("trailLocation"),
+            fontSize = 11.sp, color = Muted, maxLines = 1
+        )
     }
 }
 
