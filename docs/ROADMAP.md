@@ -1,15 +1,15 @@
 # Roadmap — GridMates: Grid Hunt
 
 **Original baseline:** 2026-11-21; historical GH-00–GH-05 milestones below.  
-**Current state (2026-11-23):** Android playable prototype exists; 9 square finds and 5 Golden Spots, recent owner screenshots, [QA85 full CI pass](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45261941012), draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12). **Not merged or release-approved.**  
+**Current state (2026-11-23):** Android playable prototype exists; 9 square finds, 5 Golden Spots and a new 4-item Treasure Checklist pilot, recent owner screenshots, [QA98 full CI pass](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45267677473), draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12). **Not merged or release-approved.**  
 **Current forward roadmap:** [Gameplay, Campaign & UI Blueprint — phases P0–P7](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md). Historical proposal milestones below do not imply source is still absent.  
 **Method:** small vertical slices, evidence-gated; do not generate a large art set before the mechanics/data/UI warrant it.
 
 ## Active next phases (as of 2026-11-23)
 
-1. **P0 — Phone-quality checkpoint:** Review QA85's compact header, gold marker, current-state feedback and local progress on a real phone. Record installer behavior separately.
-2. **P1–P2 — Treasure Checklist:** Define canonical landmark/objective IDs, ambiguity rules and save format; implement one small, fully playable 3–5-object find-and-cross-off map puzzle.
-3. **P3 — What's at This Grid?:** Implement one small coordinate→object identification puzzle with clear answer tiles and uniqueness/multiple-answer validation.
+1. **P0 — Phone-quality checkpoint:** Review QA98's new Treasure Checklist, compact header, golden markers, keyboard and saved progress on a real phone. Record installer behavior separately.
+2. **P1–P2 — Treasure Checklist:** **First pilot IMPLEMENTED + CI-TESTED**: four canonical existing woodland landmarks, exact four-digit cells, isolated save format, four-item cross-off Android screen and finish/replay. Owner phone validation remains pending.
+3. **P3 — What's at This Grid? (NEXT):** Implement one small coordinate→object identification puzzle with clear answer tiles and uniqueness/multiple-answer validation.
 4. **P4–P5 — Campaign & Custom Play:** Compose mixed chapter objectives on the same engine; then Quick Play and compatible, deterministic Custom Play presets.
 5. **P6–P7 — Game UI integration, carefully justified art, and beta readiness:** Make it feel like a native Play Store puzzle game, run content/visual/accessibility audits, and only later handle production signing/store requirements.
 
