@@ -1,7 +1,7 @@
 # GridMates: Grid Hunt — Campaign, Puzzle Modes & Product Blueprint
 
 **Owner direction captured:** 2026-11-23  
-**Status:** APPROVED DIRECTION / PROPOSED EXPANSION, NOT IMPLEMENTED GAME MODES  
+**Status:** APPROVED DIRECTION; FIRST TREASURE CHECKLIST PILOT IMPLEMENTED + EMULATOR-TESTED. Wider campaign, object-identification and Custom Play remain proposals.  
 **Purpose:** Durable product vision, practical build order, and chat-to-chat handoff. Read this before starting any new gameplay/content/art phase.
 
 > **Design promise:** *Grid Hunt is a welcoming, replayable, native Android map-puzzle adventure. Coordinates are the underlying rule system; discovery, recognition, treasure hunting, and mixed challenges are what make it a game.*
@@ -10,11 +10,11 @@
 
 - **Repository:** [PlayerEden/GridMates-Grid-Hunt](https://github.com/PlayerEden/GridMates-Grid-Hunt).
 - **Active development:** draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12), branch `feature/gh-v02-in-puzzle-map-look` → `main`. **Not merged.**
-- **Last confirmed fully green test candidate:** [QA85 Android CI](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45261941012) (APK/core/signature/update preflight + executed emulator tests/screenshot capture). Public **test-only** QA signing; not production-ready.
-- **Actually implemented:** Kotlin/Jetpack Compose Android app, pure-Kotlin four-digit training grid and validator; touch map/camera; one authored Little Woodland map; 3 Trail Treasures mini-trails = **9 square-finding objectives**; **5 Golden Spots** reverse-reading objectives; Cozy Woods/Cool Sketch appearances; hints, local progress, golden discovery stamps, finish/replay cards; automated Android UI/visual tests.
-- **Actually tested on a real phone:** owner-provided QA72 screenshots reviewed. QA85 follow-up phone acceptance, large-text/landscape comfort, and exact install-over evidence still require confirmation. See [QA72 phone findings](vision/GH_V08_PHONE_QA72_SCREEN_AUDIT.md).
-- **What is NOT built yet:** object-checklist treasure hunts; coordinate-to-object identification; distinct campaign worlds; a shared cross-mode mission engine; mixed/multi-step chapters; Quick/Custom Play; seeded content generator; collectable/reward system; store/release signing.
-- **Next action:** stabilize/accept the current phone presentation, then build one **small, real checklist treasure hunt** and one **coordinate-to-object identification puzzle** on validated map data. Do **not** start by mass-generating maps, buying/generating a large sprite library, or building all menus at once.
+- **Last confirmed fully green test candidate:** [QA98 Android CI](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45267677473) (APK/core/signature/update preflight + executed emulator gameplay and 10 visual captures). [QA98 APK ZIP](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45267677473/artifacts/14863597316). Public **test-only** QA signing; not production-ready.
+- **Actually implemented:** Kotlin/Jetpack Compose Android app, pure-Kotlin four-digit training grid and validator; touch map/camera; one authored Little Woodland map; 3 Trail Treasures mini-trails = **9 square-finding objectives**; **5 Golden Spots** reverse-reading objectives; **new four-item Treasure Checklist** using canonically anchored Mushroom Nook, Buttercup Glade, Acorn Nook and Old Waystone; Cozy Woods/Cool Sketch appearances; hints, isolated local progress, golden discovery stamps, finish/replay cards; automated Android UI/visual tests.
+- **Actually tested on a real phone:** owner-provided QA72 screenshots reviewed (older two modes). QA85 layout updates and **new QA98 checklist** still need physical-phone acceptance, large-text/landscape checks and exact install-over evidence. See [QA72 phone findings](vision/GH_V08_PHONE_QA72_SCREEN_AUDIT.md).
+- **What is NOT built yet:** the full object/building catalogue (only four existing woodland decorations have canonical IDs); coordinate-to-object identification; distinct campaign worlds; a generalized cross-mode mission engine; mixed/multi-step chapters; Quick/Custom Play; seeded content generator; collectable/reward system; store/release signing.
+- **Next action:** review the actual QA98 Treasure Checklist on a phone, especially the recognizable tiny map landmarks, compact checklist layout, keyboard usability and resume. Then design one **small coordinate-to-object identification puzzle** on these same four validated landmarks, sharing validation and avoiding same-square ambiguity. Do **not** generate a huge asset library or new worlds first.
 - **Continuity rule:** after each milestone update this handoff, the mode/phase status table, source SHA, CI run, APK link, owner findings, and next blocking action. A chat summary is not a substitute for repository status.
 
 This blueprint expands [Master Game Design](MASTER_GAME_DESIGN.md), [Puzzle & Content System](PUZZLE_AND_CONTENT_SYSTEM.md), [Roadmap](ROADMAP.md), [Map Accuracy](MAP_READING_ACCURACY.md), and the [GM01–GM08 gameplay research](research/GAMEPLAY_MECHANICS_RESEARCH_TRACK.md). The **new owner vision here takes precedence for future mode/chapter and product-experience direction**; older prototype status text elsewhere may describe historical states.
@@ -37,7 +37,7 @@ This blueprint expands [Master Game Design](MASTER_GAME_DESIGN.md), [Puzzle & Co
 | --- | --- | --- | --- |
 | **Trail Treasures** (existing) | A four-digit grid-square reference | Tap/adjust the matching square, check and progress | IMPLEMENTED, improve presentation |
 | **Golden Spots** (existing) | A clearly highlighted point on the map | Read/type its containing four-digit square | IMPLEMENTED, improve presentation |
-| **Treasure Checklist** (NEW) | A list of landmarks/objects/buildings to find on an illustrated map | Find each **distinct listed object**, supply its grid reference, cross it off when accepted; complete the list | **FIRST NEW VERTICAL SLICE** |
+| **Treasure Checklist** (first pilot BUILT) | Four existing woodland illustrations with a named 4-item list | Enter each distinct object's four-digit cell; correct answers cross items off and reveal a 4/4 finish | **IMPLEMENTED + QA98 CI PASS; PHONE TEST PENDING** |
 | **What's at This Grid?** (NEW) | A coordinate reference and a map with multiple plausible features | Identify the correct feature **in that square** from a small image/name answer tray, or select the pictured map object; complete a short list | **SECOND NEW VERTICAL SLICE** |
 | **Clue Chain** (NEW) | A location-based clue whose answer reveals the next clue | Mix find-square, identify-object and reverse-read objectives in a fixed order; reveal only the next valid stage | After standalone checklist/identify modes |
 | **Route / Trailblazer** (CANDIDATE) | Start/end/landmark clues and possible paths | Trace or choose valid waypoints/route; optional obstacles with clearly authored rules | Evaluate later; don't promise pathfinding yet |
@@ -193,11 +193,11 @@ Real-world GPS/MGRS outdoor use; combat/military simulation; mandatory online ac
 **Tell the assistant:** 'Continue GridMates: Grid Hunt using `docs/GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md` in `PlayerEden/GridMates-Grid-Hunt`. Read the latest PR, START_HERE and roadmap, confirm CI, then implement the next approved phase in a tested slice.'
 
 **Start-of-session checklist:**
-1. Fetch the **actual current** GitHub docs and [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12); confirm branch/merge state and last successful source-matched run. Never assume QA85 stays latest.
+1. Fetch the **actual current** GitHub docs and [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12); confirm branch/merge state and last successful source-matched run. Never assume QA98 stays latest.
 2. Read [this blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md), [master design](MASTER_GAME_DESIGN.md), [accuracy rules](MAP_READING_ACCURACY.md), [content contract](PUZZLE_AND_CONTENT_SYSTEM.md), and the relevant prior [phone audit](vision/GH_V08_PHONE_QA72_SCREEN_AUDIT.md).
 3. Reconfirm the current phase, what code is actually built, what is merely proposed, and what still needs the owner's physical-device test.
 4. For any new puzzle mode, first write answer/ambiguity/fairness tests, then add minimal native UI, then run Android CI and review screenshots.
 5. Maintain the **stable QA Android signing identity** and monotonic update version; don't tell owner to uninstall a working QA app to test.
 6. Update this file's current handoff and status once the milestone is done, with exact PR, commit, Android run, owner remarks, and next step.
 
-**Status as of writing:** documentation milestone only. No checklist, identification or campaign/custom code has been implemented by this document. There is **no reason to generate art just because this blueprint exists**.
+**Implementation status at latest update (2026-11-23):** The first **four-item Treasure Checklist mode is actually coded**, with canonical `TreasureChecklistMission` and `WoodlandLandmarks` core data, reused map art anchored to those coordinates, Android Compose UI, separate local saves and executed QA98 CI tests including a full four-answer completion/screenshot run. **No What's at This Grid?, generalized campaign controller, Quick/Custom Play, large asset library or production release exists.** The four-item pilot needs an actual phone visual/gesture test. The plan remains valid; do not generate art solely because this document exists.
