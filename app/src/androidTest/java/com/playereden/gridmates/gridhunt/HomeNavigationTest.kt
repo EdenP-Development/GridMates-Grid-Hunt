@@ -3,6 +3,9 @@ package com.playereden.gridmates.gridhunt
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.test.platform.app.InstrumentationRegistry
+import android.content.Context
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -51,6 +54,35 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
         compose.onNodeWithTag("mapLookToggle").assertExists().performClick()
         compose.onNodeWithText("Golden Spots").assertExists()
+    }
+
+    @Test fun firstTreasureCanBeFoundAndSurvivesRelaunch() {
+        // Isolate this test from prior emulator navigation / completion tests.
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_first_bearings_v1", Context.MODE_PRIVATE)
+            .edit().clear().commit()
+        compose.activityRule.scenario.recreate()
+
+        compose.onNodeWithTag("openChapter").performClick()
+        dismissGuideIfShown()
+        compose.onNodeWithText("CLUE 1 OF 3").assertExists()
+
+        // Default arrow origin is 2640; 2 west and 3 south yields canonical 2437.
+        repeat(2) {
+            compose.onNodeWithContentDescription("Move selected square west").performClick()
+        }
+        repeat(3) {
+            compose.onNodeWithContentDescription("Move selected square south").performClick()
+        }
+        compose.onNodeWithText("YOUR PICK  2437", substring = true).assertExists()
+        compose.onNodeWithText("Try this square").performClick()
+        compose.onNodeWithText("FOUND 1 OF 3").assertExists()
+        compose.onNodeWithText("CLUE 2 OF 3").assertExists()
+        compose.onNodeWithTag("chapterHome").performClick()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openChapter").performClick()
+        dismissGuideIfShown()
+        compose.onNodeWithText("CLUE 2 OF 3").assertExists()
     }
 
     @Test fun visualMapChoiceIsReachable() {
