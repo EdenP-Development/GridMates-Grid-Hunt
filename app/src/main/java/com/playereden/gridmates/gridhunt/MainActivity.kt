@@ -320,7 +320,7 @@ private fun FirstBearingsScreen(
     }
     var hintStage by rememberSaveable { mutableIntStateOf(prefs.getInt("hint_stage", 0).coerceIn(0, 2)) }
     var feedback by rememberSaveable {
-        mutableStateOf("Read eastings first, then northings. Your chapter saves automatically.")
+        mutableStateOf("Ready for your first clue? Pick a square, then check your guess.")
     }
     var showGuide by rememberSaveable {
         mutableStateOf(!prefs.getBoolean("guide_seen", false))
@@ -383,7 +383,7 @@ private fun FirstBearingsScreen(
             (origin.eastIndex + eastDelta).coerceIn(24, 29),
             (origin.northIndex + northDelta).coerceIn(37, 42)
         ).reference
-        feedback = "Selected " + selected + ". Check or adjust the square."
+        feedback = "Square " + selected + " is your pick. Check it or choose another!"
     }
 
     val mapSizeChanged: (IntSize) -> Unit = { size ->
@@ -405,7 +405,7 @@ private fun FirstBearingsScreen(
     val onMapSelect: (String) -> Unit = { ref ->
         if (!finished) {
             selected = ref
-            feedback = "Selected " + ref + ". Check or choose another square."
+            feedback = "Square " + ref + " is your pick. Ready to try it?"
         }
     }
 
@@ -417,8 +417,8 @@ private fun FirstBearingsScreen(
             step = next.objectiveIndex
             selected = null
             hintStage = 0
-            feedback = if (replayed) "Chapter restarted. Find the first grid square."
-            else "Next hunt ready. New references, same woodland map."
+            feedback = if (replayed) "A fresh walk! Your first clue is waiting."
+            else "A new stretch of trail! Find the next hiding spot."
             resetView()
         } else {
             val expected = active!!
@@ -433,13 +433,13 @@ private fun FirstBearingsScreen(
                     hintStage = 0
                     feedback = when {
                         step >= targets.size && huntIndex == FirstBearingsChapter.hunts.lastIndex ->
-                            "Chapter complete! The woodland survey is finished."
+                            "What a trail! You found all nine woodland squares."
                         step >= targets.size ->
-                            "Hunt complete! Your next survey is ready."
-                        else -> "Correct: " + expected.reference + ". Find the next square."
+                            "Beautifully done! Your next trail is ready."
+                        else -> "Nice find! ✦ " + expected.reference + " was the spot. Another clue awaits."
                     }
                 } else {
-                    feedback = HuntRules.errorText(expected, attempt)
+                    feedback = "Not quite! " + HuntRules.errorText(expected, attempt)
                 }
             }
         }
@@ -500,15 +500,15 @@ private fun FirstBearingsScreen(
                         onMove = ::moveSelected, onZoom = ::zoomBy,
                         onUndo = {
                             selected = null
-                            feedback = "Selection cleared. Choose another square."
+                            feedback = "All clear! Pick a new square whenever you are ready."
                         },
                         onHint = { hintStage = (hintStage + 1).coerceAtMost(2) },
                         onFit = ::resetView,
                         onCheck = onCheck,
                         actionLabel = when {
-                            chapterFinished -> "Replay chapter  ↻"
-                            finished -> "Next hunt  →"
-                            else -> "Check square"
+                            chapterFinished -> "Explore again  ↻"
+                            finished -> "Next trail  →"
+                            else -> "Try this square"
                         }
                     )
                 }
@@ -551,15 +551,15 @@ private fun FirstBearingsScreen(
                     onMove = ::moveSelected, onZoom = ::zoomBy,
                     onUndo = {
                         selected = null
-                        feedback = "Selection cleared. Choose another square."
+                        feedback = "All clear! Pick a new square whenever you are ready."
                     },
                     onHint = { hintStage = (hintStage + 1).coerceAtMost(2) },
                     onFit = ::resetView,
                     onCheck = onCheck,
                     actionLabel = when {
-                        chapterFinished -> "Replay chapter  ↻"
-                        finished -> "Next hunt  →"
-                        else -> "Check square"
+                        chapterFinished -> "Explore again  ↻"
+                        finished -> "Next trail  →"
+                        else -> "Try this square"
                     }
                 )
             }
