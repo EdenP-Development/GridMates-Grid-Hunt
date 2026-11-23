@@ -493,7 +493,8 @@ private fun FirstBearingsScreen(
                     onViewport = mapSizeChanged,
                     onCamera = ::updateCamera,
                     onSelect = onMapSelect, mapLook = mapLook,
-                    discoveryMessage = discoveryMessage
+                    discoveryMessage = discoveryMessage,
+                    onLook = onLook
                 )
                 Column(
                     modifier = Modifier
@@ -505,8 +506,6 @@ private fun FirstBearingsScreen(
                     HuntHeader(
                         compact = true, huntName = hunt.name,
                         huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
-                        mapLook = mapLook,
-                        onLook = onLook,
                         onGuide = { showGuide = !showGuide },
                         onHome = onHome
                     )
@@ -554,8 +553,6 @@ private fun FirstBearingsScreen(
                 HuntHeader(
                     compact = false, huntName = hunt.name,
                     huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
-                    mapLook = mapLook,
-                    onLook = onLook,
                     onGuide = { showGuide = !showGuide },
                     onHome = onHome
                 )
@@ -579,7 +576,8 @@ private fun FirstBearingsScreen(
                     onViewport = mapSizeChanged,
                     onCamera = ::updateCamera,
                     onSelect = onMapSelect, mapLook = mapLook,
-                    discoveryMessage = discoveryMessage
+                    discoveryMessage = discoveryMessage,
+                    onLook = onLook
                 )
                 Spacer(Modifier.height(4.dp))
                 if (finished) {
