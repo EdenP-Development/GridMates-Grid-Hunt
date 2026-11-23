@@ -6,6 +6,7 @@ import android.graphics.Paint
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -166,7 +167,8 @@ internal fun ObjectiveRibbon(
 ) {
     val done = active == null
     Surface(
-        color = Color(0xFFFFFBF1), shape = RoundedCornerShape(14.dp),
+        color = Color(0xFFFFF7E0), shape = RoundedCornerShape(18.dp),
+        border = BorderStroke(1.dp, Color(0xFFE7CF9D)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -189,11 +191,17 @@ internal fun ObjectiveRibbon(
                     fontSize = 11.sp, maxLines = 2, color = Muted
                 )
             }
-            Text(
-                if (done) "✓" else active.reference,
-                fontSize = if (done) 32.sp else 33.sp,
-                color = Ink, fontWeight = FontWeight.ExtraBold
-            )
+            Surface(
+                shape = RoundedCornerShape(13.dp),
+                color = Color(0xFFF6DFA9)
+            ) {
+                Text(
+                    if (done) "✓" else active.reference,
+                    fontSize = if (done) 29.sp else 31.sp,
+                    color = Ink, fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
         }
     }
 }
