@@ -165,8 +165,10 @@ internal fun TreasureChecklistScreen(
                     "Every woodland discovery found! Your journal is complete."
                 else "Found it! ${current.name} is crossed off your list."
             } else {
-                val attempted = GridReference.parse(answer)
-                feedback = "Not quite! " +
+                val attempted = runCatching { GridReference.parse(answer) }.getOrNull()
+                feedback = if (attempted == null)
+                    "Enter four digits: easting first, then northing."
+                else "Not quite! " +
                     com.playereden.gridhunt.core.HuntRules.errorText(current.cell, attempted)
             }
         }
@@ -186,6 +188,7 @@ internal fun TreasureChecklistScreen(
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         val wide = maxWidth > maxHeight
+        val sidePanelWidth = (maxWidth * 0.43f).coerceAtMost(340.dp)
         if (wide) {
             Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 HuntMapPanel(
@@ -196,7 +199,7 @@ internal fun TreasureChecklistScreen(
                     onSelect = {}, enableSelect = false, mapLook = mapLook, onLook = onLook
                 )
                 Column(
-                    Modifier.width((maxWidth * 0.43f).coerceAtMost(340.dp))
+                    Modifier.width(sidePanelWidth)
                         .fillMaxHeight().verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
