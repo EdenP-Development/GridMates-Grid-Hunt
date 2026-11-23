@@ -120,6 +120,16 @@ internal fun HuntMapPanel(
             markerPoint = markerPoint, enableSelect = enableSelect,
             mapLook = mapLook
         )
+        // The north cue belongs to the map, not the crowded game header.
+        // Keep it compact and translucent so a marker near the edge stays visible.
+        Text(
+            "N ↑", color = Ink, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.TopEnd)
+                .padding(8.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color(0xCFFFF9EA))
+                .padding(horizontal = 7.dp, vertical = 4.dp)
+        )
     }
 }
 
