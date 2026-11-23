@@ -351,11 +351,29 @@ private fun TrainingMapCanvas(
                 val y = p(bounds.west, northing.toDouble()).y
                 drawLine(gridInk, Offset(left, y), Offset(right, y), strokeWidth = 1.5f)
             }
+            // Solved discoveries stay on the map as little gold stamps.
+            // Only already-accepted answers appear here; future targets stay hidden.
             completed.forEach { cell ->
                 val tl = p(cell.westMeters.toDouble(), (cell.southMeters + 1000).toDouble())
                 val side = (1000 * cam.pixelsPerMeter).toFloat()
-                drawRect(Color(0x3C397C65), topLeft = tl, size = Size(side, side))
-                drawRect(Color(0xFF4E7D60), topLeft = tl, size = Size(side, side), style = Stroke(2f))
+                drawRect(Color(0x264D8A63), topLeft = tl, size = Size(side, side))
+                drawRect(Color(0xFF548066), topLeft = tl, size = Size(side, side),
+                    style = Stroke(2f))
+                val center = p(cell.westMeters + 500.0, cell.southMeters + 500.0)
+                val stamp = (155.0 * cam.pixelsPerMeter).toFloat().coerceIn(7f, 22f)
+                drawCircle(Color(0x59543F27), radius = stamp * 1.08f,
+                    center = center + Offset(2f, 2f))
+                drawCircle(Color(0xFFFAEDC5), radius = stamp, center = center)
+                drawCircle(Color(0xFFD29C49), radius = stamp * 0.81f, center = center)
+                val tick = Path().apply {
+                    moveTo(center.x - stamp * 0.44f, center.y)
+                    lineTo(center.x - stamp * 0.08f, center.y + stamp * 0.35f)
+                    lineTo(center.x + stamp * 0.51f, center.y - stamp * 0.41f)
+                }
+                drawPath(tick, Color(0xFFFFFCED),
+                    style = Stroke(width = (stamp * 0.22f).coerceAtLeast(1.8f),
+                        cap = androidx.compose.ui.graphics.StrokeCap.Round,
+                        join = androidx.compose.ui.graphics.PathJoin.Round))
             }
             selectedCell?.let { cell ->
                 val tl = p(cell.westMeters.toDouble(), (cell.southMeters + 1000).toDouble())
