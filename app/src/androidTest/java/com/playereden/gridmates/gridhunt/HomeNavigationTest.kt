@@ -57,7 +57,7 @@ class HomeNavigationTest {
         compose.onNodeWithTag("appearanceToggle").performScrollTo().performClick()
         compose.onNodeWithTag("style_SURVEY_TABLE").performScrollTo().performClick()
         compose.onNodeWithTag("style_FIELD_GUIDE").assertExists()
-        compose.onNodeWithTag("openChapter").performClick()
+        compose.onNodeWithTag("openChapter").performScrollTo().performClick()
         dismissGuideIfShown()
         compose.onNodeWithText("Trail Treasures").assertExists()
     }
