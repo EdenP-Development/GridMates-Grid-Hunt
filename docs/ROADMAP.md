@@ -1,8 +1,21 @@
 # Roadmap — GridMates: Grid Hunt
 
-**Baseline date:** 2026-11-21  
-**All milestones currently PLANNED.** No game source, APK or passing CI evidence exists yet.  
-**Method:** small vertical slices, evidence-gated. Reorder after owner phone feedback.
+**Original baseline:** 2026-11-21; historical GH-00–GH-05 milestones below.  
+**Current state (2026-11-23):** Android playable prototype exists; 9 square finds and 5 Golden Spots, recent owner screenshots, [QA85 full CI pass](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45261941012), draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12). **Not merged or release-approved.**  
+**Current forward roadmap:** [Gameplay, Campaign & UI Blueprint — phases P0–P7](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md). Historical proposal milestones below do not imply source is still absent.  
+**Method:** small vertical slices, evidence-gated; do not generate a large art set before the mechanics/data/UI warrant it.
+
+## Active next phases (as of 2026-11-23)
+
+1. **P0 — Phone-quality checkpoint:** Review QA85's compact header, gold marker, current-state feedback and local progress on a real phone. Record installer behavior separately.
+2. **P1–P2 — Treasure Checklist:** Define canonical landmark/objective IDs, ambiguity rules and save format; implement one small, fully playable 3–5-object find-and-cross-off map puzzle.
+3. **P3 — What's at This Grid?:** Implement one small coordinate→object identification puzzle with clear answer tiles and uniqueness/multiple-answer validation.
+4. **P4–P5 — Campaign & Custom Play:** Compose mixed chapter objectives on the same engine; then Quick Play and compatible, deterministic Custom Play presets.
+5. **P6–P7 — Game UI integration, carefully justified art, and beta readiness:** Make it feel like a native Play Store puzzle game, run content/visual/accessibility audits, and only later handle production signing/store requirements.
+
+**Explicit owner rule:** organize systems and content first; make individual assets when needed for legibility/fairness, with a fuller cohesive art pass after the core modes prove fun.
+
+---
 
 ## GH-00 — Documentation and design foundation
 
