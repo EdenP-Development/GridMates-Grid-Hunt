@@ -156,7 +156,7 @@ private fun GridHuntScreen() {
     }
 }
 
-/** A small playtest hub, not a promise of all future modes. */
+/** Player-facing home: a cozy puzzle-book hub rather than a training dashboard. */
 @Composable
 private fun GridHuntHome(
     mapLook: MapLook,
@@ -179,91 +179,112 @@ private fun GridHuntHome(
     val chapterCompleted = FirstBearingsChapter.hunts.take(chapterState.huntIndex)
         .sumOf { it.objectives.size } + chapterState.objectiveIndex
     val reverseCompleted = reversePrefs.getInt("step", 0).coerceIn(0, ReverseTraining.markers.size)
+    var showAppearance by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize().background(Paper)
             .statusBarsPadding().navigationBarsPadding()
-            .verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 18.dp, vertical = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(11.dp)
     ) {
-        Text("GRIDMATES  /  FIELD NOTES", fontWeight = FontWeight.Bold,
-            color = Forest, fontSize = 11.sp)
+        Text("GRIDMATES  •  PUZZLE ADVENTURES", fontWeight = FontWeight.Bold,
+            color = Forest, fontSize = 10.sp)
         Text("Grid Hunt", fontWeight = FontWeight.ExtraBold,
-            color = Ink, fontSize = 34.sp)
-        Text("Good puzzles. Good company.", color = Muted, fontSize = 13.sp)
-        Surface(shape = RoundedCornerShape(18.dp), color = Color(0xFFDFE7D7)) {
-            Column(Modifier.fillMaxWidth().padding(16.dp)) {
-                Text("YOUR FIELD JOURNAL", fontWeight = FontWeight.Bold,
-                    color = Forest, fontSize = 10.sp)
-                Spacer(Modifier.height(5.dp))
-                Text("The woodland survey", fontWeight = FontWeight.SemiBold,
-                    color = Ink, fontSize = 20.sp)
-                Text("Find landmarks by reading the grid — no timer, no pressure.",
-                    fontSize = 12.sp, color = Muted)
-                Spacer(Modifier.height(9.dp))
-                Text("$chapterCompleted / 9 chapter squares  ·  $reverseCompleted / 5 reverse markers",
-                    fontSize = 12.sp, color = Forest, fontWeight = FontWeight.Medium)
+            color = Ink, fontSize = 36.sp)
+        Text("A little map. A new mystery. Where will you explore?",
+            color = Muted, fontSize = 13.sp)
+        WoodlandPostcard(modifier = Modifier.height(144.dp))
+        Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFDFEAD4)) {
+            Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 11.dp)) {
+                Text("✦  YOUR LITTLE DISCOVERIES", color = Forest,
+                    fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                Spacer(Modifier.height(4.dp))
+                Text("$chapterCompleted of 9 squares found   •   $reverseCompleted of 5 golden spots",
+                    color = Ink, fontSize = 12.sp)
             }
         }
-        Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFFBF1)) {
-            Column(Modifier.fillMaxWidth().padding(14.dp)) {
-                Text("01   FIRST BEARINGS", color = Forest, fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold)
-                Text("Three short woodland hunts · 9 grid squares",
-                    fontSize = 12.sp, color = Muted)
-                Spacer(Modifier.height(7.dp))
+        Text("Choose your next puzzle", color = Ink, fontSize = 19.sp,
+            fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+        Surface(shape = RoundedCornerShape(19.dp), color = Color(0xFFFFFAEC),
+            shadowElevation = 2.dp) {
+            Column(Modifier.fillMaxWidth().padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("✦   TRAIL TREASURES", color = Forest, fontSize = 15.sp,
+                    fontWeight = FontWeight.ExtraBold)
+                Text("Follow a number clue to find its hiding place on the map.",
+                    color = Muted, fontSize = 12.sp)
                 Button(
                     onClick = onChapter,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("openChapter"),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("openChapter"),
                     colors = ButtonDefaults.buttonColors(containerColor = Forest)
-                ) { Text(if (chapterCompleted > 0) "Continue chapter" else "Start chapter") }
-            }
-        }
-        Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFFBF1)) {
-            Column(Modifier.fillMaxWidth().padding(14.dp)) {
-                Text("02   LOOK AGAIN", color = Forest, fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold)
-                Text("Reverse practice · 5 marked locations, read the reference",
-                    fontSize = 12.sp, color = Muted)
-                Spacer(Modifier.height(7.dp))
-                OutlinedButton(onClick = onReverse,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("openReverse")) {
-                    Text(if (reverseCompleted > 0) "Continue reverse practice" else "Try reverse practice")
+                ) {
+                    Text(if (chapterCompleted > 0) "Keep exploring" else "Let's find a square!",
+                        fontWeight = FontWeight.Bold)
                 }
             }
         }
-        Text("VISUAL PLAYTEST", color = Forest, fontSize = 11.sp,
-            fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
-        Text("Compare two map treatments using the same real puzzle rules.",
-            fontSize = 12.sp, color = Muted)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            MapLook.entries.forEach { look ->
-                val chosen = mapLook == look
+        Surface(shape = RoundedCornerShape(19.dp), color = Color(0xFFFFFAEC),
+            shadowElevation = 2.dp) {
+            Column(Modifier.fillMaxWidth().padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("✦   GOLDEN SPOTS", color = Forest, fontSize = 15.sp,
+                    fontWeight = FontWeight.ExtraBold)
+                Text("See the golden marker? Find its secret four-digit code.",
+                    color = Muted, fontSize = 12.sp)
                 OutlinedButton(
-                    onClick = { onLook(look) },
-                    modifier = Modifier.weight(1f).heightIn(min = 64.dp).testTag("style_" + look.name),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = if (chosen) Color(0xFFDDE7D6) else Color(0xFFFFFBF1)
-                    ),
-                    contentPadding = PaddingValues(6.dp)
+                    onClick = onReverse,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("openReverse")
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(if (chosen) "✓  "+look.label else look.label,
-                            fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                        Text(if (look == MapLook.FIELD_GUIDE) "Warm" else "Cool",
-                            fontSize = 10.sp)
-                    }
+                    Text(if (reverseCompleted > 0) "Find another golden spot" else "Try Golden Spots",
+                        fontWeight = FontWeight.Bold)
                 }
             }
         }
         OutlinedButton(
-            onClick = { onHaptics(!hapticsEnabled) },
-            modifier = Modifier.fillMaxWidth().heightIn(min = 46.dp)
+            onClick = { showAppearance = !showAppearance },
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("appearanceToggle")
         ) {
-            Text("Completion vibration: " + if (hapticsEnabled) "On" else "Off")
+            Text(if (showAppearance) "Hide map styles & options  ↑"
+                else "Make it yours: maps & options  ↓")
         }
-        Text("Design preview · Offline · Fictional grid · Progress saves on this device",
-            fontSize = 10.sp, color = Muted)
+        if (showAppearance) {
+            Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFF0E8D5)) {
+                Column(Modifier.fillMaxWidth().padding(13.dp),
+                    verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                    Text("Pick your map's look", color = Ink, fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp)
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                        MapLook.entries.forEach { look ->
+                            val chosen = mapLook == look
+                            OutlinedButton(
+                                onClick = { onLook(look) },
+                                modifier = Modifier.weight(1f).heightIn(min = 54.dp)
+                                    .testTag("style_" + look.name),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = if (chosen) Color(0xFFD2E1C5)
+                                        else Color(0xFFFFFAEC)
+                                ),
+                                contentPadding = PaddingValues(4.dp)
+                            ) {
+                                Text((if (chosen) "✓ " else "") + look.label,
+                                    fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
+                                    maxLines = 2)
+                            }
+                        }
+                    }
+                    OutlinedButton(
+                        onClick = { onHaptics(!hapticsEnabled) },
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 45.dp)
+                    ) {
+                        Text("Little victory buzz: " + if (hapticsEnabled) "On" else "Off")
+                    }
+                }
+            }
+        }
+        Text("Play offline. Your puzzle progress stays on this device.",
+            fontSize = 11.sp, color = Muted)
     }
 }
 
