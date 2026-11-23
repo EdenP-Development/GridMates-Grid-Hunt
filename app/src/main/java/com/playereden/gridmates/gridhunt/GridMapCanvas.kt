@@ -373,7 +373,7 @@ private fun TrainingMapCanvas(
                 drawPath(tick, Color(0xFFFFFCED),
                     style = Stroke(width = (stamp * 0.22f).coerceAtLeast(1.8f),
                         cap = androidx.compose.ui.graphics.StrokeCap.Round,
-                        join = androidx.compose.ui.graphics.PathJoin.Round))
+                        join = androidx.compose.ui.graphics.StrokeJoin.Round))
             }
             selectedCell?.let { cell ->
                 val tl = p(cell.westMeters.toDouble(), (cell.southMeters + 1000).toDouble())
