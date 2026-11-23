@@ -104,6 +104,39 @@ class HomeNavigationTest {
         compose.onNodeWithText("GOLDEN SPOT 2 OF 5").assertExists()
     }
 
+    @Test fun completedTrailCanReturnHomeWithoutForcingReplay() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_first_bearings_v1", Context.MODE_PRIVATE)
+            .edit().putInt("hunt_index", 2).putInt("objective_index", 3)
+            .putBoolean("guide_seen", true).commit()
+        compose.activityRule.scenario.recreate()
+
+        compose.onNodeWithTag("openChapter").performClick()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithText("Woodland adventure complete!").assertExists()
+        compose.onNodeWithTag("finishHome").performClick()
+        compose.onNodeWithTag("openChapter").performScrollTo().performClick()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithTag("finishContinue").performClick()
+        compose.onNodeWithText("CLUE 1 OF 3").assertExists()
+    }
+
+    @Test fun goldenSpotFinishCanReturnHomeAndReplayExplicitly() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
+            .edit().putInt("step", 5).commit()
+        compose.activityRule.scenario.recreate()
+
+        compose.onNodeWithTag("openReverse").performScrollTo().performClick()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithText("Every golden spot found!").assertExists()
+        compose.onNodeWithTag("finishHome").performClick()
+        compose.onNodeWithTag("openReverse").performScrollTo().performClick()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithTag("finishContinue").performClick()
+        compose.onNodeWithText("GOLDEN SPOT 1 OF 5").assertExists()
+    }
+
     @Test fun visualMapChoiceIsReachable() {
         compose.onNodeWithTag("appearanceToggle").performScrollTo().performClick()
         compose.onNodeWithTag("style_SURVEY_TABLE").performScrollTo().performClick()
