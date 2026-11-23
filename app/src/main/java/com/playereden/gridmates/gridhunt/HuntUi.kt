@@ -325,7 +325,7 @@ internal fun HuntControlPanel(
         ) { Text("See all", fontSize = 12.sp) }
     }
     Button(
-        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("checkChapter"),
         enabled = finished || selected != null,
         onClick = onCheck,
         colors = ButtonDefaults.buttonColors(containerColor = Forest)
