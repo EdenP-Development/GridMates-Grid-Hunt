@@ -192,6 +192,8 @@ class HomeNavigationTest {
         compose.onNodeWithTag("dismissWoodlandMapGuide").performClick()
         compose.onNodeWithText("0 of 4 woodland discoveries").assertExists()
         compose.onNodeWithTag("treasureItem_mushroom-nook").assertExists()
+        compose.onNodeWithTag("activeTreasurePreview").assertExists()
+        compose.onNodeWithContentDescription("Mushroom Nook map symbol").assertExists()
         compose.onNodeWithTag("treasureCodeInput").performTextInput("2538")
         compose.onNodeWithTag("checkTreasure").performClick()
         compose.onNodeWithText("1 of 4 woodland discoveries").assertExists()
