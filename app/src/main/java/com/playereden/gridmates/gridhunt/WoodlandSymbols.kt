@@ -97,18 +97,22 @@ internal fun DrawScope.drawWoodlandLandmark(
 internal fun WoodlandLandmarkSwatch(
     landmarkId: String,
     mapLook: MapLook,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    symbolSize: androidx.compose.ui.unit.Dp = 66.dp
 ) {
     val surveyStyle = mapLook == MapLook.SURVEY_TABLE
     val color = if (surveyStyle) Color(0xFFDCEFEB) else Color(0xFFF3E8CE)
     Box(
         modifier = modifier
-            .size(66.dp)
+            .size(symbolSize)
             .clip(RoundedCornerShape(12.dp))
             .background(color)
-            .semantics { contentDescription = "Illustrated map symbol" }
+            .semantics {
+                contentDescription =
+                    (WoodlandLandmarks.byId(landmarkId)?.name ?: "Woodland") + " map symbol"
+            }
     ) {
-        Canvas(Modifier.size(66.dp)) {
+        Canvas(Modifier.size(symbolSize)) {
             drawWoodlandLandmark(
                 landmarkId = landmarkId,
                 center = Offset(size.width / 2f, size.height / 2f),
