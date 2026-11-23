@@ -139,6 +139,8 @@ jobs:
             test -s vision-screenshots/04_golden_spots.png
             test -s vision-screenshots/05_treasure_finish.png
             test -s vision-screenshots/06_golden_finish.png
+            test -s vision-screenshots/07_trail_landscape.png
+            test -s vision-screenshots/08_golden_landscape.png
       - name: Publish Android instrumentation results
         if: always()
         uses: actions/upload-artifact@v4
