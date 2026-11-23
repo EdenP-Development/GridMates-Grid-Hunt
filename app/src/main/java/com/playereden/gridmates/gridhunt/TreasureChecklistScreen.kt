@@ -210,7 +210,7 @@ internal fun TreasureChecklistScreen(
                         TreasureChecklistFinished(onHome, replay)
                     } else {
                         TreasureChecklistTargets(mission.targets, completed, active?.id, choose)
-                        TreasureChecklistAnswer(active, answer, { answer = it },
+                        TreasureChecklistAnswer(active, mapLook, answer, { answer = it },
                             feedback, hintVisible, { hintVisible = !hintVisible },
                             ::zoomBy, ::fit, check)
                     }
@@ -233,7 +233,7 @@ internal fun TreasureChecklistScreen(
                 if (finished) {
                     TreasureChecklistFinished(onHome, replay)
                 } else {
-                    TreasureChecklistAnswer(active, answer, { answer = it }, feedback,
+                    TreasureChecklistAnswer(active, mapLook, answer, { answer = it }, feedback,
                         hintVisible, { hintVisible = !hintVisible }, ::zoomBy, ::fit, check)
                 }
             }
@@ -310,6 +310,7 @@ private fun TreasureChecklistTargets(
 @Composable
 private fun TreasureChecklistAnswer(
     active: WoodlandLandmark?,
+    mapLook: MapLook,
     answer: String,
     onAnswer: (String) -> Unit,
     feedback: String,
@@ -320,7 +321,20 @@ private fun TreasureChecklistAnswer(
     onCheck: () -> Unit
 ) {
     if (active == null) return
-    Text("Find: ${active.name}", color = Forest, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+    Row(
+        Modifier.fillMaxWidth().testTag("activeTreasurePreview"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(9.dp)
+    ) {
+        WoodlandLandmarkSwatch(
+            active.id, mapLook, symbolSize = 46.dp
+        )
+        Column(Modifier.weight(1f)) {
+            Text("Find: ${active.name}", color = Forest,
+                fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            Text("Match this little drawing to the map.", color = Muted, fontSize = 11.sp)
+        }
+    }
     if (showHint) {
         Text(active.clue, color = Muted, fontSize = 11.sp,
             modifier = Modifier.testTag("treasureHint"))
