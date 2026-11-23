@@ -208,7 +208,8 @@ internal fun ReversePracticeScreen(
                     camera = camera, selectedCell = null, completed = targets.take(step).map { it.cell },
                     viewport = viewport, onViewport = resized, onCamera = ::setCamera,
                     onSelect = {}, markerPoint = active?.point, enableSelect = false,
-                    mapLook = mapLook, discoveryMessage = discoveryMessage
+                    mapLook = mapLook, discoveryMessage = discoveryMessage,
+                    onLook = onLook
                 )
                 Column(
                     Modifier.width(controlsWidth).fillMaxHeight().verticalScroll(rememberScrollState()),
@@ -244,7 +245,8 @@ internal fun ReversePracticeScreen(
                     camera = camera, selectedCell = null, completed = targets.take(step).map { it.cell },
                     viewport = viewport, onViewport = resized, onCamera = ::setCamera,
                     onSelect = {}, markerPoint = active?.point, enableSelect = false,
-                    mapLook = mapLook, discoveryMessage = discoveryMessage
+                    mapLook = mapLook, discoveryMessage = discoveryMessage,
+                    onLook = onLook
                 )
                 Spacer(Modifier.height(5.dp))
                 if (finished) {
