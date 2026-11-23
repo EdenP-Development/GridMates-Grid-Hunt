@@ -2,6 +2,7 @@ package com.playereden.gridmates.gridhunt
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -15,6 +16,12 @@ import org.junit.runner.RunWith
 class HomeNavigationTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
+    private fun dismissGuideIfShown() {
+        if (compose.onAllNodesWithTag("dismissGridGuide").fetchSemanticsNodes().isNotEmpty()) {
+            compose.onNodeWithTag("dismissGridGuide").performClick()
+        }
+    }
+
     @Test fun hubOffersBothPlayableModes() {
         compose.onNodeWithText("Grid Hunt").assertExists()
         compose.onNodeWithTag("openChapter").assertExists()
@@ -24,6 +31,7 @@ class HomeNavigationTest {
 
     @Test fun journeyCanEnterAndLeaveEachMode() {
         compose.onNodeWithTag("openChapter").performClick()
+        dismissGuideIfShown()
         compose.onNodeWithText("First Bearings").assertExists()
         compose.onNodeWithTag("chapterHome").performClick()
         compose.onNodeWithTag("openReverse").performClick()
@@ -34,6 +42,7 @@ class HomeNavigationTest {
 
     @Test fun mapLookSwitchKeepsBothPuzzlesOpen() {
         compose.onNodeWithTag("openChapter").performClick()
+        dismissGuideIfShown()
         compose.onNodeWithTag("mapLookToggle").assertExists().performClick()
         compose.onNodeWithText("First Bearings").assertExists()
         compose.onNodeWithTag("chapterHome").performClick()
@@ -47,6 +56,7 @@ class HomeNavigationTest {
         compose.onNodeWithTag("style_SURVEY_TABLE").performScrollTo().performClick()
         compose.onNodeWithTag("style_FIELD_GUIDE").assertExists()
         compose.onNodeWithTag("openChapter").performClick()
+        dismissGuideIfShown()
         compose.onNodeWithText("First Bearings").assertExists()
     }
 }
