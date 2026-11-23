@@ -313,7 +313,7 @@ private fun ReverseControls(
     if (!finished) {
         OutlinedTextField(
             value = answer, onValueChange = onAnswer,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("reverseCodeInput"),
             singleLine = true, label = { Text("Four-digit map code") },
             placeholder = { Text("0000") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -350,7 +350,7 @@ private fun ReverseControls(
     }
     Button(
         onClick = onCheck, enabled = finished || answer.length == 4,
-        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("checkReverse"),
         colors = ButtonDefaults.buttonColors(containerColor = Forest)
     ) { Text(if (finished) "Find them again" else "Try this code", fontWeight = FontWeight.Bold) }
 }
