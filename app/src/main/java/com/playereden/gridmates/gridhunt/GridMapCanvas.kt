@@ -89,6 +89,7 @@ import com.playereden.gridhunt.core.GridReference
 import com.playereden.gridhunt.core.HuntRules
 import com.playereden.gridhunt.core.MapCamera
 import com.playereden.gridhunt.core.PixelPoint
+import com.playereden.gridhunt.core.WoodlandLandmarks
 import com.playereden.gridhunt.core.WoodlandTrainingMap
 import com.playereden.gridhunt.core.WorldBounds
 import com.playereden.gridhunt.core.WorldPoint
@@ -371,9 +372,9 @@ private fun TrainingMapCanvas(
                 style = Stroke(width = 10f))
             drawPath(trail, trailInk,
                 style = Stroke(width = 3f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(11f, 7f))))
-            // GH-V06: four friendly illustrated landmarks. They sit at fixed world
-            // positions and are deliberately unrelated to target answers.
-            // No random-placement drift, no tappable faux objectives.
+            // Four original illustrated landmarks now use a shared canonical source:
+            // the same positions are the exact answer data in Treasure Checklist.
+            // The point positions, not painted pixels, determine 4-digit cells.
             val landmarkScale = (130.0 * cam.pixelsPerMeter).toFloat().coerceIn(10f, 29f)
             val moss = if (surveyStyle) Color(0xFF69958D) else Color(0xFF6E956A)
             val deepMoss = if (surveyStyle) Color(0xFF426F72) else Color(0xFF416D4E)
@@ -381,7 +382,7 @@ private fun TrainingMapCanvas(
             val ivory = if (surveyStyle) Color(0xFFE6F1EA) else Color(0xFFFFE9BB)
             // Mushroom nook — small, recognizable silhouettes in a quiet clearing.
             run {
-                val m = p(25750.0, 38900.0)
+                val m = p(WoodlandLandmarks.mushrooms.point.easting, WoodlandLandmarks.mushrooms.point.northing)
                 val r = landmarkScale
                 drawOval(Color(0x3B506C4A),
                     topLeft = m + Offset(-r * 1.2f, r * 0.45f),
@@ -401,7 +402,7 @@ private fun TrainingMapCanvas(
             }
             // Buttercup glade — tiny five-petal flowers, not destination markers.
             run {
-                val c = p(28480.0, 40350.0)
+                val c = p(WoodlandLandmarks.flowers.point.easting, WoodlandLandmarks.flowers.point.northing)
                 for (j in 0 until 3) {
                     val center = c + Offset((j - 1) * landmarkScale * 0.92f,
                         if (j == 1) -landmarkScale * 0.27f else landmarkScale * 0.4f)
@@ -419,7 +420,7 @@ private fun TrainingMapCanvas(
             // Acorn nook and a smooth waystone add quiet personality without
             // duplicating the gold question marker or the solved check stamps.
             run {
-                val a = p(26580.0, 41650.0)
+                val a = p(WoodlandLandmarks.acorn.point.easting, WoodlandLandmarks.acorn.point.northing)
                 val r = landmarkScale * 0.75f
                 drawOval(terracotta, topLeft = a + Offset(-r * 0.65f, -r * 0.18f),
                     size = Size(r * 1.3f, r * 1.35f))
@@ -429,7 +430,7 @@ private fun TrainingMapCanvas(
                     a + Offset(r * 0.12f, -r * 0.80f), strokeWidth = r * 0.16f)
             }
             run {
-                val c = p(29050.0, 41600.0)
+                val c = p(WoodlandLandmarks.waystone.point.easting, WoodlandLandmarks.waystone.point.northing)
                 val r = landmarkScale * 0.84f
                 drawOval(Color(0x3B5C6E62), topLeft = c + Offset(-r, r * 0.52f),
                     size = Size(r * 2f, r * 0.42f))
