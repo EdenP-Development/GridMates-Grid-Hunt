@@ -251,7 +251,40 @@ private fun TrainingMapCanvas(
             topLeft = Offset(left, top), size = Size(right - left, bottom - top)
         )
         clipRect(left, top, right, bottom) {
-            // Decorative woodland: never used for answer grading.
+            // GH-V02: original, deterministic field-map artwork. Every shape is
+            // anchored in world meters so zoom/pan cannot slide it under the grid.
+            // These details are decorative only: the core owns every answer.
+            val meadow = if (surveyStyle) Color(0x1F5A928B) else Color(0x347FB36B)
+            val meadowLight = if (surveyStyle) Color(0x1FA2C5BC) else Color(0x39D9CD91)
+            val groveShadow = if (surveyStyle) Color(0x33527770) else Color(0x315A7651)
+            val canopyRim = if (surveyStyle) Color(0xFF7DABA1) else Color(0xFF96B18B)
+            val canopyHighlight = if (surveyStyle) Color(0xFFA5C7BC) else Color(0xFFB8C6A1)
+            fun landEllipse(e: Double, n: Double, radiusE: Double, radiusN: Double, ink: Color) {
+                val nw = p(e - radiusE, n + radiusN)
+                val se = p(e + radiusE, n - radiusN)
+                drawOval(ink, topLeft = nw, size = Size(se.x - nw.x, se.y - nw.y))
+            }
+            // Irregular clearings add texture without inventing navigable features.
+            listOf(
+                doubleArrayOf(24480.0, 41100.0, 510.0, 360.0),
+                doubleArrayOf(26720.0, 41900.0, 630.0, 400.0),
+                doubleArrayOf(29000.0, 40300.0, 700.0, 450.0),
+                doubleArrayOf(25800.0, 38100.0, 640.0, 510.0),
+                doubleArrayOf(28100.0, 39350.0, 390.0, 300.0)
+            ).forEachIndexed { i, oval ->
+                landEllipse(oval[0], oval[1], oval[2], oval[3],
+                    if (i % 2 == 0) meadow else meadowLight)
+            }
+            // Fixed flecks suggest grasses and paper grain. No random frame jitter.
+            for (i in 0 until 46) {
+                val e = 24120.0 + ((i * 977 + 103) % 5700)
+                val n = 37100.0 + ((i * 643 + 419) % 5700)
+                val center = p(e, n)
+                val radius = (55.0 * cam.pixelsPerMeter).toFloat().coerceIn(1.3f, 4.5f)
+                drawCircle(if (i % 3 == 0) meadow else meadowLight, radius, center)
+            }
+            // Trees use a soft multi-lobed silhouette, a warm highlight and a
+            // consistent shadow, rather than twelve unrelated solid circles.
             val trees = listOf(
                 24600.0 to 42250.0, 25150.0 to 41900.0, 25700.0 to 42500.0,
                 27750.0 to 41950.0, 28350.0 to 41500.0, 29400.0 to 42300.0,
@@ -260,15 +293,17 @@ private fun TrainingMapCanvas(
             )
             trees.forEachIndexed { i, pair ->
                 val center = p(pair.first, pair.second)
-                val radius = (270.0 * cam.pixelsPerMeter).toFloat().coerceIn(8f, 48f)
-                drawCircle(
-                    color = if (i % 3 == 0) treeDark else treeLight,
-                    center = center, radius = radius
-                )
-                drawCircle(
-                    color = if (surveyStyle) Color(0x55588F8B) else Color(0x557EA079),
-                    center = center + Offset(9f, 5f), radius = radius * 0.62f
-                )
+                val base = (205.0 * cam.pixelsPerMeter).toFloat().coerceIn(7f, 40f)
+                val radius = base * (0.9f + (i % 4) * 0.07f)
+                drawCircle(groveShadow, radius * 1.08f, center + Offset(radius * 0.16f, radius * 0.18f))
+                val foliage = if (i % 3 == 0) treeDark else treeLight
+                drawCircle(foliage, radius, center)
+                drawCircle(canopyRim, radius * 0.63f,
+                    center + Offset(-radius * 0.38f, radius * 0.12f))
+                drawCircle(foliage, radius * 0.59f,
+                    center + Offset(radius * 0.32f, -radius * 0.22f))
+                drawCircle(canopyHighlight, radius * 0.38f,
+                    center + Offset(-radius * 0.23f, -radius * 0.3f))
             }
             val stream = Path().apply {
                 val a = p(24900.0, 43000.0)
@@ -278,8 +313,13 @@ private fun TrainingMapCanvas(
                 val d = p(27900.0, 37800.0)
                 cubicTo(b.x, b.y, c.x, c.y, d.x, d.y)
             }
-            drawPath(stream, Color(0xFFBCD6D9), style = Stroke(width = 17f))
-            drawPath(stream, streamInk, style = Stroke(width = 7f))
+            // Layered creek banks/water; keep the original centerline exact.
+            val creekWidth = (90.0 * cam.pixelsPerMeter).toFloat().coerceIn(9f, 25f)
+            drawPath(stream, if (surveyStyle) Color(0xFFAAC4C3) else Color(0xFFB6C5AD),
+                style = Stroke(width = creekWidth + 8f))
+            drawPath(stream, if (surveyStyle) Color(0xFFA1CCD2) else Color(0xFFB5D7D8),
+                style = Stroke(width = creekWidth))
+            drawPath(stream, streamInk, style = Stroke(width = creekWidth * 0.27f))
             val trail = Path().apply {
                 val a = p(24000.0, 38950.0)
                 moveTo(a.x, a.y)
@@ -288,10 +328,10 @@ private fun TrainingMapCanvas(
                 val d = p(30000.0, 40700.0)
                 cubicTo(b.x, b.y, c.x, c.y, d.x, d.y)
             }
-            drawPath(
-                trail, trailInk,
-                style = Stroke(width = 3.5f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 7f)))
-            )
+            drawPath(trail, if (surveyStyle) Color(0x33809F9B) else Color(0x44BAA078),
+                style = Stroke(width = 10f))
+            drawPath(trail, trailInk,
+                style = Stroke(width = 3f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(11f, 7f))))
             // Labels belong to the kilometer GRID LINES, not cell centers.
             for (easting in 24000..30000 step 1000) {
                 val x = p(easting.toDouble(), bounds.south).x
