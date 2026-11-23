@@ -11,8 +11,8 @@ internal val Muted = Color(0xFF63746A)
 
 
 internal enum class MapLook(val label: String, val detail: String) {
-    FIELD_GUIDE("Field Guide", "Warm paper, natural woodland tones"),
-    SURVEY_TABLE("Survey Table", "Cool drafting board, crisp grid");
+    FIELD_GUIDE("Cozy Woods", "Warm, leafy storybook map"),
+    SURVEY_TABLE("Cool Sketch", "A mint-and-ink map");
     companion object {
         fun restore(name: String?): MapLook =
             entries.firstOrNull { it.name == name } ?: FIELD_GUIDE
