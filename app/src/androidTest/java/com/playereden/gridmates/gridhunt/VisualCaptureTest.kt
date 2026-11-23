@@ -1,5 +1,6 @@
 package com.playereden.gridmates.gridhunt
 
+import android.content.pm.ActivityInfo
 import android.content.Context
 import android.graphics.Bitmap
 import android.content.ContentValues
@@ -115,6 +116,31 @@ class VisualCaptureTest {
     private fun enterSpotCode(reference: String) {
         compose.onNodeWithTag("reverseCodeInput").performTextInput(reference)
         compose.onNodeWithTag("checkReverse").performClick()
+    }
+
+    @Test fun captureLandscapePuzzleLayouts() {
+        prepare()
+        try {
+            compose.activityRule.scenario.onActivity {
+                it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
+            compose.waitUntil(10_000) {
+                target.resources.configuration.orientation ==
+                    android.content.res.Configuration.ORIENTATION_LANDSCAPE
+            }
+            compose.onNodeWithTag("openChapter").performScrollTo().performClick()
+            dismissGuide()
+            compose.onNodeWithTag("checkChapter").assertExists()
+            capture("07_trail_landscape.png")
+            compose.onNodeWithTag("chapterHome").performClick()
+            compose.onNodeWithTag("openReverse").performScrollTo().performClick()
+            compose.onNodeWithTag("reverseCodeInput").assertExists()
+            capture("08_golden_landscape.png")
+        } finally {
+            compose.activityRule.scenario.onActivity {
+                it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
+        }
     }
 
     @Test fun captureHomeBothModesBothLooksAndBothFinishCards() {
