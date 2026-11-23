@@ -5,6 +5,9 @@ import android.graphics.Bitmap
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -18,8 +21,9 @@ import org.junit.runner.RunWith
  * Real screenshots from the running app on an Android 35 emulator.
  *
  * Captures are inspection evidence, not automated proof of visual quality.
- * This isolated emulator test may seed progress in its own app-private data;
- * it never modifies the owner's installed phone or published puzzles.
+ * End-state captures are earned by solving the actual 9+5 authored puzzles
+ * through the live UI, not by seeding progress preferences. No owner's phone
+ * or published puzzles are modified.
  */
 @RunWith(AndroidJUnit4::class)
 class VisualCaptureTest {
@@ -60,6 +64,32 @@ class VisualCaptureTest {
         }
     }
 
+    private fun chooseSquare(reference: String) {
+        require(reference.length == 4 && reference.all { it.isDigit() })
+        val e = reference.substring(0, 2).toInt()
+        val n = reference.substring(2, 4).toInt()
+        // Each accepted answer clears selection; arrow movement starts from 2640.
+        repeat((26 - e).coerceAtLeast(0)) {
+            compose.onNodeWithContentDescription("Move selected square west").performClick()
+        }
+        repeat((e - 26).coerceAtLeast(0)) {
+            compose.onNodeWithContentDescription("Move selected square east").performClick()
+        }
+        repeat((40 - n).coerceAtLeast(0)) {
+            compose.onNodeWithContentDescription("Move selected square south").performClick()
+        }
+        repeat((n - 40).coerceAtLeast(0)) {
+            compose.onNodeWithContentDescription("Move selected square north").performClick()
+        }
+        compose.onNodeWithText("YOUR PICK", substring = true).assertExists()
+        compose.onNodeWithTag("checkChapter").performClick()
+    }
+
+    private fun enterSpotCode(reference: String) {
+        compose.onNodeWithTag("reverseCodeInput").performTextInput(reference)
+        compose.onNodeWithTag("checkReverse").performClick()
+    }
+
     @Test fun captureHomeBothModesBothLooksAndBothFinishCards() {
         prepare()
         compose.onNodeWithTag("homeIllustration").assertExists()
@@ -78,20 +108,26 @@ class VisualCaptureTest {
         capture("04_golden_spots.png")
         compose.onNodeWithTag("reverseHome").performClick()
 
-        // A completed chapter is staged ONLY in this emulator's test preferences.
-        check(target.getSharedPreferences("gridhunt_first_bearings_v1", Context.MODE_PRIVATE)
-            .edit().putInt("hunt_index", 2).putInt("objective_index", 3)
-            .putBoolean("guide_seen", true).commit())
-        compose.activityRule.scenario.recreate()
-        compose.onNodeWithTag("openChapter").performClick()
-        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        // Return to the live chapter and earn every finish state legitimately.
+        compose.onNodeWithTag("openChapter").performScrollTo().performClick()
+        dismissGuide()
+        val trails = listOf(
+            listOf("2437", "2539", "2741"),
+            listOf("2938", "2642", "2839"),
+            listOf("2537", "2841", "2940")
+        )
+        trails.forEachIndexed { index, references ->
+            references.forEach(::chooseSquare)
+            compose.onNodeWithTag("puzzleFinishCard").assertExists()
+            if (index < trails.lastIndex) {
+                compose.onNodeWithTag("finishContinue").performClick()
+            }
+        }
         capture("05_treasure_finish.png")
         compose.onNodeWithTag("finishHome").performClick()
 
-        check(target.getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
-            .edit().putInt("step", 5).commit())
-        compose.activityRule.scenario.recreate()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
+        listOf("2440", "2742", "2838", "2541", "2942").forEach(::enterSpotCode)
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         capture("06_golden_finish.png")
     }
