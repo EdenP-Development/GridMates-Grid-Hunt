@@ -27,18 +27,18 @@ object FirstBearingsChapter {
 
     val hunts = listOf(
         ChapterHunt(
-            "trailhead", "Trailhead Survey",
-            "Find the first three survey squares.",
+            "trailhead", "A Walk in the Woods",
+            "Follow the first three clues through the trees.",
             authored("2437", "2539", "2741")
         ),
         ChapterHunt(
             "brook", "Across the Brook",
-            "Check another set of recorded grid squares.",
+            "Discover three more hidden squares near the water.",
             authored("2938", "2642", "2839")
         ),
         ChapterHunt(
-            "final-notes", "The Final Notes",
-            "Finish the woodland survey notebook.",
+            "final-notes", "One Last Discovery",
+            "Track down the final three woodland clues.",
             authored("2537", "2841", "2940")
         )
     )
