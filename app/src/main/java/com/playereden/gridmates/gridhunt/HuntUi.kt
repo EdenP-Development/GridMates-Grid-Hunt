@@ -127,35 +127,50 @@ internal fun HuntHeader(
     onGuide: () -> Unit,
     onHome: () -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text("GRID HUNT  •  THE LITTLE WOODLAND", color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+    // Owner's QA72 phone screenshot: the old three-line, uppercase eyebrow
+    // wrapped "THE LITTLE WOODLAND" and truncated "A Walk in the Woods".
+    // Use a title/action row plus a single dedicated trail row instead.
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Text(
                 "Trail Treasures", color = Ink,
-                fontSize = if (compact) 19.sp else 21.sp,
-                fontWeight = FontWeight.Bold, lineHeight = 24.sp
+                modifier = Modifier.weight(1f).testTag("trailModeTitle"),
+                fontSize = if (compact) 18.sp else 20.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
-            Text(
-                "TRAIL $huntNumber OF $huntTotal  ·  $huntName",
-                fontSize = 10.sp, color = Muted, maxLines = 1
-            )
+            TextButton(
+                onClick = onHome,
+                modifier = Modifier.testTag("chapterHome"),
+                contentPadding = PaddingValues(horizontal = 3.dp, vertical = 2.dp)
+            ) { Text("Home", color = Forest, fontSize = 12.sp) }
+            TextButton(
+                onClick = onGuide,
+                modifier = Modifier.semantics {
+                    contentDescription = "Show or hide grid reading guide"
+                },
+                contentPadding = PaddingValues(horizontal = 5.dp, vertical = 2.dp)
+            ) {
+                Text("?", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Forest)
+            }
         }
-        QuickMapLookButton(mapLook = mapLook, onLook = onLook)
-        TextButton(
-            onClick = onHome,
-            modifier = Modifier.testTag("chapterHome"),
-            contentPadding = PaddingValues(horizontal = 3.dp, vertical = 2.dp)
-        ) { Text("Home", color = Forest, fontSize = 11.sp) }
-        TextButton(
-            onClick = onGuide,
-            modifier = Modifier.semantics { contentDescription = "Show or hide grid reading guide" },
-            contentPadding = PaddingValues(horizontal = 5.dp, vertical = 2.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("?", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Forest)
+            Text(
+                "Trail $huntNumber/$huntTotal  ·  $huntName",
+                modifier = Modifier.weight(1f).testTag("trailLocation"),
+                fontSize = 11.sp, color = Muted, maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
+            QuickMapLookButton(mapLook = mapLook, onLook = onLook)
         }
     }
 }
