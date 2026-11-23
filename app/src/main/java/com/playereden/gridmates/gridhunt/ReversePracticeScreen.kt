@@ -215,8 +215,17 @@ internal fun ReversePracticeScreen(
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     ReverseHeader(onBack, mapLook, onLook)
-                    ReverseGoal(step, targets.size, active?.title)
-                    ReverseControls(
+                    if (!finished) ReverseGoal(step, targets.size, active?.title)
+                    if (finished) {
+                        PuzzleFinishCard(
+                            title = "Every golden spot found!",
+                            description = "Five little mysteries solved. Your discoveries will be here when you return.",
+                            discoveries = "${targets.size} OF ${targets.size} GOLDEN SPOTS",
+                            primaryLabel = "Find them again",
+                            onPrimary = check,
+                            onHome = onBack
+                        )
+                    } else ReverseControls(
                         answer, { answer = it.filter { c -> c in '0'..'9' }.take(4) },
                         feedback, hint, finished, step, targets.size,
                         { hint = (hint + 1).coerceAtMost(2) },
@@ -228,7 +237,7 @@ internal fun ReversePracticeScreen(
             Column(Modifier.fillMaxSize()) {
                 ReverseHeader(onBack, mapLook, onLook)
                 Spacer(Modifier.height(5.dp))
-                ReverseGoal(step, targets.size, active?.title)
+                if (!finished) ReverseGoal(step, targets.size, active?.title)
                 Spacer(Modifier.height(6.dp))
                 HuntMapPanel(
                     modifier = Modifier.fillMaxWidth().weight(1f), bounds = bounds,
@@ -238,7 +247,16 @@ internal fun ReversePracticeScreen(
                     mapLook = mapLook, discoveryMessage = discoveryMessage
                 )
                 Spacer(Modifier.height(5.dp))
-                ReverseControls(
+                if (finished) {
+                    PuzzleFinishCard(
+                        title = "Every golden spot found!",
+                        description = "Five little mysteries solved. Your discoveries will be here when you return.",
+                        discoveries = "${targets.size} OF ${targets.size} GOLDEN SPOTS",
+                        primaryLabel = "Find them again",
+                        onPrimary = check,
+                        onHome = onBack
+                    )
+                } else ReverseControls(
                     answer, { answer = it.filter { c -> c in '0'..'9' }.take(4) },
                     feedback, hint, finished, step, targets.size,
                     { hint = (hint + 1).coerceAtMost(2) },
