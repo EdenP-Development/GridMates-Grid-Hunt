@@ -2,6 +2,9 @@ package com.playereden.gridmates.gridhunt
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.content.ContentValues
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -12,7 +15,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import java.io.File
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,18 +38,38 @@ class VisualCaptureTest {
         val image = requireNotNull(
             InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
         ) { "Emulator screenshot was unavailable" }
-        val root = requireNotNull(target.getExternalFilesDir("visual-qa")) {
-            "Emulator screenshot output directory was unavailable"
+        // App-specific external files disappear when Gradle uninstalls the test
+        // app. Save into public Pictures through MediaStore instead so adb can
+        // still pull the evidence after connectedDebugAndroidTest completes.
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.RELATIVE_PATH,
+                "${Environment.DIRECTORY_PICTURES}/GridHuntVisualQA")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
         }
-        check(root.isDirectory || root.mkdirs()) { "Could not create screenshot directory" }
-        val output = File(root, filename)
-        output.outputStream().use { stream ->
-            check(image.compress(Bitmap.CompressFormat.PNG, 100, stream)) {
-                "PNG write failed for $filename"
+        val resolver = target.contentResolver
+        val uri = requireNotNull(
+            resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        ) { "Could not create MediaStore image $filename" }
+        try {
+            val output = requireNotNull(resolver.openOutputStream(uri)) {
+                "Could not open output for $filename"
             }
+            output.use { stream ->
+                check(image.compress(Bitmap.CompressFormat.PNG, 100, stream)) {
+                    "PNG write failed for $filename"
+                }
+            }
+            val visible = ContentValues().apply {
+                put(MediaStore.Images.Media.IS_PENDING, 0)
+            }
+            check(resolver.update(uri, visible, null, null) == 1) {
+                "Could not publish $filename"
+            }
+        } finally {
+            image.recycle()
         }
-        image.recycle()
-        check(output.length() > 0L) { "Empty screenshot $filename" }
     }
 
     private fun prepare() {
