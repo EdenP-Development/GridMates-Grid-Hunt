@@ -132,9 +132,13 @@ jobs:
             mkdir -p vision-screenshots
             # MediaStore captures persist through Gradle's test-APK teardown.
             adb pull /sdcard/Pictures/GridHuntVisualQA/. vision-screenshots/
-            for file in 01_home.png 02_trail_treasures.png 03_trail_other_map_style.png 04_golden_spots.png 05_treasure_finish.png 06_golden_finish.png; do
-              test -s "vision-screenshots/$file" || { echo "Missing visual QA screenshot: $file"; exit 1; }
-            done
+            # The runner executes each script line separately: use standalone commands.
+            test -s vision-screenshots/01_home.png
+            test -s vision-screenshots/02_trail_treasures.png
+            test -s vision-screenshots/03_trail_other_map_style.png
+            test -s vision-screenshots/04_golden_spots.png
+            test -s vision-screenshots/05_treasure_finish.png
+            test -s vision-screenshots/06_golden_finish.png
       - name: Publish Android instrumentation results
         if: always()
         uses: actions/upload-artifact@v4
