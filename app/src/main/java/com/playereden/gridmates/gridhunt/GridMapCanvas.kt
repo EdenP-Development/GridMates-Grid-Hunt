@@ -359,6 +359,74 @@ private fun TrainingMapCanvas(
                 style = Stroke(width = 10f))
             drawPath(trail, trailInk,
                 style = Stroke(width = 3f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(11f, 7f))))
+            // GH-V06: four friendly illustrated landmarks. They sit at fixed world
+            // positions and are deliberately unrelated to target answers.
+            // No random-placement drift, no tappable faux objectives.
+            val landmarkScale = (130.0 * cam.pixelsPerMeter).toFloat().coerceIn(10f, 29f)
+            val moss = if (surveyStyle) Color(0xFF69958D) else Color(0xFF6E956A)
+            val deepMoss = if (surveyStyle) Color(0xFF426F72) else Color(0xFF416D4E)
+            val terracotta = if (surveyStyle) Color(0xFF9C7D70) else Color(0xFFC17B55)
+            val ivory = if (surveyStyle) Color(0xFFE6F1EA) else Color(0xFFFFE9BB)
+            // Mushroom nook — small, recognizable silhouettes in a quiet clearing.
+            run {
+                val m = p(25750.0, 38900.0)
+                val r = landmarkScale
+                drawOval(Color(0x3B506C4A),
+                    topLeft = m + Offset(-r * 1.2f, r * 0.45f),
+                    size = Size(r * 2.4f, r * 0.5f))
+                for (j in 0..1) {
+                    val x = m.x + if (j == 0) -r * 0.43f else r * 0.42f
+                    val y = m.y + if (j == 0) r * 0.08f else r * 0.19f
+                    val scale = if (j == 0) 0.95f else 0.68f
+                    drawLine(ivory, Offset(x, y), Offset(x, y + r * 0.72f * scale),
+                        strokeWidth = r * 0.35f * scale)
+                    drawOval(terracotta,
+                        topLeft = Offset(x - r * 0.57f * scale, y - r * 0.32f * scale),
+                        size = Size(r * 1.14f * scale, r * 0.59f * scale))
+                    drawCircle(ivory, radius = r * 0.095f * scale,
+                        center = Offset(x - r * 0.12f * scale, y - r * 0.1f * scale))
+                }
+            }
+            // Buttercup glade — tiny five-petal flowers, not destination markers.
+            run {
+                val c = p(28480.0, 40350.0)
+                for (j in 0 until 3) {
+                    val center = c + Offset((j - 1) * landmarkScale * 0.92f,
+                        if (j == 1) -landmarkScale * 0.27f else landmarkScale * 0.4f)
+                    val bloom = landmarkScale * (if (j == 1) 0.38f else 0.28f)
+                    for (petal in 0 until 5) {
+                        val theta = petal * 6.2831853f / 5f
+                        val dx = kotlin.math.cos(theta) * bloom
+                        val dy = kotlin.math.sin(theta) * bloom
+                        drawCircle(ivory, bloom * 0.50f,
+                            center + Offset(dx, dy))
+                    }
+                    drawCircle(terracotta, bloom * 0.31f, center)
+                }
+            }
+            // Acorn nook and a smooth waystone add quiet personality without
+            // duplicating the gold question marker or the solved check stamps.
+            run {
+                val a = p(26580.0, 41650.0)
+                val r = landmarkScale * 0.75f
+                drawOval(terracotta, topLeft = a + Offset(-r * 0.65f, -r * 0.18f),
+                    size = Size(r * 1.3f, r * 1.35f))
+                drawOval(deepMoss, topLeft = a + Offset(-r * 0.75f, -r * 0.4f),
+                    size = Size(r * 1.5f, r * 0.55f))
+                drawLine(deepMoss, a + Offset(0f, -r * 0.45f),
+                    a + Offset(r * 0.12f, -r * 0.80f), strokeWidth = r * 0.16f)
+            }
+            run {
+                val c = p(29050.0, 41600.0)
+                val r = landmarkScale * 0.84f
+                drawOval(Color(0x3B5C6E62), topLeft = c + Offset(-r, r * 0.52f),
+                    size = Size(r * 2f, r * 0.42f))
+                drawOval(if (surveyStyle) Color(0xFF8DACA4) else Color(0xFFAAA88C),
+                    topLeft = c + Offset(-r * 0.73f, -r),
+                    size = Size(r * 1.46f, r * 1.82f))
+                drawLine(moss, c + Offset(-r * 0.2f, -r * 0.2f),
+                    c + Offset(r * 0.18f, r * 0.11f), strokeWidth = r * 0.12f)
+            }
             // Labels belong to the kilometer GRID LINES, not cell centers.
             for (easting in 24000..30000 step 1000) {
                 val x = p(easting.toDouble(), bounds.south).x
