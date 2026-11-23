@@ -1,7 +1,7 @@
 # Grid Hunt — Map Guide, Symbols & Fair Clue Design
 
 **Owner design direction:** 2026-11-23, after QA98 first real-phone Treasure Checklist screenshots.  
-**State:** Product/design contract. Legend, clue grammar and ambiguity checks described here are a specification until explicitly marked implemented in code and tested.  
+**State (2026-11-23):** **P1 woodland symbol Map Guide implemented and emulator-tested in QA113.** The repeated-object clue grammar/ambiguity validator, later difficulty tiers, elevation/road relations and full map-pack library remain **DESIGN ONLY** until independently implemented and tested.  
 **Read with:** [Campaign, Gameplay & UI Blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md), [Map Reading Accuracy](MAP_READING_ACCURACY.md), [Puzzle/Content System](PUZZLE_AND_CONTENT_SYSTEM.md).  
 **Current source:** draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12). Keep documentation/version history durable across chats.
 
@@ -104,7 +104,7 @@ Do not build a large generic clue-language interpreter before a **small, authore
 
 **First real QA insight:** the owner completed QA98's four-object checklist but was unsure what some tiny landmarks represented. Fix clarity before making those clues more sophisticated.
 
-**P1 — Symbol guide vertical slice:** Add an optional Map Guide to Treasure Checklist, using truthful present-landmark symbol previews and a short grid-reading reference. It should open/close without losing the answer, selection, zoom or checklist state. No new big asset library. Add emulator UI tests and physical screenshot review.
+**P1 — Symbol guide vertical slice: IMPLEMENTED / CI-TESTED (QA113).** The checklist's optional scrollable **Explore the Map** guide shows actual previews from the same Compose shape renderer used by the woodland map (mushrooms, flowers, acorn, waystone), plus creek, trail, groves/clearings and four-digit reading rules. Each active checklist target also displays a matching smaller preview. No clue coordinates are shown. CI verifies opening/dismissal, entries, no answer leak, and progression. **Phone legibility/comfort still needs owner review.**
 
 **P2 — Target affordance:** Make current target recognizably legible on phone. Consider a focused object detail/preview matching the actual map artwork, localized zoom or carefully framed help. Don't reveal grid answer automatically.
 
@@ -119,6 +119,6 @@ Do not build a large generic clue-language interpreter before a **small, authore
 ## 7. Living handoff
 
 - **Blueprint entry:** [GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md).
-- **Implementation after QA98:** add precise source SHA, UI test/CI run, actual phone screenshot observations, and next blocker to this document.
+- **P1 verified implementation:** code source [`0790d2eb`](https://github.com/PlayerEden/GridMates-Grid-Hunt/commit/0790d2eb53b04c1839b4f9fb1399b250716bc43a) · [QA113 full green CI](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877) · [QA113 test APK ZIP](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877/artifacts/14865234254) · [executed Android tests and 11 screenshot captures](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877/artifacts/14865474110). Production signing and actual phone acceptance not claimed. The user's QA98 phone images identified the tiny landmark ambiguity; the guide and matching active preview are the current candidate remedy. **Next:** owner checks real phone symbol recognition and dialog ergonomics; then implement typed repeated-category relation/uniqueness tests.
 - **New-chat instruction:** 'Continue Grid Hunt from the Campaign Blueprint and `docs/PUZZLE_SYMBOLS_CLUE_FAIRNESS.md`. Check the real GitHub PR and last green QA; build the next P1–P5 slice, maintaining exact map answers and our test key.'
-- **Do not assume documentation equals feature completion.** The guide and generalized clue validation described here are **planned until corresponding commits and test evidence exist**.
+- **Do not assume documentation equals feature completion.** The **Map Guide and matching landmark previews** are implemented and QA113 emulator-tested. The **generalized repeated-category clue validation, multi-church levels, elevation/road relationships, and mixed campaigns** remain proposals only.
