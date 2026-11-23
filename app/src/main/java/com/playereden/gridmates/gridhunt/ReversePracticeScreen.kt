@@ -6,6 +6,7 @@ import android.graphics.Paint
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -259,7 +260,8 @@ private fun ReverseHeader(
 
 @Composable
 private fun ReverseGoal(step: Int, total: Int, title: String?) {
-    Surface(color = Color(0xFFFFFBF1), shape = RoundedCornerShape(14.dp)) {
+    Surface(color = Color(0xFFFFF7E0), shape = RoundedCornerShape(18.dp),
+        border = BorderStroke(1.dp, Color(0xFFE7CF9D))) {
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 13.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
@@ -269,7 +271,11 @@ private fun ReverseGoal(step: Int, total: Int, title: String?) {
                     fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Forest)
                 Text(title ?: "Five golden discoveries, all yours!", fontSize = 12.sp, color = Muted)
             }
-            Text(if (title == null) "✓" else "✦", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Ink)
+            Surface(color = Color(0xFFF6DFA9), shape = RoundedCornerShape(13.dp)) {
+                Text(if (title == null) "✓" else "✦",
+                    fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Ink,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp))
+            }
         }
     }
 }
