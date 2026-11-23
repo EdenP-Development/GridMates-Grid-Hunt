@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.test.platform.app.InstrumentationRegistry
 import android.content.Context
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -67,6 +68,8 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuideIfShown()
         compose.onNodeWithText("CLUE 1 OF 3").assertExists()
+        compose.onNodeWithTag("trailModeTitle").assertExists()
+        compose.onNodeWithTag("trailLocation").assertTextContains("A Walk in the Woods")
 
         // Default arrow origin is 2640; 2 west and 3 south yields canonical 2437.
         repeat(2) {
@@ -98,6 +101,8 @@ class HomeNavigationTest {
         compose.onNodeWithTag("reverseCodeInput").performTextInput("2440")
         compose.onNodeWithTag("checkReverse").performClick()
         compose.onNodeWithText("GOLDEN SPOT 2 OF 5").assertExists()
+        compose.onNodeWithText("Next golden spot! Find its dot and read the square.").assertExists()
+        compose.onNodeWithText("0000").assertDoesNotExist()
         compose.onNodeWithTag("reverseHome").performClick()
         compose.activityRule.scenario.recreate()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
