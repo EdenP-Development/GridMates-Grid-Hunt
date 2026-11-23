@@ -1,7 +1,7 @@
 # Grid Hunt — Map Guide, Symbols & Fair Clue Design
 
 **Owner design direction:** 2026-11-23, after QA98 first real-phone Treasure Checklist screenshots.  
-**State (2026-11-23):** **P1 woodland symbol Map Guide implemented and emulator-tested in QA113.** The repeated-object clue grammar/ambiguity validator, later difficulty tiers, elevation/road relations and full map-pack library remain **DESIGN ONLY** until independently implemented and tested.  
+**State (2026-11-23):** **P1 Map Guide implemented and QA113-tested; P3 typed clue-validation foundation implemented in pure Kotlin with JUnit tests, pending final GH-V11 CI completion.** Authored multi-church chapters, elevation/road geometry, mixed puzzle UI and full map packs remain **DESIGN ONLY**.  
 **Read with:** [Campaign, Gameplay & UI Blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md), [Map Reading Accuracy](MAP_READING_ACCURACY.md), [Puzzle/Content System](PUZZLE_AND_CONTENT_SYSTEM.md).  
 **Current source:** draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12). Keep documentation/version history durable across chats.
 
@@ -94,11 +94,15 @@ Authored map: `church-riverside`, `church-hilltop`, `church-village`.
 - **Conditional**: `Find the church east of the footbridge and north of the school` requires exact known footbridge/school IDs and unique matching instance.
 - **Bad even with one correct-looking answer**: using `2641` when multiple candidate churches occupy square 2641 and the task asks the player to distinguish their identities by coordinate alone.
 
-### Validator implementation outline (future feature, not yet code)
+### GH-V11 implemented clue validator and limits
 
-A pure-Kotlin `ClueValidation` module should take `MapPack`, `Landmark`, `FeatureRelationship`, `CluePredicate`, `ObjectiveSpec`, and return either a **single unique ID** or an explicit reason for rejection (`MISSING_FEATURE`, `AMBIGUOUS`, `UNRECOGNIZABLE_SYMBOL`, `SAME_GRID_SQUARE`, `UNSUPPORTED_RELATION`). Unit tests create multi-church fixtures and verify every case. Rendering uses the same validated IDs.
+The pure-Kotlin [`ClueValidation.kt`](../core/src/main/kotlin/com/playereden/gridhunt/core/ClueValidation.kt) implements `ClueFeature`, `ClueMapPack`, `ClueObjective`, typed `ClueCondition`, `FeatureRelation` and a fail-closed `ClueVerdict` suitable for **content publication validation**. It checks known/published symbols, real feature IDs, regions with complete metadata, explicit authored BESIDE links, world-meter EastOf/NorthOf/NearPoint conditions, unique matching landmark ID, correct authored target ID and unique **four-digit** grid square among same-category candidates. It returns a `Publishable` verdict or a specific rejection code: `INVALID_SPEC`, `MISSING_FEATURE`, `UNRECOGNIZABLE_SYMBOL`, `UNSUPPORTED_RELATION`, `NO_MATCH`, `AMBIGUOUS`, `TARGET_MISMATCH`, `SAME_GRID_SQUARE`.
 
-Do not build a large generic clue-language interpreter before a **small, authored, tested** three-similar-object map is needed. Implement the simplest typed predicate subset first (e.g. `CATEGORY`, `NEAR`, `EAST_OF`) and grow only with real puzzle content.
+A **linear** creek/road feature cannot be interpreted as a point to fake distances or compass directions. `NearPoint`/EastOf/NorthOf require an actual point feature; a relation such as *beside the creek* must be separately authored and verified against the real drawn waterway. The engine currently trusts reviewed, explicitly authored BESIDE links; it does **not** independently prove that the art matches those relationships, nor does it infer elevation or road adjacency. Unimplemented conditions fail closed, not silently.
+
+[`ClueValidationTest.kt`](../core/src/test/kotlin/com/playereden/gridhunt/core/ClueValidationTest.kt) uses **synthetic three-church fixtures**, including missing features, unknown symbols, ambiguous category, region, combined directions, invalid distances, a same-square second church and a linear creek. **No churches were added to the actual woodland map.** The `WoodlandClueMap` adapter reads the existing four landmark points and IDs unchanged, without fabricating creek/road/region relationships.
+
+Next: inspect completed GH-V11 CI evidence and, once stable, build a very small **What's at This Grid?** identification slice on the four known woodland objects. Do **not** construct a huge natural-language clue interpreter or multiply content before those mechanics are playable and fair.
 
 ## 6. Near-term build order
 
@@ -108,7 +112,7 @@ Do not build a large generic clue-language interpreter before a **small, authore
 
 **P2 — Target affordance:** Make current target recognizably legible on phone. Consider a focused object detail/preview matching the actual map artwork, localized zoom or carefully framed help. Don't reveal grid answer automatically.
 
-**P3 — Clue fairness foundation:** Add stable categories and authored relationship metadata to the content registry, plus simple unique-candidate tests. Build a **three-similar-object fixture** for tests; do not add fake churches to the Little Woodland map without an authored chapter and fair visual anchors.
+**P3 — Clue fairness foundation: CODED / JVM CORE TESTS PASSING (GH-V11).** Typed category, region, authored BESIDE, directional and point-nearness rules, rejection diagnostics and three-church fixtures live in `core`. The real woodland feature positions are adapted unchanged. Confirm the **latest** source-matched CI run before marking all Android jobs green; no new playable mode or church art has been introduced.
 
 **P4 — First distinct repeated-object chapter:** One map/mission with at most a few same-category features and one unambiguous relation (creek / trail / region). Playtest before multiplying clue types.
 
@@ -119,6 +123,6 @@ Do not build a large generic clue-language interpreter before a **small, authore
 ## 7. Living handoff
 
 - **Blueprint entry:** [GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md).
-- **P1 verified implementation:** code source [`0790d2eb`](https://github.com/PlayerEden/GridMates-Grid-Hunt/commit/0790d2eb53b04c1839b4f9fb1399b250716bc43a) · [QA113 full green CI](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877) · [QA113 test APK ZIP](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877/artifacts/14865234254) · [executed Android tests and 11 screenshot captures](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877/artifacts/14865474110). Production signing and actual phone acceptance not claimed. The user's QA98 phone images identified the tiny landmark ambiguity; the guide and matching active preview are the current candidate remedy. **Next:** owner checks real phone symbol recognition and dialog ergonomics; then implement typed repeated-category relation/uniqueness tests.
+- **P1 verified implementation:** code source [`0790d2eb`](https://github.com/PlayerEden/GridMates-Grid-Hunt/commit/0790d2eb53b04c1839b4f9fb1399b250716bc43a) · [QA113 full green CI](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877) · [QA113 test APK ZIP](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877/artifacts/14865234254) · [executed Android tests and 11 screenshot captures](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877/artifacts/14865474110). Production signing and actual phone acceptance not claimed. The user's QA98 phone images identified the tiny landmark ambiguity; the guide and matching active preview are the current candidate remedy. **Next:** owner checks the real phone Map Guide; typed repeated-category relation/uniqueness tests are now in GH-V11. After verifying current CI, implement and playtest the first coordinate-to-object answer tray.
 - **New-chat instruction:** 'Continue Grid Hunt from the Campaign Blueprint and `docs/PUZZLE_SYMBOLS_CLUE_FAIRNESS.md`. Check the real GitHub PR and last green QA; build the next P1–P5 slice, maintaining exact map answers and our test key.'
-- **Do not assume documentation equals feature completion.** The **Map Guide and matching landmark previews** are implemented and QA113 emulator-tested. The **generalized repeated-category clue validation, multi-church levels, elevation/road relationships, and mixed campaigns** remain proposals only.
+- **Do not assume documentation equals feature completion.** The **Map Guide and matching landmark previews** are implemented and QA113 emulator-tested. The **typed repeated-category clue validator exists as GH-V11 core code and JUnit tests**, but multi-church gameplay levels, elevation/road geometry, authored chapter integration, and mixed campaigns remain proposals only.
