@@ -273,18 +273,31 @@ private fun ReverseHeader(
     mapLook: MapLook,
     onLook: (MapLook) -> Unit
 ) {
-    Row(
-        Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text("GRID HUNT  •  THE LITTLE WOODLAND", fontSize = 10.sp, color = Forest, fontWeight = FontWeight.Bold)
-            Text("Golden Spots", fontSize = 21.sp, color = Ink, fontWeight = FontWeight.Bold)
-            Text("FIND THE SECRET FOUR-DIGIT CODE", fontSize = 10.sp, color = Muted)
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                "Golden Spots", fontSize = 21.sp, color = Ink,
+                fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f),
+                maxLines = 1
+            )
+            TextButton(onClick = onBack, modifier = Modifier.testTag("reverseHome")) {
+                Text("Home", fontSize = 12.sp)
+            }
         }
-        QuickMapLookButton(mapLook = mapLook, onLook = onLook)
-        TextButton(onClick = onBack, modifier = Modifier.testTag("reverseHome")) {
-            Text("Home", fontSize = 12.sp)
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                "Find its four-digit map code", fontSize = 11.sp, color = Muted,
+                modifier = Modifier.weight(1f), maxLines = 1
+            )
+            QuickMapLookButton(mapLook = mapLook, onLook = onLook)
         }
     }
 }
