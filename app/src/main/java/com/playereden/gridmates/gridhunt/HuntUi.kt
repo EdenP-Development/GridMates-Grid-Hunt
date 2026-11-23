@@ -132,18 +132,17 @@ internal fun HuntHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text("GRIDMATES / GRID HUNT", color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Text("GRID HUNT  •  THE LITTLE WOODLAND", color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             Text(
-                "First Bearings", color = Ink,
+                "Trail Treasures", color = Ink,
                 fontSize = if (compact) 19.sp else 21.sp,
                 fontWeight = FontWeight.Bold, lineHeight = 24.sp
             )
             Text(
-                "HUNT $huntNumber / $huntTotal  ·  $huntName",
+                "TRAIL $huntNumber OF $huntTotal  ·  $huntName",
                 fontSize = 10.sp, color = Muted, maxLines = 1
             )
         }
-        Text("N ↑", color = Forest, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         QuickMapLookButton(mapLook = mapLook, onLook = onLook)
         TextButton(
             onClick = onHome,
@@ -178,15 +177,15 @@ internal fun ObjectiveRibbon(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     when {
-                        chapterFinished -> "CHAPTER COMPLETE"
-                        done -> "HUNT COMPLETE"
-                        else -> "FIND SQUARE  " + (step + 1) + " / " + total
+                        chapterFinished -> "ALL CLUES FOUND!"
+                        done -> "TRAIL COMPLETE"
+                        else -> "CLUE " + (step + 1) + " OF " + total
                     },
                     fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Forest
                 )
                 Text(
-                    if (done) "Nice work. Survey recorded."
-                    else "Eastings first, then northings",
+                    if (done) "Every square found. Nice exploring!"
+                    else "Find this square on the map",
                     fontSize = 11.sp, maxLines = 2, color = Muted
                 )
             }
@@ -205,13 +204,14 @@ internal fun GridReadingGuide(onDismiss: () -> Unit) {
     // Once dismissed, tapping the ? button in the header opens it again.
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("How to read the grid", color = Ink, fontWeight = FontWeight.Bold) },
+        title = { Text("A little map-reading trick", color = Ink, fontWeight = FontWeight.Bold) },
         text = {
             Text(
-                "Read eastings first (numbers at the bottom), then northings " +
-                    "(numbers at the left). For 2437, find line 24 and line 37. " +
-                    "Tap the square immediately above and right of their crossing. " +
-                    "Preview your choice, then Check. Hints are always free.",
+                "Every square has a four-digit address. First, follow the first two " +
+                    "numbers along the bottom. Then, follow the last two numbers " +
+                    "up the left side. For 2437, find the crossing of 24 and 37, " +
+                    "then tap the square just above and to the right. " +
+                    "Try a guess — you can change it anytime! Hints are free.",
                 color = Ink
             )
         },
@@ -254,12 +254,12 @@ internal fun HuntControlPanel(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            if (finished) "COMPLETE  " + total + " / " + total
-            else "FOUND  " + step + " / " + total,
+            if (finished) "FOUND ALL " + total
+            else "FOUND " + step + " OF " + total,
             color = Forest, fontWeight = FontWeight.Bold, fontSize = 12.sp
         )
         Text(
-            if (finished) "✓ ALL SITES" else "SELECTED  " + (selected ?: "—"),
+            if (finished) "✦ WELL DONE" else "YOUR PICK  " + (selected ?: "—"),
             color = Forest, fontSize = 12.sp, fontWeight = FontWeight.SemiBold
         )
     }
@@ -280,8 +280,8 @@ internal fun HuntControlPanel(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("SELECT SQUARE", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
-        Text("ZOOM", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
+        Text("MOVE YOUR PICK", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
+        Text("MAP VIEW", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
     }
     Row(
         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -304,17 +304,17 @@ internal fun HuntControlPanel(
             onClick = onUndo, enabled = !finished,
             modifier = Modifier.weight(1f).heightIn(min = 46.dp),
             contentPadding = PaddingValues(0.dp)
-        ) { Text("Undo", fontSize = 12.sp) }
+        ) { Text("Clear", fontSize = 12.sp) }
         OutlinedButton(
             onClick = onHint, enabled = !finished,
             modifier = Modifier.weight(1f).heightIn(min = 46.dp),
             contentPadding = PaddingValues(0.dp)
-        ) { Text("Hint", fontSize = 12.sp) }
+        ) { Text("Clue", fontSize = 12.sp) }
         OutlinedButton(
             onClick = onFit,
             modifier = Modifier.weight(1f).heightIn(min = 46.dp),
             contentPadding = PaddingValues(0.dp)
-        ) { Text("Fit map", fontSize = 12.sp) }
+        ) { Text("See all", fontSize = 12.sp) }
     }
     Button(
         modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
