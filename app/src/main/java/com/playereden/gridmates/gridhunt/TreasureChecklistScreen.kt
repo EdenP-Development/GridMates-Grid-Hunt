@@ -83,6 +83,7 @@ internal fun TreasureChecklistScreen(
         mutableStateOf(prefs.getString("answer", "") ?: "")
     }
     var hintVisible by rememberSaveable { mutableStateOf(false) }
+    var showMapGuide by rememberSaveable { mutableStateOf(false) }
     var feedback by rememberSaveable {
         mutableStateOf("Find a landmark, then enter the square where it belongs.")
     }
@@ -203,7 +204,8 @@ internal fun TreasureChecklistScreen(
                         .fillMaxHeight().verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    TreasureChecklistHeader(completed.size, mission.targets.size, onHome)
+                    TreasureChecklistHeader(completed.size, mission.targets.size,
+                        onGuide = { showMapGuide = true }, onHome = onHome)
                     if (finished) {
                         TreasureChecklistFinished(onHome, replay)
                     } else {
@@ -216,7 +218,8 @@ internal fun TreasureChecklistScreen(
             }
         } else {
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                TreasureChecklistHeader(completed.size, mission.targets.size, onHome)
+                TreasureChecklistHeader(completed.size, mission.targets.size,
+                        onGuide = { showMapGuide = true }, onHome = onHome)
                 if (!finished) {
                     TreasureChecklistTargets(mission.targets, completed, active?.id, choose)
                 }
@@ -236,19 +239,28 @@ internal fun TreasureChecklistScreen(
             }
         }
     }
+    if (showMapGuide) {
+        WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showMapGuide = false })
+    }
 }
 
 @Composable
-private fun TreasureChecklistHeader(found: Int, total: Int, onHome: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) {
-            Text("Treasure Checklist", color = Ink, fontWeight = FontWeight.ExtraBold,
-                fontSize = 21.sp)
-            Text("$found of $total woodland discoveries", color = Forest, fontSize = 11.sp,
-                fontWeight = FontWeight.Medium, modifier = Modifier.testTag("treasureProgress"))
-        }
-        TextButton(onClick = onHome, modifier = Modifier.testTag("treasureHome")) {
-            Text("Home", color = Forest)
+private fun TreasureChecklistHeader(
+    found: Int, total: Int, onGuide: () -> Unit, onHome: () -> Unit
+) {
+    Column(Modifier.fillMaxWidth()) {
+        Text("Treasure Checklist", color = Ink, fontWeight = FontWeight.ExtraBold,
+            fontSize = 21.sp, maxLines = 1)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("$found of $total woodland discoveries", color = Forest,
+                fontSize = 11.sp, fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f).testTag("treasureProgress"))
+            TextButton(onClick = onGuide, modifier = Modifier.testTag("openWoodlandMapGuide")) {
+                Text("Map Guide", color = Forest, fontSize = 12.sp)
+            }
+            TextButton(onClick = onHome, modifier = Modifier.testTag("treasureHome")) {
+                Text("Home", color = Forest, fontSize = 12.sp)
+            }
         }
     }
 }
