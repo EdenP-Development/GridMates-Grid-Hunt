@@ -29,7 +29,8 @@ class ClueValidationTest {
             ),
             // Creek is a map feature whose BESIDE relationship is EXPLICITLY
             // authored. NearPoint is never used to approximate its polyline.
-            ClueFeature("east-creek", "waterway", WorldPoint(24900.0, 40900.0), "creek"),
+            ClueFeature("east-creek", "waterway", WorldPoint(24900.0, 40900.0),
+                "creek", geometry = ClueGeometry.LINEAR),
             ClueFeature("footbridge", "bridge", WorldPoint(26300.0, 40500.0), "bridge"),
             ClueFeature("school", "school", WorldPoint(27000.0, 39900.0), "school"),
             ClueFeature("orchard", "orchard", WorldPoint(28800.0, 39250.0), "orchard")
@@ -144,6 +145,26 @@ class ClueValidationTest {
         rejected(fixture(),
             objective(conditions = listOf(ClueCondition.NearPoint("orchard", Double.NaN))),
             ClueRejection.INVALID_SPEC)
+    }
+
+    @Test fun linearCreekCannotPretendToBeAPointForDistanceOrDirection() {
+        rejected(
+            fixture(),
+            objective(conditions = listOf(ClueCondition.NearPoint("east-creek", 500.0))),
+            ClueRejection.UNSUPPORTED_RELATION
+        )
+        rejected(
+            fixture(),
+            objective(conditions = listOf(ClueCondition.EastOf("east-creek"))),
+            ClueRejection.UNSUPPORTED_RELATION
+        )
+        // The separately authored BESIDE link remains a valid way to use
+        // the creek until a reviewed, real polyline distance engine exists.
+        accepted(
+            fixture(),
+            objective(conditions = listOf(ClueCondition.BesideFeature("east-creek"))),
+            "church-riverside", "2440"
+        )
     }
 
     @Test fun wrongTargetIdCannotSneakThroughAnOtherwiseUniqueClue() {
