@@ -214,7 +214,7 @@ internal fun ReversePracticeScreen(
                     Modifier.width(controlsWidth).fillMaxHeight().verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    ReverseHeader(onBack, mapLook, onLook)
+                    ReverseHeader(onBack)
                     if (!finished) ReverseGoal(step, targets.size, active?.title)
                     if (finished) {
                         PuzzleFinishCard(
@@ -235,7 +235,7 @@ internal fun ReversePracticeScreen(
             }
         } else {
             Column(Modifier.fillMaxSize()) {
-                ReverseHeader(onBack, mapLook, onLook)
+                ReverseHeader(onBack)
                 Spacer(Modifier.height(5.dp))
                 if (!finished) ReverseGoal(step, targets.size, active?.title)
                 Spacer(Modifier.height(6.dp))
@@ -268,11 +268,7 @@ internal fun ReversePracticeScreen(
 }
 
 @Composable
-private fun ReverseHeader(
-    onBack: () -> Unit,
-    mapLook: MapLook,
-    onLook: (MapLook) -> Unit
-) {
+private fun ReverseHeader(onBack: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             Modifier.fillMaxWidth(),
@@ -288,17 +284,10 @@ private fun ReverseHeader(
                 Text("Home", fontSize = 12.sp)
             }
         }
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                "Find its four-digit map code", fontSize = 11.sp, color = Muted,
-                modifier = Modifier.weight(1f), maxLines = 1
-            )
-            QuickMapLookButton(mapLook = mapLook, onLook = onLook)
-        }
+        Text(
+            "Find its four-digit map code", fontSize = 11.sp,
+            color = Muted, maxLines = 1
+        )
     }
 }
 
