@@ -1,10 +1,12 @@
 # GridMates: Grid Hunt
 
-**Current development checkpoint (2026-11-23):** The native Android app now has 9 authored Trail Treasures targets, 5 Golden Spots and a new **4-item Treasure Checklist pilot**, all on one woodland map with local saves. [QA98 Android CI passed](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45267677473), including real emulator gameplay and screenshot checks; owner QA72 screenshots informed earlier polish. The work is in **draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12)**, not yet merged or production-released. Physical QA98 checklist acceptance and install-over proof remain open.
+**Current development checkpoint (2026-11-23):** Native Android Grid Hunt includes 9 Trail Treasures square finds, 5 Golden Spots, a four-item woodland Treasure Checklist, and now an optional **Map Guide** with exact matching previews of map landmarks. [QA113 Android build and emulator tests passed](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45273290877), including 11 screenshot captures. Owner QA98 phone screenshots prompted the guide and clearer active-target previews. This work is in draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12), not merged or production-released. **QA113 real-phone acceptance and actual install-over proof remain open.**
 
 **Premise:** A welcoming, offline-first map-grid puzzle hunt that teaches transferable land-navigation habits through play. Find grid references on illustrated maps, reverse-read coordinates from landmarks, and eventually complete multi-step hunts. Fun first; technically honest coordinate rules underneath.
 
 **Companion GridMates games:** [Sudoku](https://github.com/PlayerEden/SudokuTogether), [Word Search](https://github.com/PlayerEden/GridMates-Word-Search), [Crossroads](https://github.com/PlayerEden/GridMates-Crossroads). Grid Hunt is a **separate app**, repository, package and save space.
+
+**Map symbols and fair clues:** [Map Guide, Symbols & Clue Fairness](docs/PUZZLE_SYMBOLS_CLUE_FAIRNESS.md). Saves the owner's QA98 findings, which symbols the game uses, and five difficulty tiers for future repeated-object clues. The Map Guide has been implemented and emulator-tested; the generalized clue-uniqueness system remains planned.
 
 **NEW — Campaign/mode/Custom Play/UI plan:** [Grid Hunt Gameplay, Campaign & UI Blueprint](docs/GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md). This is the durable **future-game vision and chat handoff**, including Word Search–like object checklists, identify-by-grid puzzles, mixed chapters, custom play and just-in-time art policy. Proposed modes are **not implemented** by this document.
 
