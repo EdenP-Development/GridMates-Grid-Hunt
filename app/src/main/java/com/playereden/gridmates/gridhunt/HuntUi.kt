@@ -108,7 +108,7 @@ internal fun QuickMapLookButton(mapLook: MapLook, onLook: (MapLook) -> Unit) {
         contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)
     ) {
         Text(
-            if (mapLook == MapLook.FIELD_GUIDE) "Field ↔" else "Survey ↔",
+            if (mapLook == MapLook.FIELD_GUIDE) "Warm" else "Cool",
             color = Forest, fontSize = 11.sp, fontWeight = FontWeight.Bold,
             maxLines = 1
         )
