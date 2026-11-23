@@ -114,7 +114,7 @@ internal fun ReversePracticeScreen(
     }
     var hint by rememberSaveable { mutableIntStateOf(prefs.getInt("hint", 0).coerceIn(0, 2)) }
     var feedback by rememberSaveable {
-        mutableStateOf("Read the gold survey marker's grid square. Enter its four digits.")
+        mutableStateOf("Find the golden dot! What four-digit square is it hiding in?")
     }
     LaunchedEffect(step, answer, hint) {
         prefs.edit().putInt("step", step).putString("answer", answer)
@@ -163,7 +163,7 @@ internal fun ReversePracticeScreen(
     val check: () -> Unit = {
         if (finished) {
             step = 0; answer = ""; hint = 0
-            feedback = "Reverse practice restarted. Read the gold survey point."
+            feedback = "Another adventure! Find the first golden spot again."
             fit()
         } else {
             val target = active!!
@@ -173,10 +173,10 @@ internal fun ReversePracticeScreen(
                 answer = ""
                 hint = 0
                 feedback = if (step == targets.size)
-                    "All five survey points recorded. Nice work!"
-                else "Correct! Now read the next marked point."
+                    "Golden explorer! You found all five hiding spots."
+                else "You got it! ✦ The next golden spot is waiting."
             } else {
-                feedback = ReverseTraining.feedback(target, answer)
+                feedback = "Not quite! " + ReverseTraining.feedback(target, answer)
             }
         }
     }
@@ -246,11 +246,10 @@ private fun ReverseHeader(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(Modifier.weight(1f)) {
-            Text("GRIDMATES / GRID HUNT", fontSize = 10.sp, color = Forest, fontWeight = FontWeight.Bold)
-            Text("Look Again", fontSize = 21.sp, color = Ink, fontWeight = FontWeight.Bold)
-            Text("REVERSE SURVEY · PRACTICE", fontSize = 10.sp, color = Muted)
+            Text("GRID HUNT  •  THE LITTLE WOODLAND", fontSize = 10.sp, color = Forest, fontWeight = FontWeight.Bold)
+            Text("Golden Spots", fontSize = 21.sp, color = Ink, fontWeight = FontWeight.Bold)
+            Text("FIND THE SECRET FOUR-DIGIT CODE", fontSize = 10.sp, color = Muted)
         }
-        Text("N ↑", fontSize = 16.sp, color = Forest)
         QuickMapLookButton(mapLook = mapLook, onLook = onLook)
         TextButton(onClick = onBack, modifier = Modifier.testTag("reverseHome")) {
             Text("Home", fontSize = 12.sp)
@@ -266,11 +265,11 @@ private fun ReverseGoal(step: Int, total: Int, title: String?) {
             horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f)) {
-                Text(if (title == null) "PRACTICE COMPLETE" else "READ THE MARKER · " + (step + 1) + "/" + total,
+                Text(if (title == null) "ALL SPOTS FOUND!" else "GOLDEN SPOT " + (step + 1) + " OF " + total,
                     fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Forest)
-                Text(title ?: "All five points recorded", fontSize = 12.sp, color = Muted)
+                Text(title ?: "Five golden discoveries, all yours!", fontSize = 12.sp, color = Muted)
             }
-            Text(if (title == null) "✓" else "?", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Ink)
+            Text(if (title == null) "✓" else "✦", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Ink)
         }
     }
 }
@@ -283,7 +282,7 @@ private fun ReverseControls(
     onFit: () -> Unit, onZoom: (Double) -> Unit, onCheck: () -> Unit
 ) {
     Text(
-        if (finished) "Reverse practice complete" else "Gold marker · Easting first, northing second",
+        if (finished) "Every golden spot found!" else "Find the gold dot, then read its map square.",
         color = Forest, fontWeight = FontWeight.SemiBold, fontSize = 12.sp
     )
     LinearProgressIndicator(
@@ -296,14 +295,14 @@ private fun ReverseControls(
         OutlinedTextField(
             value = answer, onValueChange = onAnswer,
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true, label = { Text("Four-digit grid reference") },
+            singleLine = true, label = { Text("Four-digit map code") },
             placeholder = { Text("0000") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
     }
     Text(
-        if (hint == 1 && !finished) "Hint: Read the easting line LEFT of the gold point."
-        else if (hint >= 2 && !finished) "Hint: Then read the northing line BELOW the gold point; keep 4 digits."
+        if (hint == 1 && !finished) "Clue: Read the easting line to the left of the gold dot."
+        else if (hint >= 2 && !finished) "Clue: Then read the northing line below it. Four digits!"
         else feedback,
         fontSize = 11.sp, color = Ink, lineHeight = 15.sp,
         maxLines = 3, modifier = Modifier.fillMaxWidth().heightIn(min = 26.dp)
@@ -313,7 +312,7 @@ private fun ReverseControls(
             onClick = onHint, enabled = !finished,
             modifier = Modifier.weight(1f).heightIn(min = 46.dp),
             contentPadding = PaddingValues(0.dp)
-        ) { Text("Hint") }
+        ) { Text("Clue") }
         OutlinedButton(
             onClick = { onZoom(1.6) },
             modifier = Modifier.weight(1f).heightIn(min = 46.dp),
@@ -328,12 +327,12 @@ private fun ReverseControls(
             onClick = onFit,
             modifier = Modifier.weight(1f).heightIn(min = 46.dp),
             contentPadding = PaddingValues(0.dp)
-        ) { Text("Fit") }
+        ) { Text("See all") }
     }
     Button(
         onClick = onCheck, enabled = finished || answer.length == 4,
         modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Forest)
-    ) { Text(if (finished) "Replay Reverse Practice" else "Check reference", fontWeight = FontWeight.Bold) }
+    ) { Text(if (finished) "Find them again" else "Try this code", fontWeight = FontWeight.Bold) }
 }
 
