@@ -204,7 +204,8 @@ internal fun ReversePracticeScreen(
                     ReverseGoal(step, targets.size, active?.title)
                     ReverseControls(
                         answer, { answer = it.filter { c -> c in '0'..'9' }.take(4) },
-                        feedback, hint, finished, { hint = (hint + 1).coerceAtMost(2) },
+                        feedback, hint, finished, step, targets.size,
+                        { hint = (hint + 1).coerceAtMost(2) },
                         ::fit, ::zoomBy, check
                     )
                 }
@@ -225,7 +226,8 @@ internal fun ReversePracticeScreen(
                 Spacer(Modifier.height(5.dp))
                 ReverseControls(
                     answer, { answer = it.filter { c -> c in '0'..'9' }.take(4) },
-                    feedback, hint, finished, { hint = (hint + 1).coerceAtMost(2) },
+                    feedback, hint, finished, step, targets.size,
+                    { hint = (hint + 1).coerceAtMost(2) },
                     ::fit, ::zoomBy, check
                 )
             }
@@ -276,16 +278,18 @@ private fun ReverseGoal(step: Int, total: Int, title: String?) {
 @Composable
 private fun ReverseControls(
     answer: String, onAnswer: (String) -> Unit,
-    feedback: String, hint: Int, finished: Boolean, onHint: () -> Unit,
+    feedback: String, hint: Int, finished: Boolean,
+    completed: Int, total: Int, onHint: () -> Unit,
     onFit: () -> Unit, onZoom: (Double) -> Unit, onCheck: () -> Unit
 ) {
     Text(
-        if (finished) "Reverse practice complete" else "Find the gold point · Read west line, then south line",
+        if (finished) "Reverse practice complete" else "Gold marker · Easting first, northing second",
         color = Forest, fontWeight = FontWeight.SemiBold, fontSize = 12.sp
     )
     LinearProgressIndicator(
-        progress = { if (finished) 1f else answer.length.coerceIn(0, 4) / 4f },
-        modifier = Modifier.fillMaxWidth().height(5.dp),
+        // Actual chapter progress, not the number of digits typed in this answer.
+        progress = { completed.toFloat() / total.coerceAtLeast(1).toFloat() },
+        modifier = Modifier.fillMaxWidth().height(5.dp).testTag("reverseChapterProgress"),
         color = Forest, trackColor = Color(0xFFE0E5D8)
     )
     if (!finished) {
