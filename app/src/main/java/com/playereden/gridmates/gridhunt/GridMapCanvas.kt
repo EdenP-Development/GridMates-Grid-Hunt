@@ -70,6 +70,7 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -105,7 +106,8 @@ internal fun HuntMapPanel(
     onSelect: (String) -> Unit,
     markerPoint: WorldPoint? = null,
     enableSelect: Boolean = true,
-    mapLook: MapLook
+    mapLook: MapLook,
+    discoveryMessage: String? = null
 ) {
     Box(
         modifier = modifier
@@ -120,6 +122,21 @@ internal fun HuntMapPanel(
             markerPoint = markerPoint, enableSelect = enableSelect,
             mapLook = mapLook
         )
+        if (discoveryMessage != null) {
+            Surface(
+                modifier = Modifier.align(Alignment.BottomCenter)
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+                    .testTag("discoveryMoment"),
+                color = Color(0xFFFFF2CB),
+                shape = RoundedCornerShape(16.dp),
+                shadowElevation = 4.dp
+            ) {
+                Text("✦  " + discoveryMessage,
+                    color = Ink, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    maxLines = 2)
+            }
+        }
         // The north cue belongs to the map, not the crowded game header.
         // Keep it compact and translucent so a marker near the edge stays visible.
         Text(
