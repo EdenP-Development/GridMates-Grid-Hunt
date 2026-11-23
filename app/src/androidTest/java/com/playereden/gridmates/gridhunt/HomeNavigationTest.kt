@@ -172,6 +172,31 @@ class HomeNavigationTest {
         compose.onNodeWithText("2 of 4 woodland discoveries").assertExists()
     }
 
+    @Test fun mapGuideShowsRealSymbolsWithoutSpoilersOrProgressReset() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_treasure_checklist_v1", Context.MODE_PRIVATE)
+            .edit().clear().commit()
+        compose.activityRule.scenario.recreate()
+
+        compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
+        compose.onNodeWithTag("openWoodlandMapGuide").performClick()
+        compose.onNodeWithTag("woodlandMapGuide").assertExists()
+        listOf("mushroom-nook", "buttercup-glade", "acorn-nook", "old-waystone")
+            .forEach { id ->
+                compose.onNodeWithTag("guideSymbol_$id").assertExists()
+            }
+        compose.onNodeWithText("Creek").assertExists()
+        compose.onNodeWithText("Trail").assertExists()
+        // The guide teaches symbol *types*; it cannot reveal the secret square.
+        compose.onNodeWithText("2538").assertDoesNotExist()
+        compose.onNodeWithTag("dismissWoodlandMapGuide").performClick()
+        compose.onNodeWithText("0 of 4 woodland discoveries").assertExists()
+        compose.onNodeWithTag("treasureItem_mushroom-nook").assertExists()
+        compose.onNodeWithTag("treasureCodeInput").performTextInput("2538")
+        compose.onNodeWithTag("checkTreasure").performClick()
+        compose.onNodeWithText("1 of 4 woodland discoveries").assertExists()
+    }
+
     @Test fun treasureChecklistHasAnExplicitReplayAfterFourFinds() {
         InstrumentationRegistry.getInstrumentation().targetContext
             .getSharedPreferences("gridhunt_treasure_checklist_v1", Context.MODE_PRIVATE)
