@@ -467,10 +467,14 @@ private fun TrainingMapCanvas(
                 drawRect(Color(0xFFE1A947), topLeft = tl, size = Size(side, side), style = Stroke(3.8f))
             }
             markerPoint?.let { point ->
+                // Phone QA: the tiny active dot got lost among green tree canopies.
+                // A fixed-screen-size cream halo and dark center clearly distinguish
+                // the active puzzle target from completed gold checkmark stamps.
                 val center = p(point.easting, point.northing)
-                drawCircle(Color(0xFFFFF8E5), radius = 20f, center = center)
-                drawCircle(Color(0xFFBF8331), radius = 14f, center = center)
-                drawCircle(Color(0xFF244236), radius = 5f, center = center)
+                drawCircle(Color(0x99FFF9E8), radius = 30f, center = center)
+                drawCircle(Color(0xFFFFFDF0), radius = 23f, center = center)
+                drawCircle(Color(0xFFC5892F), radius = 17.5f, center = center)
+                drawCircle(Color(0xFF244236), radius = 7f, center = center)
             }
         }
         // Separate axis rails prevent the 24/37 overlap seen at the SW corner.
