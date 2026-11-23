@@ -128,6 +128,12 @@ jobs:
           script: |
             chmod +x gradlew
             ./gradlew :app:connectedDebugAndroidTest --no-daemon --max-workers=2 --console=plain
+            # Pull genuine on-emulator screenshots created by VisualCaptureTest.
+            mkdir -p vision-screenshots
+            adb pull /sdcard/Android/data/com.playereden.gridmates.gridhunt.qa/files/visual-qa/. vision-screenshots/
+            for file in 01_home.png 02_trail_treasures.png 03_trail_other_map_style.png 04_golden_spots.png 05_treasure_finish.png 06_golden_finish.png; do
+              test -s "vision-screenshots/$file" || { echo "Missing visual QA screenshot: $file"; exit 1; }
+            done
       - name: Publish Android instrumentation results
         if: always()
         uses: actions/upload-artifact@v4
@@ -136,5 +142,6 @@ jobs:
           path: |
             app/build/outputs/androidTest-results/connected/
             app/build/reports/androidTests/connected/
+            vision-screenshots/
           if-no-files-found: warn
           retention-days: 14
