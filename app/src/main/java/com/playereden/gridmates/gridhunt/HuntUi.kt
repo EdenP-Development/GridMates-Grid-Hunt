@@ -186,7 +186,7 @@ internal fun ObjectiveRibbon(
                 )
                 Text(
                     if (done) "Nice work. Survey recorded."
-                    else "East first, then north  ·  $huntName",
+                    else "Eastings first, then northings",
                     fontSize = 11.sp, maxLines = 2, color = Muted
                 )
             }
@@ -201,25 +201,29 @@ internal fun ObjectiveRibbon(
 
 @Composable
 internal fun GridReadingGuide(onDismiss: () -> Unit) {
-    Surface(
-        color = Color(0xFFE8EEDC),
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+    // A dialog keeps the map at its actual play size while instructions are open.
+    // Once dismissed, tapping the ? button in the header opens it again.
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("How to read the grid", color = Ink, fontWeight = FontWeight.Bold) },
+        text = {
             Text(
-                "HOW TO PLAY · Read 24 on the bottom, then 37 on the side. " +
-                    "For 2437, tap the square above-right of their crossing. " +
-                    "Preview and Check; hints are free.",
-                fontSize = 11.sp, lineHeight = 14.sp, color = Ink,
-                modifier = Modifier.weight(1f)
+                "Read eastings first (numbers at the bottom), then northings " +
+                    "(numbers at the left). For 2437, find line 24 and line 37. " +
+                    "Tap the square immediately above and right of their crossing. " +
+                    "Preview your choice, then Check. Hints are always free.",
+                color = Ink
             )
-            TextButton(onClick = onDismiss) { Text("Got it", fontSize = 11.sp) }
-        }
-    }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss, modifier = Modifier.testTag("dismissGridGuide")) {
+                Text("Got it", color = Forest, fontWeight = FontWeight.Bold)
+            }
+        },
+        containerColor = Color(0xFFFFFBF1),
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier.testTag("gridReadingGuide")
+    )
 }
 
 
