@@ -11,7 +11,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** Compiles in CI. Actual instrumentation execution requires an Android emulator/device. */
+/** Executed on Android 35 emulator in PR CI; physical phone acceptance is separate. */
 @RunWith(AndroidJUnit4::class)
 class HomeNavigationTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
@@ -26,16 +26,17 @@ class HomeNavigationTest {
         compose.onNodeWithText("Grid Hunt").assertExists()
         compose.onNodeWithTag("openChapter").assertExists()
         compose.onNodeWithTag("openReverse").assertExists()
-        compose.onNodeWithText("VISUAL PLAYTEST").assertExists()
+        compose.onNodeWithTag("homeIllustration").assertExists()
+        compose.onNodeWithText("Choose your next puzzle").assertExists()
     }
 
     @Test fun journeyCanEnterAndLeaveEachMode() {
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuideIfShown()
-        compose.onNodeWithText("First Bearings").assertExists()
+        compose.onNodeWithText("Trail Treasures").assertExists()
         compose.onNodeWithTag("chapterHome").performClick()
-        compose.onNodeWithTag("openReverse").performClick()
-        compose.onNodeWithText("Look Again").assertExists()
+        compose.onNodeWithTag("openReverse").performScrollTo().performClick()
+        compose.onNodeWithText("Golden Spots").assertExists()
         compose.onNodeWithTag("reverseHome").performClick()
         compose.onNodeWithTag("openChapter").assertExists()
     }
@@ -44,19 +45,20 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuideIfShown()
         compose.onNodeWithTag("mapLookToggle").assertExists().performClick()
-        compose.onNodeWithText("First Bearings").assertExists()
+        compose.onNodeWithText("Trail Treasures").assertExists()
         compose.onNodeWithTag("chapterHome").performClick()
 
-        compose.onNodeWithTag("openReverse").performClick()
+        compose.onNodeWithTag("openReverse").performScrollTo().performClick()
         compose.onNodeWithTag("mapLookToggle").assertExists().performClick()
-        compose.onNodeWithText("Look Again").assertExists()
+        compose.onNodeWithText("Golden Spots").assertExists()
     }
 
     @Test fun visualMapChoiceIsReachable() {
+        compose.onNodeWithTag("appearanceToggle").performScrollTo().performClick()
         compose.onNodeWithTag("style_SURVEY_TABLE").performScrollTo().performClick()
         compose.onNodeWithTag("style_FIELD_GUIDE").assertExists()
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuideIfShown()
-        compose.onNodeWithText("First Bearings").assertExists()
+        compose.onNodeWithText("Trail Treasures").assertExists()
     }
 }
