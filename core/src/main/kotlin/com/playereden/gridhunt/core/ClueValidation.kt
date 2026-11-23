@@ -9,13 +9,16 @@ import kotlin.math.hypot
  * FOUR-digit grid answer can distinguish it. It does not render art, infer
  * relationships from a picture, generate puzzle prose, or award discoveries.
  */
+enum class ClueGeometry { POINT, LINEAR }
+
 data class ClueFeature(
     val id: String,
     val categoryId: String,
     val point: WorldPoint,
     val symbolKey: String,
     val regionId: String? = null,
-    val authoredRelations: Set<FeatureRelation> = emptySet()
+    val authoredRelations: Set<FeatureRelation> = emptySet(),
+    val geometry: ClueGeometry = ClueGeometry.POINT
 ) {
     init {
         require(id.isNotBlank() && categoryId.isNotBlank() && symbolKey.isNotBlank())
@@ -155,6 +158,13 @@ object ClueValidation {
                         ?: return reject(ClueRejection.MISSING_FEATURE)
                     if (anchor.symbolKey !in map.publishedSymbolKeys) {
                         return reject(ClueRejection.UNRECOGNIZABLE_SYMBOL)
+                    }
+                    // A creek/road polyline cannot be represented by distance
+                    // or direction from its arbitrary label/anchor POINT.
+                    // BesideFeature uses an independently authored relationship.
+                    if (condition !is ClueCondition.BesideFeature &&
+                        anchor.geometry != ClueGeometry.POINT) {
+                        return reject(ClueRejection.UNSUPPORTED_RELATION)
                     }
                     val distance = when (condition) {
                         is ClueCondition.EastOf -> condition.minMeters
