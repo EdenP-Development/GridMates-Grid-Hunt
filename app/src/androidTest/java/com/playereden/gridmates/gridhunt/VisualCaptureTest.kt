@@ -124,6 +124,10 @@ class VisualCaptureTest {
         compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
         compose.onNodeWithTag("treasureCodeInput").assertExists()
         capture("09_woodland_checklist.png")
+        compose.onNodeWithTag("openWoodlandMapGuide").performClick()
+        compose.onNodeWithTag("woodlandMapGuide").assertExists()
+        capture("11_woodland_map_guide.png")
+        compose.onNodeWithTag("dismissWoodlandMapGuide").performClick()
         listOf("2538", "2840", "2641", "2941").forEach { code ->
             compose.onNodeWithTag("treasureCodeInput").performTextInput(code)
             compose.onNodeWithTag("checkTreasure").performClick()
