@@ -1,8 +1,8 @@
 # START HERE — GridMates: Grid Hunt
 
-**As of:** 2026-11-21  
-**Status:** DESIGN ONLY. The initial repo has been organized; there is no implemented app or APK.  
-**Source of truth:** this document + [master design](MASTER_GAME_DESIGN.md) + [roadmap](ROADMAP.md).
+**Current snapshot:** 2026-11-23  
+**Status:** Native Android **prototype implemented and tested**: 9 Trail Treasures clues, 5 Golden Spots, saved progress, original woodland map, executed emulator UI tests. [QA85 passed](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45261941012). Latest code lives in draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12), **not yet merged**; owner QA72 screenshots informed phone layout fixes, but QA85 phone acceptance/install-over still requires confirmation.  
+**Source of truth for next game phase:** [Gameplay, Campaign & UI Blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md) + [Master design](MASTER_GAME_DESIGN.md) + [Roadmap](ROADMAP.md). Historical research notes below record their original time/status; don't treat their old 'no app built' claims as current.
 
 ## Product in one sentence
 
@@ -38,7 +38,13 @@ A casual grid-map puzzle hunt that quietly teaches real eastings/northings, grid
 
 Do not claim a feature is built because it appears in design documentation.
 
-## Current prioritized steps
+## Historical GH-01 prototype priorities (2026-11-21; completed or superseded)
+
+**Current next steps (2026-11-23):** approve QA85 phone usability; establish shared landmark/objective IDs and answer validators; build one 3–5-item Treasure Checklist, then one What's at This Grid? identification puzzle, each with native UI and real QA. See [expansion blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md) for phase gates and the asset policy.
+
+The following older checklist is retained as a record of the initial prototype scope.
+
+
 
 1. Implement and unit-test [grid rules](MAP_READING_ACCURACY.md) in a pure Kotlin module.
 2. Show a compact, smooth map viewport with correct transforms and north-up labeling.
