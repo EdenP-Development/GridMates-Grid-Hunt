@@ -8,6 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import android.content.Context
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
@@ -83,6 +84,24 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuideIfShown()
         compose.onNodeWithText("CLUE 2 OF 3").assertExists()
+    }
+
+    @Test fun goldenSpotCodeAdvancesAndSurvivesRelaunch() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
+            .edit().clear().commit()
+        compose.activityRule.scenario.recreate()
+
+        compose.onNodeWithTag("openReverse").performScrollTo().performClick()
+        compose.onNodeWithText("GOLDEN SPOT 1 OF 5").assertExists()
+        // Golden spot A is at E=24650, N=40620, so its containing square is 2440.
+        compose.onNodeWithTag("reverseCodeInput").performTextInput("2440")
+        compose.onNodeWithTag("checkReverse").performClick()
+        compose.onNodeWithText("GOLDEN SPOT 2 OF 5").assertExists()
+        compose.onNodeWithTag("reverseHome").performClick()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openReverse").performScrollTo().performClick()
+        compose.onNodeWithText("GOLDEN SPOT 2 OF 5").assertExists()
     }
 
     @Test fun visualMapChoiceIsReachable() {
