@@ -179,6 +179,9 @@ private fun GridHuntHome(
     val chapterCompleted = FirstBearingsChapter.hunts.take(chapterState.huntIndex)
         .sumOf { it.objectives.size } + chapterState.objectiveIndex
     val reverseCompleted = reversePrefs.getInt("step", 0).coerceIn(0, ReverseTraining.markers.size)
+    val allTrailsFinished = chapterState.huntIndex == FirstBearingsChapter.hunts.lastIndex &&
+        chapterState.objectiveIndex == FirstBearingsChapter.hunts.last().objectives.size
+    val allGoldenSpotsFinished = reverseCompleted == ReverseTraining.markers.size
     var showAppearance by rememberSaveable { mutableStateOf(false) }
 
     Column(
@@ -219,8 +222,11 @@ private fun GridHuntHome(
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("openChapter"),
                     colors = ButtonDefaults.buttonColors(containerColor = Forest)
                 ) {
-                    Text(if (chapterCompleted > 0) "Keep exploring" else "Let's find a square!",
-                        fontWeight = FontWeight.Bold)
+                    Text(when {
+                        allTrailsFinished -> "See your completed trails"
+                        chapterCompleted > 0 -> "Keep exploring"
+                        else -> "Let's find a square!"
+                    }, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -236,8 +242,11 @@ private fun GridHuntHome(
                     onClick = onReverse,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("openReverse")
                 ) {
-                    Text(if (reverseCompleted > 0) "Find another golden spot" else "Try Golden Spots",
-                        fontWeight = FontWeight.Bold)
+                    Text(when {
+                        allGoldenSpotsFinished -> "See your golden discoveries"
+                        reverseCompleted > 0 -> "Find another golden spot"
+                        else -> "Try Golden Spots"
+                    }, fontWeight = FontWeight.Bold)
                 }
             }
         }
