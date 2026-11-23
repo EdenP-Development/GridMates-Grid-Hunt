@@ -117,6 +117,14 @@ internal fun ReversePracticeScreen(
     var feedback by rememberSaveable {
         mutableStateOf("Find the golden dot! What four-digit square is it hiding in?")
     }
+    var discoveryMessage by remember { mutableStateOf<String?>(null) }
+    var discoverySequence by remember { mutableIntStateOf(0) }
+    LaunchedEffect(discoverySequence) {
+        if (discoverySequence > 0) {
+            kotlinx.coroutines.delay(1700L)
+            discoveryMessage = null
+        }
+    }
     LaunchedEffect(step, answer, hint) {
         prefs.edit().putInt("step", step).putString("answer", answer)
             .putInt("hint", hint).apply()
@@ -165,6 +173,7 @@ internal fun ReversePracticeScreen(
         if (finished) {
             step = 0; answer = ""; hint = 0
             feedback = "Another adventure! Find the first golden spot again."
+            discoveryMessage = null
             fit()
         } else {
             val target = active!!
@@ -173,10 +182,14 @@ internal fun ReversePracticeScreen(
                 step += 1
                 answer = ""
                 hint = 0
+                discoveryMessage = if (step == targets.size) "All golden spots found!"
+                    else "Golden spot discovered!"
+                discoverySequence += 1
                 feedback = if (step == targets.size)
                     "Golden explorer! You found all five hiding spots."
                 else "You got it! ✦ The next golden spot is waiting."
             } else {
+                discoveryMessage = null
                 feedback = "Not quite! " + ReverseTraining.feedback(target, answer)
             }
         }
@@ -192,10 +205,10 @@ internal fun ReversePracticeScreen(
             Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 HuntMapPanel(
                     modifier = Modifier.weight(1f).fillMaxHeight(), bounds = bounds,
-                    camera = camera, selectedCell = null, completed = emptyList(),
+                    camera = camera, selectedCell = null, completed = targets.take(step).map { it.cell },
                     viewport = viewport, onViewport = resized, onCamera = ::setCamera,
                     onSelect = {}, markerPoint = active?.point, enableSelect = false,
-                    mapLook = mapLook
+                    mapLook = mapLook, discoveryMessage = discoveryMessage
                 )
                 Column(
                     Modifier.width(controlsWidth).fillMaxHeight().verticalScroll(rememberScrollState()),
@@ -219,10 +232,10 @@ internal fun ReversePracticeScreen(
                 Spacer(Modifier.height(6.dp))
                 HuntMapPanel(
                     modifier = Modifier.fillMaxWidth().weight(1f), bounds = bounds,
-                    camera = camera, selectedCell = null, completed = emptyList(),
+                    camera = camera, selectedCell = null, completed = targets.take(step).map { it.cell },
                     viewport = viewport, onViewport = resized, onCamera = ::setCamera,
                     onSelect = {}, markerPoint = active?.point, enableSelect = false,
-                    mapLook = mapLook
+                    mapLook = mapLook, discoveryMessage = discoveryMessage
                 )
                 Spacer(Modifier.height(5.dp))
                 ReverseControls(
