@@ -1,7 +1,9 @@
 # GridMates: Grid Hunt — Master Game Design
 
-**Version:** planning baseline 0.1 — 2026-11-21  
-**Status:** DESIGN DOCUMENT; mechanics are proposed until implemented and tested.
+**Version:** original design baseline 0.1 (2026-11-21), with a new expansion plan as of 2026-11-23.  
+**Status:** Historical design foundation; some simple modes are implemented, while additional modes remain proposed. **For the owner's current vision, implementation order, and chat handoff use [Gameplay, Campaign & UI Blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md).** That blueprint adds object checklists, identify-by-grid puzzles, mixed chapters, Custom/Quick Play and native-game UI guidance. It supersedes illustrative chapter/mode examples here where they differ; it does not claim those future modes are built.
+
+**Current checked prototype:** [QA85 CI green](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45261941012), 9 authored Trail Treasures square finds and 5 Golden Spots reverse references in draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12). QA85 phone acceptance and production release remain unverified.
 
 ## Product pillars
 
