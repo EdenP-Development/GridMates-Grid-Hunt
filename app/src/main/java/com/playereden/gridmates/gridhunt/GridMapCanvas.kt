@@ -370,18 +370,31 @@ private fun TrainingMapCanvas(
                 textSize = (12f * density).coerceAtMost(18f)
                 isFakeBoldText = true
             }
-            val eastingBaseline = (bottom + 21f).coerceAtMost(size.height - 7f)
-            val northingColumn = (left - 26f).coerceAtLeast(6f)
+            // Tiny white paper halos preserve label contrast over forest/creek
+            // artwork and keep labels tied to the true kilometer lines.
+            val halo = Paint(paint).apply {
+                color = if (surveyStyle) android.graphics.Color.rgb(223, 236, 233)
+                    else android.graphics.Color.rgb(247, 239, 220)
+                style = Paint.Style.STROKE
+                strokeWidth = 3f * density
+                strokeJoin = Paint.Join.ROUND
+            }
+            fun gridLabel(text: String, x: Float, y: Float) {
+                canvas.nativeCanvas.drawText(text, x, y, halo)
+                canvas.nativeCanvas.drawText(text, x, y, paint)
+            }
+            val eastingBaseline = (bottom + 21f).coerceAtMost(size.height - 8f)
+            val northingColumn = (left - 26f).coerceAtLeast(7f)
             for (easting in 24000..29000 step 1000) {
                 val x = p(easting.toDouble(), bounds.south).x
-                if (x >= 4f && x + 26f < size.width) {
-                    canvas.nativeCanvas.drawText((easting / 1000).toString(), x + 3f, eastingBaseline, paint)
+                if (x >= 3f && x + 26f < size.width) {
+                    gridLabel((easting / 1000).toString(), x + 3f, eastingBaseline)
                 }
             }
             for (northing in 37000..42000 step 1000) {
                 val y = p(bounds.west, northing.toDouble()).y
                 if (y >= 12f && y < size.height - 12f) {
-                    canvas.nativeCanvas.drawText((northing / 1000).toString(), northingColumn, y + 5f, paint)
+                    gridLabel((northing / 1000).toString(), northingColumn, y + 5f)
                 }
             }
         }
