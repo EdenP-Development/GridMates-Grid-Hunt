@@ -35,6 +35,11 @@ class VisualCaptureTest {
 
     private fun capture(filename: String) {
         compose.waitForIdle()
+        // Compose semantics can settle before the emulator's last rendered frame.
+        // Give SurfaceFlinger a moment to present the correct navigation state;
+        // this delay runs only in visual QA, never in the shipped game.
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        android.os.SystemClock.sleep(500L)
         val image = requireNotNull(
             InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
         ) { "Emulator screenshot was unavailable" }
