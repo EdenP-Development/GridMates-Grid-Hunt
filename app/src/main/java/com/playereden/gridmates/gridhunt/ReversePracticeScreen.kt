@@ -187,7 +187,7 @@ internal fun ReversePracticeScreen(
                 discoverySequence += 1
                 feedback = if (step == targets.size)
                     "Golden explorer! You found all five hiding spots."
-                else "You got it! ✦ The next golden spot is waiting."
+                else "Next golden spot! Find its dot and read the square."
             } else {
                 discoveryMessage = null
                 feedback = "Not quite! " + ReverseTraining.feedback(target, answer)
@@ -313,7 +313,8 @@ private fun ReverseGoal(step: Int, total: Int, title: String?) {
             Column(Modifier.weight(1f)) {
                 Text(if (title == null) "ALL SPOTS FOUND!" else "GOLDEN SPOT " + (step + 1) + " OF " + total,
                     fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Forest)
-                Text(title ?: "Five golden discoveries, all yours!", fontSize = 12.sp, color = Muted)
+                Text(if (title == null) "Five golden discoveries, all yours!"
+                    else "Find the gold dot on the map", fontSize = 12.sp, color = Muted)
             }
             Surface(color = Color(0xFFF6DFA9), shape = RoundedCornerShape(13.dp)) {
                 Text(if (title == null) "✓" else "✦",
@@ -332,7 +333,7 @@ private fun ReverseControls(
     onFit: () -> Unit, onZoom: (Double) -> Unit, onCheck: () -> Unit
 ) {
     Text(
-        if (finished) "Every golden spot found!" else "Find the gold dot, then read its map square.",
+        if (finished) "Every golden spot found!" else "Find the gold dot. Which square is it in?",
         color = Forest, fontWeight = FontWeight.SemiBold, fontSize = 12.sp
     )
     LinearProgressIndicator(
@@ -346,7 +347,7 @@ private fun ReverseControls(
             value = answer, onValueChange = onAnswer,
             modifier = Modifier.fillMaxWidth().testTag("reverseCodeInput"),
             singleLine = true, label = { Text("Four-digit map code") },
-            placeholder = { Text("0000") },
+            placeholder = { Text("Enter 4 digits") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
     }
