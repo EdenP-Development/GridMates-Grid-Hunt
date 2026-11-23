@@ -107,7 +107,8 @@ internal fun HuntMapPanel(
     markerPoint: WorldPoint? = null,
     enableSelect: Boolean = true,
     mapLook: MapLook,
-    discoveryMessage: String? = null
+    discoveryMessage: String? = null,
+    onLook: ((MapLook) -> Unit)? = null
 ) {
     Box(
         modifier = modifier
@@ -135,6 +136,17 @@ internal fun HuntMapPanel(
                     color = Ink, fontWeight = FontWeight.Bold, fontSize = 13.sp,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                     maxLines = 2)
+            }
+        }
+        if (onLook != null) {
+            // Appearance belongs beside the compass, not in the story caption.
+            // Keep the grid and camera untouched when switching looks.
+            Surface(
+                modifier = Modifier.align(Alignment.TopStart).padding(8.dp),
+                color = Color(0xEFFFF9EA),
+                shape = RoundedCornerShape(9.dp)
+            ) {
+                QuickMapLookButton(mapLook = mapLook, onLook = onLook)
             }
         }
         // The north cue belongs to the map, not the crowded game header.
