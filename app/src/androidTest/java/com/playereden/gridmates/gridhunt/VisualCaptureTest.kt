@@ -79,7 +79,8 @@ class VisualCaptureTest {
     }
 
     private fun prepare() {
-        listOf("gridhunt_first_bearings_v1", "gridhunt_reverse_v1").forEach { name ->
+        listOf("gridhunt_first_bearings_v1", "gridhunt_reverse_v1",
+            "gridhunt_treasure_checklist_v1").forEach { name ->
             check(target.getSharedPreferences(name, Context.MODE_PRIVATE)
                 .edit().clear().commit()) { "Could not reset test-only $name" }
         }
@@ -116,6 +117,19 @@ class VisualCaptureTest {
     private fun enterSpotCode(reference: String) {
         compose.onNodeWithTag("reverseCodeInput").performTextInput(reference)
         compose.onNodeWithTag("checkReverse").performClick()
+    }
+
+    @Test fun captureIntroTreasureChecklistAndEarnedFinish() {
+        prepare()
+        compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
+        compose.onNodeWithTag("treasureCodeInput").assertExists()
+        capture("09_woodland_checklist.png")
+        listOf("2538", "2840", "2641", "2941").forEach { code ->
+            compose.onNodeWithTag("treasureCodeInput").performTextInput(code)
+            compose.onNodeWithTag("checkTreasure").performClick()
+        }
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        capture("10_woodland_checklist_finish.png")
     }
 
     @Test fun captureLandscapePuzzleLayouts() {
