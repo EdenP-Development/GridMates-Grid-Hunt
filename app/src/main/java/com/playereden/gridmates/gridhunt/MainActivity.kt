@@ -501,7 +501,7 @@ private fun FirstBearingsScreen(
                         onGuide = { showGuide = !showGuide },
                         onHome = onHome
                     )
-                    ObjectiveRibbon(
+                    if (!finished) ObjectiveRibbon(
                         step = step, total = targets.size, active = active,
                         huntName = hunt.name, chapterFinished = chapterFinished
                     )
@@ -509,7 +509,19 @@ private fun FirstBearingsScreen(
                         showGuide = false
                         prefs.edit().putBoolean("guide_seen", true).apply()
                     }
-                    HuntControlPanel(
+                    if (finished) {
+                        PuzzleFinishCard(
+                            title = if (chapterFinished) "Woodland adventure complete!" else "Trail complete!",
+                            description = if (chapterFinished)
+                                "Nine clues found across three trails. The whole little woodland is yours to revisit."
+                            else "You found every square on this trail. There's another path to explore!",
+                            discoveries = if (chapterFinished) "9 OF 9 LITTLE DISCOVERIES"
+                                else "${targets.size} OF ${targets.size} SQUARES FOUND",
+                            primaryLabel = if (chapterFinished) "Explore again" else "Next trail",
+                            onPrimary = onCheck,
+                            onHome = onHome
+                        )
+                    } else HuntControlPanel(
                         step = step, total = targets.size, selected = selected,
                         feedback = feedback, hintStage = hintStage, finished = finished,
                         onMove = ::moveSelected, onZoom = ::zoomBy,
@@ -539,7 +551,7 @@ private fun FirstBearingsScreen(
                     onHome = onHome
                 )
                 Spacer(Modifier.height(5.dp))
-                ObjectiveRibbon(
+                if (!finished) ObjectiveRibbon(
                     step = step, total = targets.size, active = active,
                     huntName = hunt.name, chapterFinished = chapterFinished
                 )
@@ -561,7 +573,19 @@ private fun FirstBearingsScreen(
                     discoveryMessage = discoveryMessage
                 )
                 Spacer(Modifier.height(4.dp))
-                HuntControlPanel(
+                if (finished) {
+                    PuzzleFinishCard(
+                        title = if (chapterFinished) "Woodland adventure complete!" else "Trail complete!",
+                        description = if (chapterFinished)
+                            "Nine clues found across three trails. The whole little woodland is yours to revisit."
+                        else "You found every square on this trail. There's another path to explore!",
+                        discoveries = if (chapterFinished) "9 OF 9 LITTLE DISCOVERIES"
+                            else "${targets.size} OF ${targets.size} SQUARES FOUND",
+                        primaryLabel = if (chapterFinished) "Explore again" else "Next trail",
+                        onPrimary = onCheck,
+                        onHome = onHome
+                    )
+                } else HuntControlPanel(
                     step = step, total = targets.size, selected = selected,
                     feedback = feedback, hintStage = hintStage, finished = finished,
                     onMove = ::moveSelected, onZoom = ::zoomBy,
