@@ -325,6 +325,15 @@ private fun FirstBearingsScreen(
     var showGuide by rememberSaveable {
         mutableStateOf(!prefs.getBoolean("guide_seen", false))
     }
+    // A discovery is a brief celebration, not persisted reward currency.
+    var discoveryMessage by remember { mutableStateOf<String?>(null) }
+    var discoverySequence by remember { mutableIntStateOf(0) }
+    LaunchedEffect(discoverySequence) {
+        if (discoverySequence > 0) {
+            kotlinx.coroutines.delay(1700L)
+            discoveryMessage = null
+        }
+    }
 
     val hunt = FirstBearingsChapter.hunts[huntIndex]
     val targets = hunt.objectives
@@ -420,6 +429,7 @@ private fun FirstBearingsScreen(
             feedback = if (replayed) "A fresh walk! Your first clue is waiting."
             else "A new stretch of trail! Find the next hiding spot."
             resetView()
+            discoveryMessage = null
         } else {
             val expected = active!!
             val attempt = selectedCell
@@ -431,6 +441,9 @@ private fun FirstBearingsScreen(
                     ).objectiveIndex
                     selected = null
                     hintStage = 0
+                    discoveryMessage = if (step >= targets.size) "Trail complete!"
+                        else "A new discovery!"
+                    discoverySequence += 1
                     feedback = when {
                         step >= targets.size && huntIndex == FirstBearingsChapter.hunts.lastIndex ->
                             "What a trail! You found all nine woodland squares."
@@ -439,6 +452,7 @@ private fun FirstBearingsScreen(
                         else -> "Nice find! ✦ " + expected.reference + " was the spot. Another clue awaits."
                     }
                 } else {
+                    discoveryMessage = null
                     feedback = "Not quite! " + HuntRules.errorText(expected, attempt)
                 }
             }
@@ -469,7 +483,8 @@ private fun FirstBearingsScreen(
                     viewport = viewport,
                     onViewport = mapSizeChanged,
                     onCamera = ::updateCamera,
-                    onSelect = onMapSelect, mapLook = mapLook
+                    onSelect = onMapSelect, mapLook = mapLook,
+                    discoveryMessage = discoveryMessage
                 )
                 Column(
                     modifier = Modifier
@@ -542,7 +557,8 @@ private fun FirstBearingsScreen(
                     viewport = viewport,
                     onViewport = mapSizeChanged,
                     onCamera = ::updateCamera,
-                    onSelect = onMapSelect, mapLook = mapLook
+                    onSelect = onMapSelect, mapLook = mapLook,
+                    discoveryMessage = discoveryMessage
                 )
                 Spacer(Modifier.height(4.dp))
                 HuntControlPanel(
