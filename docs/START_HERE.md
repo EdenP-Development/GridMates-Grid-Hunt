@@ -1,7 +1,7 @@
 # START HERE — GridMates: Grid Hunt
 
 **Current snapshot:** 2026-11-23  
-**Status:** Native Android **prototype implemented and tested**: 9 Trail Treasures clues, 5 Golden Spots, saved progress, original woodland map, executed emulator UI tests. [QA85 passed](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45261941012). Latest code lives in draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12), **not yet merged**; owner QA72 screenshots informed phone layout fixes, but QA85 phone acceptance/install-over still requires confirmation.  
+**Status:** Native Android **prototype implemented and tested**: 9 Trail Treasures clues, 5 Golden Spots and a 4-object Treasure Checklist pilot, with saved progress and an original woodland map. [QA98 passed](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45267677473), including actual Android emulator puzzle tests and visual captures. Latest code lives in draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12), **not yet merged**; owner QA72 screenshots informed phone layout fixes, but QA98 checklist phone acceptance/install-over still requires confirmation.  
 **Source of truth for next game phase:** [Gameplay, Campaign & UI Blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md) + [Master design](MASTER_GAME_DESIGN.md) + [Roadmap](ROADMAP.md). Historical research notes below record their original time/status; don't treat their old 'no app built' claims as current.
 
 ## Product in one sentence
@@ -40,7 +40,7 @@ Do not claim a feature is built because it appears in design documentation.
 
 ## Historical GH-01 prototype priorities (2026-11-21; completed or superseded)
 
-**Current next steps (2026-11-23):** approve QA85 phone usability; establish shared landmark/objective IDs and answer validators; build one 3–5-item Treasure Checklist, then one What's at This Grid? identification puzzle, each with native UI and real QA. See [expansion blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md) for phase gates and the asset policy.
+**Current next steps (2026-11-23):** review QA98 Treasure Checklist and existing mode usability on a real phone; build one What's at This Grid? identification pilot using the four now-canonical woodland landmarks, each with native UI and real QA. See [expansion blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md) for phase gates and the asset policy.
 
 The following older checklist is retained as a record of the initial prototype scope.
 
