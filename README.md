@@ -1,6 +1,6 @@
 # GridMates: Grid Hunt
 
-**Current development checkpoint (2026-11-23):** The native Android app now has 9 authored Trail Treasures targets, 5 Golden Spots, woodland map visuals, saved progress and executed emulator UI tests. [QA85 Android CI passed](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45261941012); owner QA72 phone screenshots informed the latest polish. The work is in **draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12)**, not yet merged or production-released. Physical QA85 acceptance and install-over proof remain open.
+**Current development checkpoint (2026-11-23):** The native Android app now has 9 authored Trail Treasures targets, 5 Golden Spots and a new **4-item Treasure Checklist pilot**, all on one woodland map with local saves. [QA98 Android CI passed](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45267677473), including real emulator gameplay and screenshot checks; owner QA72 screenshots informed earlier polish. The work is in **draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12)**, not yet merged or production-released. Physical QA98 checklist acceptance and install-over proof remain open.
 
 **Premise:** A welcoming, offline-first map-grid puzzle hunt that teaches transferable land-navigation habits through play. Find grid references on illustrated maps, reverse-read coordinates from landmarks, and eventually complete multi-step hunts. Fun first; technically honest coordinate rules underneath.
 
@@ -29,7 +29,7 @@
 - **Make the map usable:** readable labels, generous touch targets, zoom/pan, and an uncluttered play screen.
 - **Respect separate apps:** no shared package identifiers, secrets, saves or assumed drop-in Sudoku/Word Search engine.
 
-**Current next step:** stabilize the latest real-phone layout, then prototype a **3–5-object Treasure Checklist** and **What's at This Grid?** identification on a shared validated landmark/objective model. Use the [new blueprint](docs/GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md), [CI workflow](.github/workflows/gh01-android-qa.yml), and current draft PR for reality checks. **A GitHub commit alone is not a working APK or phone test.**
+**Current next step:** test the new 4-item Treasure Checklist on a real phone (the same woodland art is now canonical landmark data), then build one small **What's at This Grid?** coordinate-to-object identification puzzle on the verified landmarks. Use the [new blueprint](docs/GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md), [CI workflow](.github/workflows/gh01-android-qa.yml), and current draft PR for reality checks. **A GitHub commit alone is not a working APK or phone test.**
 
 ## Research library (2026-11-21)
 
