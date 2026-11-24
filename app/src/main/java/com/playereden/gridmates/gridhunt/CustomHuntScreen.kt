@@ -42,7 +42,9 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
     var replaceHunt by rememberSaveable { mutableStateOf(false) }
     BackHandler(enabled = playing) { playing = false }
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
-    var feedback by rememberSaveable { mutableStateOf(when(mode) { "gold" -> "Read the gold dot’s square."; "identify" -> "Which landmark is there?"; "checklist" -> "Find the landmark and read its square."; else -> "Tap the matching square." }) }
+    fun instruction(type: String) = when(type) { "gold" -> "Read the gold dot’s square."; "identify" -> "Which landmark is there?"; "checklist" -> "Find the landmark and read its square."; else -> "Tap the matching square." }
+    var feedback by rememberSaveable { mutableStateOf(instruction(if (mode == "mixed") mixed.getOrNull(step)?.type ?: "grid" else mode)) }
+    var showGuide by rememberSaveable { mutableStateOf(false) }
     var hint by rememberSaveable { mutableIntStateOf(0) }
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
@@ -61,11 +63,12 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
         kinds = generated.joinToString(",") { it.type }
         codes = CustomHuntGenerator.encode(if (generated.isNotEmpty()) generated.map { it.cell } else if (nextMode in listOf("identify", "checklist")) CustomHuntGenerator.generateLandmarks() else CustomHuntGenerator.generate(count))
         mode = nextMode
-        step = 0; selected = null; answer = ""; hint = 0; feedback = when(mode) { "gold" -> "Read the gold dot’s square."; "identify" -> "Which landmark is there?"; "checklist" -> "Find the landmark and read its square."; else -> "Tap the matching square." }
+        step = 0; selected = null; answer = ""; hint = 0; feedback = instruction(generated.firstOrNull()?.type ?: mode)
         prefs.edit().putInt("count", count).putString("codes", codes).putString("mode", mode).putString("kinds", kinds).putInt("step", 0).apply()
         playing = true
         fit()
     }
+    if (showGuide) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showGuide = false })
     if (replaceHunt) AlertDialog(
         onDismissRequest = { replaceHunt = false },
         title = { Text("Start a new hunt?") },
@@ -80,12 +83,13 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Custom Play", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Ink,
                 modifier = Modifier.weight(1f))
+            if (playing) HuntToolButton(ExplorerTool.GUIDE, Modifier.size(48.dp).testTag("customGuide"), { showGuide = true })
             TextButton(onClick = { if (playing) playing = false else onHome() },
                 modifier = Modifier.testTag("customBack")) { Text(if (playing) "Setup" else "Home") }
         }
         if (!playing) {
-            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                WoodlandPostcard(Modifier.fillMaxWidth().height(130.dp))
+            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                WoodlandPostcard(Modifier.fillMaxWidth().height(96.dp))
                 Text("Little Woodland", fontWeight = FontWeight.Bold, color = Ink, fontSize = 18.sp)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf("grid" to "Trail Treasures", "gold" to "Golden Spots").forEach { (id,label) ->
@@ -155,7 +159,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 markerPoint = if (objectiveMode == "gold") active?.let { WorldPoint(it.eastIndex * 1000.0 + 500.0, it.northIndex * 1000.0 + 500.0) } else null,
                 enableSelect = active != null && objectiveMode == "grid", mapLook = mapLook, onLook = onLook)
             if (active == null) PuzzleFinishCard("Your hunt is complete!", "A little woodland adventure, all yours.",
-                "${targets.size} OF ${targets.size} FOUND", "New hunt", ::start, { playing = false })
+                "${targets.size} OF ${targets.size} FOUND", "New hunt", { nextMode = mode; count = targets.size; start() }, onHome)
             else if (objectiveMode in listOf("gold", "checklist")) {
                 OutlinedTextField(value = answer, onValueChange = { answer = it.filter { c -> c in '0'..'9' }.take(4) },
                     label = { Text("Four-digit map code") }, singleLine = true,
@@ -176,7 +180,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     if (answer == active.reference) {
                         step += 1; answer = ""; selected = null; hint = 0; feedback = "Found it!"
                         prefs.edit().putInt("step",step).apply()
-                    } else feedback = "Not quite. Try another code."
+                    } else { hint = 0; feedback = "Not quite. Try another code." }
                 }, enabled = answer.length == 4,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag(if (objectiveMode == "gold") "customGoldCheck" else "customChecklistCheck")) {
                     Text(if (objectiveMode == "gold") "Try this code" else "Mark found")
@@ -220,7 +224,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     if (selected == active.reference) {
                         step += 1; selected = null; hint = 0; feedback = "Found it! On to the next square."
                         prefs.edit().putInt("step",step).apply()
-                    } else feedback = "Not quite. Try another square."
+                    } else { hint = 0; feedback = "Not quite. Try another square." }
                 }, actionLabel = "Try this square")
         }
     }
