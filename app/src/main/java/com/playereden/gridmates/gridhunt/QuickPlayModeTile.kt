@@ -78,7 +78,7 @@ internal fun QuickPlayModeTile(
 
 /** Original field-journal illustrations; no puzzle answers encoded in decorative art. */
 @Composable
-private fun PuzzleModeIllustration(tag: String, glyph: String, modifier: Modifier) {
+internal fun PuzzleModeIllustration(tag: String, glyph: String, modifier: Modifier) {
     if (tag !in setOf("openChapter", "openReverse", "openTreasure", "openIdentify")) {
         Text(glyph, fontSize = 29.sp, color = Forest)
         return
