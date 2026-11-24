@@ -349,27 +349,11 @@ private fun ReverseControls(
         fontSize = 11.sp, color = Ink, lineHeight = 15.sp,
         maxLines = 3, modifier = Modifier.fillMaxWidth().heightIn(min = 26.dp)
     )
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        OutlinedButton(
-            onClick = onHint, enabled = !finished,
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("Clue") }
-        OutlinedButton(
-            onClick = { onZoom(1.6) },
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("+") }
-        OutlinedButton(
-            onClick = { onZoom(1.0 / 1.6) },
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("−") }
-        OutlinedButton(
-            onClick = onFit,
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("See all") }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        ReverseToolButton(ExplorerTool.HINT, Modifier.weight(1f), onHint, !finished)
+        ReverseToolButton(ExplorerTool.ZOOM_IN, Modifier.weight(1f), { onZoom(1.6) })
+        ReverseToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f), { onZoom(1.0 / 1.6) })
+        ReverseToolButton(ExplorerTool.FIT, Modifier.weight(1f), onFit)
     }
     Button(
         onClick = onCheck, enabled = finished || answer.length == 4,
@@ -378,3 +362,12 @@ private fun ReverseControls(
     ) { Text(if (finished) "Find them again" else "Try this code", fontWeight = FontWeight.Bold) }
 }
 
+
+@Composable
+private fun ReverseToolButton(tool: ExplorerTool, modifier: Modifier, action: () -> Unit, enabled: Boolean = true) {
+    OutlinedButton(onClick = action, enabled = enabled,
+        modifier = modifier.heightIn(min = 48.dp).semantics { contentDescription = tool.label },
+        contentPadding = PaddingValues(0.dp)) {
+        ExplorerToolIcon(tool)
+    }
+}
