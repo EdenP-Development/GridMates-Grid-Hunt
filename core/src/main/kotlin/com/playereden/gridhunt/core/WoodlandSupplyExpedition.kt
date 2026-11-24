@@ -54,34 +54,38 @@ object WoodlandSupplyExpedition {
             ExpeditionObjective(
                 "follow-glow-b", ExpeditionVerb.READ_MARKER,
                 "A glimmer on the trail",
-                "The first note says to check golden marker B. " +
+                "A supply note points to golden marker B. " +
                     "Read the four-digit square containing its glow.",
                 ReverseTraining.markers.single { it.id == "B" }.cell,
-                markerId = "B"
+                markerId = "B",
+                discovery = "The marker note mentions a clearing of pale flowers."
             ),
             ExpeditionObjective(
                 "visit-buttercups", ExpeditionVerb.LOCATE_LANDMARK,
                 "The flower clearing",
-                "The next note mentions pale flowers in an eastern clearing. " +
+                "Follow the flower clue from the marker note. " +
                     "Find Buttercup Glade and enter its grid square.",
                 WoodlandLandmarks.flowers.cell,
-                landmarkId = WoodlandLandmarks.flowers.id
+                landmarkId = WoodlandLandmarks.flowers.id,
+                discovery = "The clearing note records another stop at 2641."
             ),
             ExpeditionObjective(
                 "decode-acorn", ExpeditionVerb.IDENTIFY_LANDMARK,
                 "A clue in the north",
-                "The trail journal points to square 2641. " +
+                "The clearing note gives the next stop: square 2641. " +
                     "Which landmark appears in that square?",
                 WoodlandLandmarks.acorn.cell,
-                landmarkId = WoodlandLandmarks.acorn.id
+                landmarkId = WoodlandLandmarks.acorn.id,
+                discovery = "The acorn note names the last stop: the Old Waystone."
             ),
             ExpeditionObjective(
                 "last-seen-waystone", ExpeditionVerb.LOCATE_LANDMARK,
                 "The last known stop",
-                "A final message says the missing supplies were last seen " +
+                "The acorn note says the missing supplies were last seen " +
                     "near the Old Waystone. Locate the stone and read its four-digit square.",
                 WoodlandLandmarks.waystone.cell,
-                landmarkId = WoodlandLandmarks.waystone.id
+                landmarkId = WoodlandLandmarks.waystone.id,
+                discovery = "The last known supply stop is recorded in your journal."
             )
         )
     )
