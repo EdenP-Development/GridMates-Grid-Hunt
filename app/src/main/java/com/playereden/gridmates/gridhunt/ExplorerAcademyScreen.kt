@@ -41,7 +41,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
     )) }
     val active = ExplorerAcademy.current(earned)
     var feedback by rememberSaveable(active?.id) { mutableStateOf("") }
-    var selected by rememberSaveable(active?.id) { mutableStateOf<String?>(null) }
+    var selected by rememberSaveable(active?.id) { mutableStateOf<String?>(active?.route?.start?.reference) }
     var success by rememberSaveable { mutableStateOf("") }
     Column(
         Modifier.fillMaxSize().background(Paper).statusBarsPadding()
@@ -90,7 +90,20 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                         AcademyGrid(task, selected) { selected = it }
                     }
                     if (active.woodlandField) {
+                        active.symbolId?.let { id ->
+                            Row(verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                WoodlandLandmarkSwatch(id, mapLook, symbolSize = 48.dp)
+                                Text("Match this symbol", color = Forest)
+                            }
+                        }
                         AcademyWoodlandMap(mapLook, onLook, selected) { selected = it }
+                        active.route?.let { route ->
+                            OutlinedButton(onClick = { selected = route.start.reference },
+                                modifier = Modifier.fillMaxWidth().testTag("academyRouteReset")) {
+                                Text("Return to start · " + route.start.reference)
+                            }
+                        }
                     }
                     if (task?.selectSquare == true || active.woodlandField) {
                         Text("Selected: " + (selected ?: "Tap a square"), color = Forest)
@@ -110,7 +123,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
         } else {
             Text("Practice complete!", color = Forest, fontSize = 23.sp,
                 fontWeight = FontWeight.Bold, modifier = Modifier.testTag("academyPracticeComplete"))
-            Text("You've completed compass, grid and woodland field practice. More lessons and graduation are in development.", color = Ink)
+            Text("You've completed compass, grid, landmark and route practice. More lessons and graduation are in development.", color = Ink)
             Button(onClick = {
                 prefs.edit().remove("earned").apply()
                 earned = emptySet()
