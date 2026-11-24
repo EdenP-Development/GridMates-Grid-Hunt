@@ -5,11 +5,13 @@ data class AcademyExercise(
     val id: String, val lesson: String, val teaching: String,
     val prompt: String, val choices: List<String>, val answer: String,
     val explanation: String,
-    val mapTask: AcademyMapTask? = null
+    val mapTask: AcademyMapTask? = null,
+    val woodlandField: Boolean = false
 ) {
     init {
         require(id.isNotBlank() && choices.size == 4 && choices.distinct().size == 4)
         require(answer in choices)
+        if (woodlandField) require(mapTask == null && WoodlandLandmarks.all.any { it.cell.reference == answer })
         if (mapTask != null) require(answer == mapTask.target && AcademyTrainingGrid.contains(answer))
     }
 }
@@ -59,7 +61,13 @@ object ExplorerAcademy {
             "Tap square 2740, then check your selection.",
             listOf("2740", "2640", "2739", "2639"), "2740",
             "The square begins at 27 across and 40 up.",
-            AcademyMapTask("2740", guided = false, selectSquare = true))
+            AcademyMapTask("2740", guided = false, selectSquare = true)),
+        AcademyExercise("woodland-field", "Your first woodland map",
+            "Use + to zoom in, drag to move around, and See all to return to the full map. The Map Guide explains the symbols.",
+            "Find Mushroom Nook and select the square containing the mushrooms.",
+            listOf("2538", "2641", "2840", "2941"), WoodlandLandmarks.mushrooms.cell.reference,
+            "Mushroom Nook is in square 2538. Read its west and south grid boundaries.",
+            woodlandField = true)
     )
     fun restore(ids: Set<String>): Set<String> =
         ids.intersect(exercises.map { it.id }.toSet())
