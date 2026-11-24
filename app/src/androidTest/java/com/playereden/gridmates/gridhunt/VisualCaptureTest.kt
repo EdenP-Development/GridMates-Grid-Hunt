@@ -87,6 +87,9 @@ class VisualCaptureTest {
     }
 
     private fun prepare() {
+        // Explicitly initialize precision controls used by scripted visual playthroughs.
+        check(target.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE)
+            .edit().putBoolean("precise_selection", true).commit())
         listOf("gridhunt_first_bearings_v1", "gridhunt_reverse_v1",
             "gridhunt_treasure_checklist_v1", "gridhunt_identify_v1",
             "gridhunt_mixed_woodland_v1",
