@@ -273,6 +273,10 @@ private fun AcademyWoodlandMap(
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
     var guide by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+    val controls = remember(context) { context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE) }
+    var precise by remember { mutableStateOf(controls.getBoolean("precise_selection", false)) }
+    var toolOptions by rememberSaveable { mutableStateOf(false) }
     fun fit() {
         if (viewport.width > 80 && viewport.height > 80)
             camera = MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble())
@@ -298,12 +302,12 @@ private fun AcademyWoodlandMap(
             Triple(ExplorerTool.ZOOM_IN, "academyZoomIn", { zoom(1.6) }),
             Triple(ExplorerTool.ZOOM_OUT, "academyZoomOut", { zoom(1.0 / 1.6) }),
             Triple(ExplorerTool.FIT, "academyFit", { fit() }),
-            Triple(ExplorerTool.GUIDE, "academyGuide", { guide = true })
+            Triple(ExplorerTool.GUIDE, "academyGuide", { toolOptions = true })
         ).forEach { (tool, tag, action) ->
             AcademyToolButton(tool, tag, Modifier.weight(1f), action)
         }
     }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    if (precise) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         listOf(Triple(ExplorerTool.WEST, -1, 0), Triple(ExplorerTool.EAST, 1, 0),
             Triple(ExplorerTool.NORTH, 0, 1), Triple(ExplorerTool.SOUTH, 0, -1)).forEach { (tool, dx, dy) ->
             val direction = tool.name.lowercase().replaceFirstChar { it.uppercase() }
@@ -315,6 +319,25 @@ private fun AcademyWoodlandMap(
             }
         }
     }
+    if (toolOptions) AlertDialog(
+        onDismissRequest = { toolOptions = false },
+        title = { Text("Map tools") },
+        text = {
+            Column {
+                TextButton(onClick = { toolOptions = false; guide = true },
+                    modifier = Modifier.testTag("academyOpenLegend")) { Text("Map guide") }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Precise selection arrows", modifier = Modifier.weight(1f))
+                    Switch(checked = precise, onCheckedChange = {
+                        precise = it
+                        controls.edit().putBoolean("precise_selection", it).apply()
+                    }, modifier = Modifier.testTag("academyPreciseSelection"))
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { toolOptions = false },
+            modifier = Modifier.testTag("academyCloseTools")) { Text("Done") } }
+    )
     if (guide) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { guide = false })
 }
 
