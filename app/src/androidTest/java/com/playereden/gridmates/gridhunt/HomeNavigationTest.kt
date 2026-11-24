@@ -7,6 +7,8 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.test.platform.app.InstrumentationRegistry
 import android.content.Context
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
@@ -377,6 +379,45 @@ class HomeNavigationTest {
         compose.onNodeWithTag("mixedCheck").performClick()
         compose.onNodeWithText("4 of 4 pages found").assertExists()
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
+    }
+
+    @Test fun secondChapterStaysLockedUntilFirstIsFinishedThenCanBePlayed() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        context.getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
+            .edit().putInt("step", 0).commit()
+        context.getSharedPreferences("gridhunt_woodland_supplies_v1", Context.MODE_PRIVATE)
+            .edit().clear().commit()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("openSecondChapter").assertExists()
+        compose.onNodeWithTag("openSecondChapter").assertIsNotEnabled()
+        compose.onNodeWithTag("adventureBack").performClick()
+
+        context.getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
+            .edit().putInt("step", 4).commit()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("openSecondChapter").assertIsEnabled().performClick()
+        compose.onNodeWithText("The Lost Supplies").assertExists()
+
+        compose.onNodeWithTag("mixedCodeInput").performTextInput("2840")
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithText("0 of 4 pages found").assertExists()
+        compose.onNodeWithTag("mixedCodeInput").performTextReplacement("2742")
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithText("1 of 4 pages found").assertExists()
+        compose.onNodeWithTag("mixedCodeInput").performTextInput("2840")
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithText("2 of 4 pages found").assertExists()
+        compose.onNodeWithTag("mixedOption_acorn-nook").performClick()
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithText("3 of 4 pages found").assertExists()
+        compose.onNodeWithTag("mixedCodeInput").performTextInput("2941")
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithTag("mixedHome").performClick()
+        compose.onNodeWithTag("secondChapterStatus").assertExists()
+        compose.onNodeWithTag("openSecondChapter").assertIsEnabled()
     }
 
     @Test fun mixedChapterFinishRemainsUntilExplicitReplay() {
