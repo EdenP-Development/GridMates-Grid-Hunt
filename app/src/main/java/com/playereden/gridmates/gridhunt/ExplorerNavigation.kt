@@ -35,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.WoodlandExpedition
+import com.playereden.gridhunt.core.CampaignChapterStatus
+import com.playereden.gridhunt.core.WoodlandSupplyExpedition
 
 /** GH-V14 Explorer Desk navigation shell. No new modes, art pack or saved-game keys. */
 @Composable
@@ -195,7 +197,10 @@ private fun HomeDestinationStrip(
 internal fun WoodlandAdventureJourney(
     progress: Int,
     onChapter: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    secondStatus: CampaignChapterStatus = CampaignChapterStatus.LOCKED,
+    secondProgress: Int = 0,
+    onSecondChapter: () -> Unit = {}
 ) {
     Column(
         Modifier.fillMaxSize().background(Paper)
@@ -223,7 +228,7 @@ internal fun WoodlandAdventureJourney(
                     Text("WORLD 1  ·  LITTLE WOODLAND", color = Forest,
                         fontSize = 11.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f))
-                    Text("1 chapter", color = Muted, fontSize = 11.sp)
+                    Text("2 chapters", color = Muted, fontSize = 11.sp)
                 }
                 androidx.compose.foundation.layout.Box(
                     modifier = Modifier.fillMaxWidth().height(246.dp)
@@ -327,8 +332,38 @@ internal fun WoodlandAdventureJourney(
                 }
             }
         }
-        Text("A larger journey is planned. For now, this woodland has one " +
-            "real chapter you can play and revisit.",
+        Surface(shape = RoundedCornerShape(18.dp), color = Color(0xFFF3E9D2)) {
+            Column(Modifier.fillMaxWidth().padding(13.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("CHAPTER 2  ·  THE LOST SUPPLIES", color = Forest,
+                    fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
+                Text("Four new clues across Little Woodland.", color = Ink, fontSize = 13.sp)
+                Text(when (secondStatus) {
+                    CampaignChapterStatus.LOCKED ->
+                        "Locked — finish Chapter 1 to follow the supply trail"
+                    CampaignChapterStatus.READY -> "Ready for a new adventure"
+                    CampaignChapterStatus.IN_PROGRESS ->
+                        "$secondProgress of 4 clues solved"
+                    CampaignChapterStatus.COMPLETE -> "4 of 4 clues solved · Complete"
+                }, color = Muted, fontSize = 12.sp,
+                    modifier = Modifier.testTag("secondChapterStatus"))
+                Button(
+                    onClick = onSecondChapter,
+                    enabled = secondStatus != CampaignChapterStatus.LOCKED,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)
+                        .testTag("openSecondChapter"),
+                    colors = ButtonDefaults.buttonColors(containerColor = Forest)
+                ) {
+                    Text(when (secondStatus) {
+                        CampaignChapterStatus.LOCKED -> "Finish Chapter 1 to unlock"
+                        CampaignChapterStatus.READY -> "Begin Chapter 2"
+                        CampaignChapterStatus.IN_PROGRESS -> "Continue Chapter 2"
+                        CampaignChapterStatus.COMPLETE -> "Revisit Chapter 2"
+                    }, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+        Text("More woodland destinations will follow as we build new puzzles.",
             color = Muted, fontSize = 12.sp)
     }
 }
