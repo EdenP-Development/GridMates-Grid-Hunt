@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 
 internal enum class ExplorerTool(val label: String) {
     ZOOM_IN("Zoom in"), ZOOM_OUT("Zoom out"), FIT("See all"), GUIDE("Map guide"),
+    CLEAR("Clear selection"), HINT("Hint"), MORE("More map tools"),
     WEST("Move west"), EAST("Move east"), NORTH("Move north"), SOUTH("Move south")
 }
 
@@ -44,6 +45,19 @@ internal fun ExplorerToolIcon(tool: ExplorerTool, modifier: Modifier = Modifier.
                 line(.87f,.15f,.87f,.73f);line(.87f,.73f,.50f,.81f)
                 line(.23f,.34f,.39f,.38f);line(.61f,.38f,.77f,.34f)
                 line(.23f,.51f,.39f,.55f);line(.61f,.55f,.77f,.51f)
+            }
+            ExplorerTool.CLEAR -> {
+                line(.22f,.57f,.55f,.24f);line(.55f,.24f,.82f,.51f)
+                line(.82f,.51f,.49f,.84f);line(.49f,.84f,.22f,.57f)
+                line(.35f,.44f,.62f,.71f);line(.49f,.84f,.86f,.84f)
+            }
+            ExplorerTool.HINT -> {
+                drawCircle(Forest,s*.25f,p(.5f,.37f),style=Stroke(s*.065f))
+                line(.36f,.57f,.40f,.72f);line(.64f,.57f,.60f,.72f)
+                line(.40f,.72f,.60f,.72f);line(.43f,.84f,.57f,.84f)
+            }
+            ExplorerTool.MORE -> {
+                for(x in listOf(.22f,.50f,.78f)) drawCircle(Forest,s*.065f,p(x,.5f))
             }
             else -> {
                 val d=when(tool) {
