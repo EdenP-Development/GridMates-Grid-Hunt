@@ -223,6 +223,19 @@ class VisualCaptureTest {
         compose.onNodeWithTag("mixedCheck").performClick()
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         capture("15_mixed_expedition_finish.png")
+        // Quick Play must not expose the campaign-only shortcut.
+        check(compose.onAllNodesWithTag("nextExpedition").fetchSemanticsNodes().isEmpty())
+        compose.onNodeWithTag("finishJournal").performClick()
+        compose.onNodeWithTag("journalEntry_identify-waystone").assertExists()
+        compose.onNodeWithTag("journalComplete").assertExists()
+        compose.onNodeWithTag("closeJournal").performClick()
+        compose.onNodeWithTag("mixedHome").performClick()
+        compose.onNodeWithTag("quickBack").performClick()
+        compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("openAdventureChapter").performClick()
+        compose.onNodeWithTag("nextExpedition").performClick()
+        compose.onNodeWithText("The Lost Supplies").assertExists()
+        compose.onNodeWithTag("mixedProgress").assertExists()
     }
 
     @Test fun captureLandscapePuzzleLayouts() {
