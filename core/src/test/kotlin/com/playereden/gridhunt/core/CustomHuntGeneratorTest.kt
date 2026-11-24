@@ -37,4 +37,18 @@ class CustomHuntGeneratorTest {
         assertTrue(CustomHuntGenerator.restoreLandmarks("2437,2438,2439").isEmpty())
     }
 
+    @Test fun mixedSessionsContainEveryTypeAndRestoreExactOrder() {
+        for (seed in 0..99) for (count in CustomHuntGenerator.mixedLengths) {
+            val objectives = CustomHuntGenerator.generateMixed(count, Random(seed))
+            assertEquals(count, objectives.size)
+            assertEquals(count, objectives.map { it.cell }.toSet().size)
+            assertEquals(setOf("grid", "gold", "identify", "checklist"), objectives.map { it.type }.toSet())
+            val codes = CustomHuntGenerator.encode(objectives.map { it.cell })
+            val kinds = objectives.joinToString(",") { it.type }
+            assertEquals(objectives, CustomHuntGenerator.restoreMixed(codes, kinds))
+            assertTrue(CustomHuntGenerator.restoreMixed(codes, "grid").isEmpty())
+            assertTrue(CustomHuntGenerator.restoreMixed(codes, kinds.replace("identify", "invalid")).isEmpty())
+        }
+    }
+
 }
