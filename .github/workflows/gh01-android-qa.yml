@@ -144,6 +144,8 @@ jobs:
             test -s vision-screenshots/09_woodland_checklist.png
             test -s vision-screenshots/10_woodland_checklist_finish.png
             test -s vision-screenshots/11_woodland_map_guide.png
+            test -s vision-screenshots/12_identify_woodland.png
+            test -s vision-screenshots/13_identify_finish.png
       - name: Publish Android instrumentation results
         if: always()
         uses: actions/upload-artifact@v4
