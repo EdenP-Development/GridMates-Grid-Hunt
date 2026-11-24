@@ -66,10 +66,9 @@ class HomeNavigationTest {
         compose.onNodeWithTag("mixedHome").performClick()
         compose.onNodeWithTag("adventureBack").performClick()
         compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
-        compose.onNodeWithTag("customNotReady").assertExists()
-        compose.onNodeWithTag("customOpenQuick").performClick()
-        compose.onNodeWithText("Quick Play").assertExists()
-        compose.onNodeWithTag("quickBack").performClick()
+        compose.onNodeWithTag("customStart").assertExists()
+        compose.onNodeWithTag("customLength_3").assertExists()
+        compose.onNodeWithTag("customBack").performClick()
         compose.onNodeWithTag("openAdventure").assertExists()
     }
 
@@ -117,6 +116,14 @@ class HomeNavigationTest {
         // reviewed from actual emulator + phone screenshots, not text semantics.
         compose.onNodeWithTag("trailLocation").assertExists()
 
+        if (compose.onAllNodesWithTag("huntToolOptions").fetchSemanticsNodes().isNotEmpty()) {
+            compose.onNodeWithTag("huntToolOptions").performClick()
+            val preferences = InstrumentationRegistry.getInstrumentation().targetContext
+                .getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE)
+            if (!preferences.getBoolean("precise_selection", false))
+                compose.onNodeWithTag("huntPreciseSelection").performClick()
+            compose.onNodeWithTag("huntCloseTools").performClick()
+        }
         // Default arrow origin is 2640; 2 west and 3 south yields canonical 2437.
         repeat(2) {
             compose.onNodeWithContentDescription("Move selected square west").performClick()
@@ -468,4 +475,28 @@ class HomeNavigationTest {
         dismissGuideIfShown()
         compose.onNodeWithText("Trail Treasures").assertExists()
     }
+    @Test fun customHuntGeneratesUniqueTargetsAndResumesWithoutChangingCampaign() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val custom = context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE)
+        val campaign = context.getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
+        val before = campaign.all.toMap()
+        check(custom.edit().clear().commit())
+        compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+        compose.onNodeWithTag("customLength_6").performScrollTo().performClick()
+        compose.onNodeWithTag("customStart").performScrollTo().performClick()
+        compose.onNodeWithTag("customMap").assertExists()
+        val codes = custom.getString("codes", "")!!.split(",")
+        org.junit.Assert.assertEquals(6, codes.size)
+        org.junit.Assert.assertEquals(6, codes.toSet().size)
+        org.junit.Assert.assertTrue(codes.all { it.length == 4 && it.take(2).toInt() in 24..29 && it.takeLast(2).toInt() in 37..42 })
+        compose.onNodeWithTag("customBack").performClick()
+        compose.onNodeWithTag("customBack").performClick()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+        compose.onNodeWithTag("customResume").performScrollTo().performClick()
+        compose.onNodeWithTag("customMap").assertExists()
+        org.junit.Assert.assertEquals(codes.joinToString(","), custom.getString("codes", ""))
+        org.junit.Assert.assertEquals(before, campaign.all.toMap())
+    }
+
 }
