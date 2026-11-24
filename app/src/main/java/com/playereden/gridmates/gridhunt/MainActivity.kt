@@ -342,18 +342,21 @@ private fun GridHuntHome(
         modifier = Modifier.fillMaxSize().background(Paper)
             .statusBarsPadding().navigationBarsPadding()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 18.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(11.dp)
+            .padding(horizontal = 18.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(7.dp)
     ) {
-        Text("Quick Play", fontWeight = FontWeight.ExtraBold,
-            color = Ink, fontSize = 28.sp)
-        Text("Pick a favorite kind of puzzle.", color = Muted, fontSize = 13.sp)
-        TextButton(onClick = onReturnHome,
-            modifier = Modifier.testTag("quickBack")) {
-            Text("←  Back to Home", color = Forest)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("Quick Play", fontWeight = FontWeight.ExtraBold,
+                    color = Ink, fontSize = 26.sp)
+                Text("Pick a favorite puzzle.", color = Muted, fontSize = 12.sp)
+            }
+            TextButton(onClick = onReturnHome, modifier = Modifier.testTag("quickBack")) {
+                Text("Home", color = Forest)
+            }
         }
         Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFDFEAD4)) {
-            Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 11.dp)) {
+            Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp)) {
                 Text("✦  YOUR LITTLE DISCOVERIES", color = Forest,
                     fontWeight = FontWeight.Bold, fontSize = 11.sp)
                 Spacer(Modifier.height(4.dp))
@@ -361,7 +364,7 @@ private fun GridHuntHome(
                     color = Ink, fontSize = 12.sp)
             }
         }
-        Text("Choose your puzzle", color = Ink, fontSize = 19.sp,
+        Text("Choose your puzzle", color = Ink, fontSize = 17.sp,
             fontWeight = FontWeight.Bold)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
             QuickPlayModeTile(
