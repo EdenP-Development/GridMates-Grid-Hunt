@@ -1,8 +1,17 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. Read this first when resuming in a new chat. This is a checkpoint, not a replacement for source or design Bibles. Update this document as milestones change.
+Updated 2026-11-24. **Current checkpoint: GH-V22 Custom Play.** Read the current status below before historical entries. Read this first when resuming in a new chat. This is a checkpoint, not a replacement for source or design Bibles. Update this document as milestones change.
 
-## Repository and verified build
+## CURRENT STATUS — supersedes historical checkpoints below
+- Current branch head before this handoff: 334af382a5b0edd1019779abe51473b093ac0539. CI run 45447289836 in progress at inspection. Last independently confirmed passing workflow QA251, source c4bdc5d5b0ce3f495221fc00a2edcc525e7017a8, run 45441832357, APK https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45441832357/artifacts/14942994211. Recheck live workflows for newer verified builds.
+- Four home destinations now implemented in source: Adventure (two chapters), Academy (9 practice + 4 graduation), Quick Play (four puzzle families plus mixed expedition), Custom Play (initial randomized grid hunt). Custom is no longer a preview; verification pending.
+- Read [visual language](vision/GH_V20_VISUAL_LANGUAGE.md) and [asset production bible](vision/GH_V21_ASSET_PRODUCTION_BIBLE.md). Owner explicitly wants straightforward, fun, uncluttered UI, natural touch gestures, minimal reading, coherent generated artwork after layout stability. No mass art generation yet. Code-drawn illustrations are provisional; retain live map geometry.
+- Recent changes: 2d0c6e30b4d5da9c8a02e55a7df517b30f9d00d9 concise Academy tips and optional illustrated help; 14ace5a908c9c89408db9f79dbf31d43a9b72890 concise feedback and optional reasoning; 2c30d8c09fa289afd51a60e7fbab001254553581 shared decorative completion seal; 7b05d0114e69bdc82400b029a24ed3bda07fb9dc initial CustomHuntScreen; 7d858f35986ddd986cc3a7815286193cb4ae09c4 navigation; 334af382a5b0edd1019779abe51473b093ac0539 home label.
+- Custom v1: 3/6/9 unique randomly selected cells within east 24..29 / north 37..42. Independent prefs gridhunt_custom_v1 (count,codes,step). Setup/resume, existing map and hint controls, completion replay. No extra map or difficulty modes yet. New hunt replaces current unfinished session; add confirmation or make intentional. Hardware Back presently returns home, unlike in-screen Setup; fix. Validate restored codes and extract generator to core with deterministic tests. No claims of passing CI or physical acceptance for latest code.
+- Immediate work: replace placeholder navigation assertions, add custom generator and Android completion/resume/isolation tests; initialize precision independently in older arrow-dependent tests. Check CI and repair. Test compact toolbar hit widths, physical phone, landscape, large text and direct touch. Add more custom puzzle modes only after stable first slice. Interactive Academy demonstrations still pending. Final art after physical layout approval. No merge without explicit owner approval.
+- Resume prompt: Continue GridMates: Grid Hunt using docs/CURRENT_DEVELOPMENT_HANDOFF.md, branch feature/gh-v02-in-puzzle-map-look, draft PR #12. Read live head and CI, act on next unfinished task with real commits/tests, preserve saves and canonical geometry, report verified vs pending, update handoff every milestone.
+
+## Repository and verified build (historical)
 - Repo: PlayerEden/GridMates-Grid-Hunt; branch feature/gh-v02-in-puzzle-map-look; draft PR #12. Work on this branch, not main. Do not merge or publish without owner acceptance.
 - Verified game source: 1679c9e02b1967743bc499ca6e3ef70eee49a030 (GH-V18-B3).
 - QA217: https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45335519555 — both JVM/instrumentation compile/signed test APK and executed Android emulator jobs succeeded.
@@ -41,7 +50,7 @@ Cozy native Android/Compose map puzzle adventure, practical readable UI, warm wo
 5. Test physical phone and novice comprehension, accessibility, orientation, scrolling, install-over, and maintain stable QA builds. Revisit UI cohesion and assets when mechanics settle.
 
 ## Resume prompt
-Continue GridMates: Grid Hunt from docs/CURRENT_DEVELOPMENT_HANDOFF.md on feature/gh-v02-in-puzzle-map-look in draft PR #12. Inspect live CI and source first. Continue the next unfinished Academy milestone with actual implementation, tests and commits. Preserve saves and approved product direction. Report verified versus pending, link latest verified APK when useful, and keep handoff current.
+Continue GridMates: Grid Hunt from docs/CURRENT_DEVELOPMENT_HANDOFF.md on feature/gh-v02-in-puzzle-map-look in draft PR #12. Inspect live CI and source first. Continue the next unfinished milestone in CURRENT STATUS above with actual implementation, tests and commits. Preserve saves and approved product direction. Report verified versus pending, link latest verified APK when useful, and keep handoff current.
 
 ## GH-V18-C through E — newer pending checkpoint
 - QA217 remains the last confirmed verified build in this handoff until new workflow results are inspected.
