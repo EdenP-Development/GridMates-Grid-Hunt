@@ -152,6 +152,9 @@ jobs:
             test -s vision-screenshots/17_adventure_journey.png
             test -s vision-screenshots/18_custom_play_preview.png
             test -s vision-screenshots/19_compact_quick_play.png
+            test -s vision-screenshots/20_chapter_two_locked.png
+            test -s vision-screenshots/21_chapter_two_unlocked.png
+            test -s vision-screenshots/22_lost_supplies_opening.png
       - name: Publish Android instrumentation results
         if: always()
         uses: actions/upload-artifact@v4
