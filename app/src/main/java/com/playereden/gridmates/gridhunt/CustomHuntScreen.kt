@@ -18,18 +18,16 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.*
-import kotlin.random.Random
 
 /** Independent custom session: never writes authored campaign or Quick Play saves. */
 @Composable
 internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHome: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember(context) { context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE) }
-    var count by rememberSaveable { mutableIntStateOf(prefs.getInt("count", 3).let { if (it in listOf(3,6,9)) it else 3 }) }
+    var count by rememberSaveable { mutableIntStateOf(prefs.getInt("count", 3).let { if (it in CustomHuntGenerator.lengths) it else 3 }) }
     var codes by rememberSaveable { mutableStateOf(prefs.getString("codes", "") ?: "") }
     val targets = remember(codes) {
-        codes.split(",").mapNotNull { runCatching { GridReference.parse(it) }.getOrNull() }
-            .filter { it.eastIndex in 24..29 && it.northIndex in 37..42 }.distinct()
+        CustomHuntGenerator.restore(codes)
     }
     var step by rememberSaveable { mutableIntStateOf(prefs.getInt("step", 0).coerceIn(0, targets.size)) }
     var playing by rememberSaveable { mutableStateOf(false) }
@@ -46,8 +44,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
             camera = MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble())
     }
     fun start() {
-        codes = (24..29).flatMap { e -> (37..42).map { n -> GridCell(e,n).reference } }
-            .shuffled(Random.Default).take(count).joinToString(",")
+        codes = CustomHuntGenerator.encode(CustomHuntGenerator.generate(count))
         step = 0; selected = null; hint = 0; feedback = "Tap the matching square."
         prefs.edit().putInt("count", count).putString("codes", codes).putInt("step", 0).apply()
         playing = true
@@ -77,7 +74,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 Text("Find the grid square", color = Forest)
                 Text("Discoveries", color = Ink, fontWeight = FontWeight.SemiBold)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf(3,6,9).forEach { n ->
+                    CustomHuntGenerator.lengths.forEach { n ->
                         FilterChip(selected = count == n, onClick = { count = n },
                             label = { Text(n.toString()) }, modifier = Modifier.weight(1f).testTag("customLength_$n"))
                     }
@@ -91,6 +88,9 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     Text("New hunt")
                 }
             }
+        } else if (targets.isEmpty()) {
+            Text("This hunt could not be restored.", color = Forest)
+            Button(onClick = { playing = false }) { Text("Return to setup") }
         } else {
             val active = targets.getOrNull(step)
             if (active != null) ObjectiveRibbon(step, targets.size, active, "Little Woodland", false)
