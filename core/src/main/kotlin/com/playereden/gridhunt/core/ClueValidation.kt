@@ -65,6 +65,7 @@ sealed interface ClueCondition {
     data class InRegion(val regionId: String) : ClueCondition
     data class BesideFeature(val featureId: String) : ClueCondition
     data class EastOf(val featureId: String, val minMeters: Double = 0.0) : ClueCondition
+    data class WestOf(val featureId: String, val minMeters: Double = 0.0) : ClueCondition
     data class NorthOf(val featureId: String, val minMeters: Double = 0.0) : ClueCondition
     data class NearPoint(val featureId: String, val maxMeters: Double) : ClueCondition
 
@@ -144,10 +145,12 @@ object ClueValidation {
 
                 is ClueCondition.BesideFeature,
                 is ClueCondition.EastOf,
+                is ClueCondition.WestOf,
                 is ClueCondition.NorthOf,
                 is ClueCondition.NearPoint -> {
                     val featureId = when (condition) {
                         is ClueCondition.BesideFeature -> condition.featureId
+                        is ClueCondition.WestOf -> condition.featureId
                         is ClueCondition.EastOf -> condition.featureId
                         is ClueCondition.NorthOf -> condition.featureId
                         is ClueCondition.NearPoint -> condition.featureId
@@ -167,6 +170,7 @@ object ClueValidation {
                         return reject(ClueRejection.UNSUPPORTED_RELATION)
                     }
                     val distance = when (condition) {
+                        is ClueCondition.WestOf -> condition.minMeters
                         is ClueCondition.EastOf -> condition.minMeters
                         is ClueCondition.NorthOf -> condition.minMeters
                         is ClueCondition.NearPoint -> condition.maxMeters
@@ -196,6 +200,11 @@ object ClueValidation {
                         candidate.id != reference.id &&
                             candidate.point.easting >
                             reference.point.easting + condition.minMeters
+                    }
+
+                    is ClueCondition.WestOf -> {
+                        val reference = byId.getValue(condition.featureId)
+                        candidate.id != reference.id && candidate.point.easting < reference.point.easting - condition.minMeters
                     }
 
                     is ClueCondition.NorthOf -> {
