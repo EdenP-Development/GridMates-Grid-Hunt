@@ -57,6 +57,23 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew :core:test :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon --max-workers=2 --stacktrace --console=plain
+      - name: Assemble unsigned beta and verify separate package
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./gradlew :app:assembleBeta --no-daemon --max-workers=2 --console=plain
+          apk=app/build/outputs/apk/beta/app-beta-unsigned.apk
+          test -s "$apk"
+          tools="$ANDROID_HOME/build-tools/35.0.0"
+          badging=$("$tools/aapt" dump badging "$apk")
+          line=$(printf '%s\n' "$badging" | sed -n '1p')
+          [[ "$line" == *"name='com.playereden.gridmates.gridhunt.beta'"* ]]
+          [[ "$line" == *"versionCode='$((10000 + GITHUB_RUN_NUMBER))'"* ]]
+          [[ "$line" == *"versionName='0.3.0-gh02c-beta.$GITHUB_RUN_NUMBER'"* ]]
+          if "$tools/apksigner" verify "$apk" >/dev/null 2>&1; then
+            echo 'Unexpected signed staging APK'; exit 1
+          fi
+          echo 'PASS: isolated unsigned beta APK verified; no private secrets used.'
       - name: Capture exact source, signer and APK checksum
         run: |
           mkdir -p vision-qa-output
