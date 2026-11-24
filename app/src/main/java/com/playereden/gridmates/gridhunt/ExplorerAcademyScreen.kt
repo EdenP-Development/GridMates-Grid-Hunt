@@ -52,6 +52,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
     var feedback by rememberSaveable(active?.id) { mutableStateOf("") }
     var selected by rememberSaveable(active?.id) { mutableStateOf<String?>(active?.route?.start?.reference) }
     var success by rememberSaveable { mutableStateOf("") }
+    var showLessonHelp by rememberSaveable(active?.id) { mutableStateOf(false) }
     val scroll = rememberScrollState()
     LaunchedEffect(active?.id, showOverview) { scroll.scrollTo(0) }
     Column(
@@ -85,19 +86,27 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
         TextButton(onClick = { showOverview = true }, modifier = Modifier.testTag("academyOverview")) {
             Text("School overview")
         }
-        if (success.isNotBlank()) Text(success, color = Forest,
-            modifier = Modifier.testTag("academySuccess"))
+        if (success.isNotBlank() && active?.woodlandField != true) Text(success, color = Forest,
+            fontSize = 12.sp, modifier = Modifier.testTag("academySuccess"))
         if (active != null) {
             Surface(color = Color(0xFFFFF0CF), shape = RoundedCornerShape(16.dp)) {
                 Column(Modifier.fillMaxWidth().padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(active.lesson, color = Ink, fontSize = 20.sp,
                         fontWeight = FontWeight.Bold)
-                    Text(active.teaching, color = Ink)
+                    if (active.woodlandField) {
+                        TextButton(onClick = { showLessonHelp = !showLessonHelp },
+                            contentPadding = PaddingValues(horizontal = 4.dp),
+                            modifier = Modifier.testTag("academyLessonHelp")) {
+                            Text(if (showLessonHelp) "Hide lesson help" else "Lesson help", color = Forest)
+                        }
+                        if (showLessonHelp) Text(active.teaching, color = Ink, fontSize = 13.sp)
+                    } else Text(active.teaching, color = Ink)
                     if (active.id == "north" || active.id == "south") {
                         AcademyCompass()
                     }
-                    Text(active.prompt, color = Ink, fontWeight = FontWeight.Bold)
+                    Text(active.prompt, color = Ink, fontWeight = FontWeight.Bold,
+                        fontSize = if (active.woodlandField) 14.sp else 16.sp)
                     val submit: (String) -> Unit = { choice ->
                         if (inGraduation && practiceDone) {
                             val next = ExplorerAcademy.acceptGraduation(earned, fieldEarned, active.id, choice)
@@ -159,6 +168,8 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                             }
                         }
                     }
+                    if (active.woodlandField && success.isNotBlank()) Text(success, color = Forest,
+                        fontSize = 12.sp, modifier = Modifier.testTag("academySuccess"))
                     if (feedback.isNotBlank()) Text(feedback, color = Forest,
                         modifier = Modifier.testTag("academyFeedback"))
                 }
