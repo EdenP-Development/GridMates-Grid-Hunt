@@ -73,31 +73,90 @@ internal fun WoodlandPostcard(modifier: Modifier = Modifier) {
             drawCircle(Color(0xFFFFF2C4), h * .12f, sunlight)
             drawCircle(Color(0xFFEABF71), h * .085f, sunlight)
 
-            // Three soft, distinct tree groups at fixed picture-book positions.
-            val groves = listOf(
-                Triple(.10f, .49f, .12f),
-                Triple(.35f, .57f, .15f),
-                Triple(.90f, .57f, .14f),
-                Triple(.57f, .29f, .095f)
-            )
-            groves.forEachIndexed { i, (x, y, fraction) ->
-                val center = point(x, y)
-                val radius = h * fraction
-                drawCircle(Color(0x7C426F4E), radius * 1.06f,
-                    center + Offset(radius * .16f, radius * .20f))
-                drawCircle(if (i % 2 == 0) Color(0xFF547E59) else Color(0xFF66936A),
-                    radius, center)
-                drawCircle(Color(0xFF91B584), radius * .65f,
-                    center + Offset(-radius * .36f, -radius * .26f))
-                drawCircle(Color(0xFFAED09A), radius * .34f,
-                    center + Offset(-radius * .43f, -radius * .40f))
+            // Original layered storybook woodland: tapered evergreens,
+            // broadleaf silhouettes, trunk details and tiny meadow marks.
+            // All positions are decorative and independent of puzzle data.
+            fun pine(x: Float, y: Float, tall: Float, dark: Color, light: Color) {
+                val p = point(x, y)
+                val t = h * tall
+                drawOval(Color(0x29405B3C), topLeft = p + Offset(-t*.29f,-t*.035f),
+                    size = androidx.compose.ui.geometry.Size(t*.66f,t*.15f))
+                drawLine(Color(0xFF806648), p, p + Offset(0f,-t*.48f),
+                    strokeWidth = (t*.065f).coerceAtLeast(1f))
+                for (tier in 0..2) {
+                    val base = p.y-t*(.12f+tier*.22f)
+                    val spread = t*(.32f-tier*.065f)
+                    val crown = Path().apply {
+                        moveTo(p.x,base-t*.48f)
+                        quadraticBezierTo(p.x-spread*.35f,base-t*.22f,p.x-spread,base)
+                        quadraticBezierTo(p.x,base+t*.08f,p.x+spread,base)
+                        quadraticBezierTo(p.x+spread*.35f,base-t*.22f,p.x,base-t*.48f)
+                        close()
+                    }
+                    drawPath(crown,dark)
+                    val lit = Path().apply {
+                        moveTo(p.x,base-t*.43f)
+                        lineTo(p.x-spread*.82f,base-t*.015f)
+                        quadraticBezierTo(p.x-spread*.35f,base+t*.025f,p.x,base-t*.045f)
+                        close()
+                    }
+                    drawPath(lit,light)
+                }
+            }
+            fun oak(x: Float,y: Float,tall: Float) {
+                val p = point(x,y)
+                val t = h*tall
+                drawOval(Color(0x30405B3C),topLeft=p+Offset(-t*.38f,-t*.04f),
+                    size=androidx.compose.ui.geometry.Size(t*.85f,t*.17f))
+                drawLine(Color(0xFF826A4C),p,p+Offset(0f,-t*.66f),strokeWidth=t*.09f)
+                val canopy = p+Offset(0f,-t*.61f)
+                listOf(Triple(-.25f,.07f,.27f),Triple(.22f,.04f,.28f),
+                    Triple(0f,-.20f,.31f),Triple(.02f,.13f,.30f)).forEach { (dx,dy,r) ->
+                    drawCircle(Color(0xFF557C51), t*r, canopy+Offset(dx*t,dy*t))
+                }
+                listOf(Triple(-.24f,-.02f,.19f),Triple(.13f,-.20f,.22f),
+                    Triple(-.06f,-.32f,.17f)).forEach { (dx,dy,r) ->
+                    drawCircle(Color(0xFF8DAD71),t*r,canopy+Offset(dx*t,dy*t))
+                }
+                repeat(5) { i ->
+                    val leaf = canopy + Offset((i%3-1)*t*.13f,(-.22f+(i/3)*.16f)*t)
+                    drawOval(Color(0xFFB3C98D),topLeft=leaf,
+                        size=androidx.compose.ui.geometry.Size(t*.09f,t*.035f))
+                }
+            }
+            // Distant silhouettes, then foreground grove, avoiding the trail.
+            listOf(Triple(.05f,.52f,.28f),Triple(.15f,.52f,.23f),
+                Triple(.39f,.47f,.24f),Triple(.46f,.47f,.19f),
+                Triple(.89f,.45f,.26f),Triple(.96f,.49f,.30f)).forEach { (x,y,t) ->
+                pine(x,y,t,Color(0xFF78986C),Color(0xFF9BB780))
+            }
+            oak(.12f,.78f,.54f)
+            pine(.23f,.73f,.42f,Color(0xFF3F7156),Color(0xFF71965F))
+            oak(.38f,.75f,.39f)
+            pine(.91f,.79f,.56f,Color(0xFF3F7156),Color(0xFF71965F))
+            oak(.82f,.85f,.38f)
+            pine(.98f,.91f,.47f,Color(0xFF345F49),Color(0xFF648D5D))
+            // Fine meadow marks and golden blossoms at fixed decorative points.
+            repeat(26) { i ->
+                val x = ((i*37+11)%97)/100f
+                val y = .78f+((i*19)%19)/100f + (i%4)*.035f
+                val p = point(x,y)
+                val g = h*.025f
+                drawLine(Color(0xFF527954),p,p+Offset(-g*.4f,-g),strokeWidth=1.dp.toPx())
+                drawLine(Color(0xFF527954),p,p+Offset(g*.45f,-g*.8f),strokeWidth=1.dp.toPx())
+                if(i%4==0) drawCircle(Color(0xFFF2D48B),h*.012f,p+Offset(0f,-g))
+            }
+            // Restrained paper-grain specks, deterministic across recompositions.
+            repeat(95) { i ->
+                drawCircle(Color(0x12695335), .55.dp.toPx(),
+                    point(((i*43+7)%101)/101f,((i*67+13)%103)/103f))
             }
             // Little golden destination marker: a playful visual promise.
             val treasure = point(.62f, .73f)
             drawCircle(Color(0xFFFDF6DA), h * .062f, treasure)
             drawCircle(Color(0xFFD28F42), h * .042f, treasure)
             drawLine(Color.White, treasure + Offset(-7f, -7f),
-                treasure + Offset(7f, 7f), strokeWidth = 3f)
+                treasure + Offset(7f, 7f), strokeWidth = 1.5.dp.toPx())
             drawLine(Color.White, treasure + Offset(7f, -7f),
                 treasure + Offset(-7f, 7f), strokeWidth = 3f)
         }
