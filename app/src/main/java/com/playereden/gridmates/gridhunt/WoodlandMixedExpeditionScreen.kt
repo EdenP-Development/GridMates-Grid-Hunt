@@ -250,11 +250,11 @@ internal fun WoodlandMixedExpeditionScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(7.dp)
                 ) {
-                    MixedExpeditionHeader(mission.chapter.name, step, mission.size,
+                    MixedExpeditionHeader(mission.chapter.name, chapterTwo, step, mission.size,
                         onHome, onGuide = { showGuide = true })
                     if (finished) MixedExpeditionFinish(chapterTwo, onHome, replay)
                     else if (active != null) {
-                        MixedExpeditionPrompt(active, step + 1, mission.size)
+                        MixedExpeditionPrompt(active, chapterTwo, step + 1, mission.size)
                         MixedExpeditionControls(
                             active, mapLook, selectedCell, enteredCode, chosenLandmark,
                             feedback, onSelected = { selectedCell = it },
@@ -267,9 +267,9 @@ internal fun WoodlandMixedExpeditionScreen(
             }
         } else {
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                MixedExpeditionHeader(mission.chapter.name, step, mission.size, onHome,
+                MixedExpeditionHeader(mission.chapter.name, chapterTwo, step, mission.size, onHome,
                     onGuide = { showGuide = true })
-                if (active != null) MixedExpeditionPrompt(active, step + 1, mission.size)
+                if (active != null) MixedExpeditionPrompt(active, chapterTwo, step + 1, mission.size)
                 HuntMapPanel(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     bounds = bounds, camera = camera,
@@ -299,13 +299,15 @@ internal fun WoodlandMixedExpeditionScreen(
 
 @Composable
 private fun MixedExpeditionHeader(
-    chapterName: String, step: Int, total: Int, onHome: () -> Unit, onGuide: () -> Unit
+    chapterName: String, chapterTwo: Boolean, step: Int, total: Int,
+    onHome: () -> Unit, onGuide: () -> Unit
 ) {
     Column(Modifier.fillMaxWidth()) {
         Text(chapterName, color = Ink,
             fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, maxLines = 1)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("$step of $total pages found", color = Forest, fontSize = 11.sp,
+            Text(if (chapterTwo) "$step of $total clues solved"
+             else "$step of $total pages found", color = Forest, fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f).testTag("mixedProgress"))
             TextButton(onClick = onGuide, modifier = Modifier.testTag("mixedGuide")) {
@@ -320,12 +322,12 @@ private fun MixedExpeditionHeader(
 
 @Composable
 private fun MixedExpeditionPrompt(
-    objective: ExpeditionObjective, stage: Int, total: Int
+    objective: ExpeditionObjective, chapterTwo: Boolean, stage: Int, total: Int
 ) {
     Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFFFF0CF)) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text("PAGE $stage OF $total · " + when (objective.verb) {
+            Text((if (chapterTwo) "CLUE" else "PAGE") + " $stage OF $total · " + when (objective.verb) {
                 ExpeditionVerb.FIND_SQUARE -> "FIND THE SQUARE"
                 ExpeditionVerb.READ_MARKER -> "READ THE GOLDEN DOT"
                 ExpeditionVerb.LOCATE_LANDMARK -> "FIND THE LANDMARK"
