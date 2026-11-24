@@ -545,4 +545,37 @@ class HomeNavigationTest {
         }
     }
 
+    @Test fun generatedGoldenSpotsCanResumeAndComplete() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val custom = context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE)
+        val reverse = context.getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
+        val before = reverse.all.toMap()
+        check(custom.edit().clear().commit())
+        compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+        compose.onNodeWithTag("customMode_gold").performScrollTo().performClick()
+        compose.onNodeWithTag("customLength_3").performScrollTo().performClick()
+        compose.onNodeWithTag("customStart").performScrollTo().performClick()
+        compose.onNodeWithTag("customGoldInput").assertExists()
+        val codes = custom.getString("codes", "")!!.split(",")
+        org.junit.Assert.assertEquals("gold", custom.getString("mode", ""))
+        compose.onNodeWithTag("customGoldInput").performTextInput("0000")
+        compose.onNodeWithTag("customGoldCheck").performClick()
+        org.junit.Assert.assertEquals(0, custom.getInt("step", 0))
+        compose.onNodeWithTag("customGoldInput").performTextReplacement(codes.first())
+        compose.onNodeWithTag("customGoldCheck").performClick()
+        compose.onNodeWithTag("customBack").performClick()
+        compose.onNodeWithTag("customBack").performClick()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+        compose.onNodeWithTag("customMode_grid").performScrollTo().performClick()
+        compose.onNodeWithTag("customResume").performScrollTo().performClick()
+        codes.drop(1).forEach { code ->
+            compose.onNodeWithTag("customGoldInput").performTextReplacement(code)
+            compose.onNodeWithTag("customGoldCheck").performClick()
+        }
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        org.junit.Assert.assertEquals(3, custom.getInt("step", 0))
+        org.junit.Assert.assertEquals(before, reverse.all.toMap())
+    }
+
 }
