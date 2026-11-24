@@ -34,6 +34,14 @@ android {
             signingConfig = signingConfigs.getByName("publicQa")
         }
         release { isMinifyEnabled = false }
+        create("beta") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".beta"
+            versionNameSuffix = "-beta.${System.getenv("GITHUB_RUN_NUMBER") ?: "local"}"
+            matchingFallbacks += listOf("release")
+            // Intentionally unsigned: sign the reviewed APK in a separate trusted workflow.
+            signingConfig = null
+        }
     }
     buildFeatures { compose = true }
     compileOptions {
