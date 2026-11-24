@@ -339,6 +339,26 @@ class HomeNavigationTest {
         compose.onNodeWithTag("mixedCheck").performClick()
     }
 
+    @Test fun earnedChapterStepSurvivesImmediateHomeWithoutChangingOtherChapter() {
+        val ctx = InstrumentationRegistry.getInstrumentation().targetContext
+        val first = ctx.getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
+        val second = ctx.getSharedPreferences("gridhunt_woodland_supplies_v1", Context.MODE_PRIVATE)
+        check(first.edit().clear().commit())
+        check(second.edit().clear().commit())
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("openAdventureChapter").performClick()
+        playFirstMixedSquare()
+        compose.onNodeWithTag("mixedHome").performClick()
+        compose.onNodeWithText("1 of 4 pages recovered").assertExists()
+        org.junit.Assert.assertEquals(1, first.getInt("step", -1))
+        org.junit.Assert.assertEquals(-1, second.getInt("step", -1))
+        compose.onNodeWithTag("openAdventureChapter").performClick()
+        compose.onNodeWithText("1 of 4 pages found").assertExists()
+        compose.onNodeWithTag("mixedHome").performClick()
+        compose.onNodeWithTag("openSecondChapter").assertIsNotEnabled()
+    }
+
     @Test fun mixedChapterValidatesEachVerbAndPreservesProgressAfterReopen() {
         InstrumentationRegistry.getInstrumentation().targetContext
             .getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
