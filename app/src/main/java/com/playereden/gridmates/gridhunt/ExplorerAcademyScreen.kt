@@ -294,26 +294,25 @@ private fun AcademyWoodlandMap(
         enableSelect = true, mapLook = mapLook, onLook = onLook
     )
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        OutlinedButton(onClick = { zoom(1.6) }, modifier = Modifier.weight(1f).testTag("academyZoomIn"),
-            contentPadding = PaddingValues(0.dp)) { Text("+") }
-        OutlinedButton(onClick = { zoom(1.0 / 1.6) }, modifier = Modifier.weight(1f).testTag("academyZoomOut"),
-            contentPadding = PaddingValues(0.dp)) { Text("−") }
-        OutlinedButton(onClick = { fit() }, modifier = Modifier.weight(1.5f).testTag("academyFit"),
-            contentPadding = PaddingValues(0.dp)) { Text("See all") }
-        OutlinedButton(onClick = { guide = true }, modifier = Modifier.weight(1.6f).testTag("academyGuide"),
-            contentPadding = PaddingValues(0.dp)) { Text("Guide") }
+        listOf(
+            Triple(ExplorerTool.ZOOM_IN, "academyZoomIn", { zoom(1.6) }),
+            Triple(ExplorerTool.ZOOM_OUT, "academyZoomOut", { zoom(1.0 / 1.6) }),
+            Triple(ExplorerTool.FIT, "academyFit", { fit() }),
+            Triple(ExplorerTool.GUIDE, "academyGuide", { guide = true })
+        ).forEach { (tool, tag, action) ->
+            AcademyToolButton(tool, tag, Modifier.weight(1f), action)
+        }
     }
-    // Accessible directional alternatives to map tapping; selection uses real grid addresses.
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        listOf(Triple("West", -1, 0), Triple("East", 1, 0),
-            Triple("North", 0, 1), Triple("South", 0, -1)).forEach { (label, dx, dy) ->
-            OutlinedButton(onClick = {
+        listOf(Triple(ExplorerTool.WEST, -1, 0), Triple(ExplorerTool.EAST, 1, 0),
+            Triple(ExplorerTool.NORTH, 0, 1), Triple(ExplorerTool.SOUTH, 0, -1)).forEach { (tool, dx, dy) ->
+            val direction = tool.name.lowercase().replaceFirstChar { it.uppercase() }
+            AcademyToolButton(tool, "academyMove$direction", Modifier.weight(1f)) {
                 val base = GridReference.parse(selected ?: "2640")
                 val e = (base.eastIndex + dx).coerceIn(24, 29)
                 val n = (base.northIndex + dy).coerceIn(37, 42)
                 onSelect(com.playereden.gridhunt.core.GridCell(e, n).reference)
-            }, modifier = Modifier.weight(1f).testTag("academyMove$label"),
-                contentPadding = PaddingValues(0.dp)) { Text(label, fontSize = 11.sp) }
+            }
         }
     }
     if (guide) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { guide = false })
@@ -428,6 +427,20 @@ private fun AcademyGraduationCard() {
             HorizontalDivider(color = Gold.copy(alpha = .45f))
             Text("You completed The Explorer’s First Journey. Your qualification is yours to keep, even when you replay.",
                 color = Ink, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        }
+    }
+}
+
+@Composable
+private fun AcademyToolButton(tool: ExplorerTool, tag: String, modifier: Modifier, action: () -> Unit) {
+    OutlinedButton(onClick = action,
+        modifier = modifier.heightIn(min = 48.dp).testTag(tag)
+            .semantics { contentDescription = tool.label },
+        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 4.dp)) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            ExplorerToolIcon(tool)
+            Text(tool.label.removePrefix("Move "), fontSize = 10.sp, color = Forest,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         }
     }
 }
