@@ -8,6 +8,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -87,7 +89,8 @@ class VisualCaptureTest {
     private fun prepare() {
         listOf("gridhunt_first_bearings_v1", "gridhunt_reverse_v1",
             "gridhunt_treasure_checklist_v1", "gridhunt_identify_v1",
-            "gridhunt_mixed_woodland_v1").forEach { name ->
+            "gridhunt_mixed_woodland_v1",
+            "gridhunt_woodland_supplies_v1").forEach { name ->
             check(target.getSharedPreferences(name, Context.MODE_PRIVATE)
                 .edit().clear().commit()) { "Could not reset test-only $name" }
         }
@@ -134,6 +137,8 @@ class VisualCaptureTest {
         compose.onNodeWithTag("adventureRouteMap").assertExists()
         compose.onNodeWithTag("openAdventureChapter").assertExists()
         capture("17_adventure_journey.png")
+        compose.onNodeWithTag("openSecondChapter").assertIsNotEnabled()
+        capture("20_chapter_two_locked.png")
         compose.onNodeWithTag("adventureBack").performClick()
         compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
         compose.onNodeWithTag("customNotReady").assertExists()
@@ -141,6 +146,15 @@ class VisualCaptureTest {
         compose.onNodeWithTag("customOpenQuick").performClick()
         compose.onNodeWithTag("openIdentify").assertExists()
         capture("19_compact_quick_play.png")
+        check(target.getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
+            .edit().putInt("step", 4).commit())
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("openSecondChapter").assertIsEnabled()
+        capture("21_chapter_two_unlocked.png")
+        compose.onNodeWithTag("openSecondChapter").performClick()
+        compose.onNodeWithText("The Lost Supplies").assertExists()
+        capture("22_lost_supplies_opening.png")
     }
 
     @Test fun captureIntroTreasureChecklistAndEarnedFinish() {
