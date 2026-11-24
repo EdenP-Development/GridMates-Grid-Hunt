@@ -56,6 +56,7 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openAdventure").performClick()
         compose.onNodeWithText("The Missing Field Notes").assertExists()
         compose.onNodeWithTag("adventureProgress").assertExists()
+        compose.onNodeWithTag("adventureRouteMap").assertExists()
         compose.onNodeWithTag("openAdventureChapter").performClick()
         compose.onNodeWithText("The Missing Field Notes").assertExists()
         compose.onNodeWithTag("mixedHome").performClick()
