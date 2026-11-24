@@ -53,8 +53,16 @@ class AcademyTrainingTest {
         }
         compose.onNodeWithTag("academyCheckSquare").assertIsEnabled()
         compose.onNodeWithTag("academyCheckSquare").performScrollTo().performClick()
+        compose.onNodeWithText("Reading the landscape").assertExists()
+        repeat(2) { compose.onNodeWithTag("academyMoveEast").performScrollTo().performClick() }
+        compose.onNodeWithTag("academyCheckSquare").performScrollTo().performClick()
+        compose.onNodeWithText("Following the trail").assertExists()
+        compose.onNodeWithTag("academyRouteReset").performScrollTo().performClick()
+        repeat(2) { compose.onNodeWithTag("academyMoveEast").performScrollTo().performClick() }
+        compose.onNodeWithTag("academyMoveNorth").performScrollTo().performClick()
+        compose.onNodeWithTag("academyCheckSquare").performScrollTo().performClick()
         compose.onNodeWithTag("academyPracticeComplete").assertExists()
-        assertEquals(6, prefs.getStringSet("earned", emptySet())?.size)
+        assertEquals(8, prefs.getStringSet("earned", emptySet())?.size)
         assertEquals(before, campaign.all.toMap())
         compose.onNodeWithTag("academyReplay").performScrollTo().performClick()
         compose.onNodeWithText("Finding your bearings").assertExists()
