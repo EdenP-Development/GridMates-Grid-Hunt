@@ -89,8 +89,8 @@ class CampaignRegistryTest {
         }
         assertThrows(IllegalArgumentException::class.java) {
             CampaignRegistry(listOf(world("wood-a",
-                item("a", order = 1, requires = setOf("b")),
-                item("b", order = 0))))
+                item("a", order = 0, requires = setOf("b")),
+                item("b", order = 1))))
         }
         assertThrows(IllegalArgumentException::class.java) {
             CampaignRegistry(listOf(world("wood-a", a), world("wood-a", item("b"))))
