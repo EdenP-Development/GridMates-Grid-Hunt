@@ -78,7 +78,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
         dismissButton = { TextButton(onClick = { replaceHunt = false },
             modifier = Modifier.testTag("customCancelReplace")) { Text("Keep hunt") } }
     )
-    Column(Modifier.fillMaxSize().background(Paper).statusBarsPadding().navigationBarsPadding()
+    Column(Modifier.fillMaxSize().background(Paper).statusBarsPadding().navigationBarsPadding().imePadding()
         .padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Custom Play", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Ink,
@@ -129,6 +129,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
             val active = targets.getOrNull(step)
             val objectiveMode = if (mode == "mixed") mixed.getOrNull(step)?.type ?: "grid" else mode
             val landmark = if (objectiveMode == "checklist") WoodlandLandmarks.all.firstOrNull { it.cell == active } else null
+            val prompt: @Composable () -> Unit = {
             if (active != null) {
                 if (objectiveMode == "gold") Text("Golden spot ${step+1} of ${targets.size}", color = Forest, fontWeight = FontWeight.Bold)
                 else if (objectiveMode == "identify") Text("Which landmark is at ${active.reference}? · ${step+1}/${targets.size}", fontWeight = FontWeight.Bold, color = Forest)
@@ -151,7 +152,9 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     Text("Find: " + (landmark?.name ?: ""), fontWeight = FontWeight.Bold, color = Forest)
                 } else ObjectiveRibbon(step, targets.size, active, "Little Woodland", false)
             }
-            HuntMapPanel(modifier = Modifier.fillMaxWidth().weight(1f).testTag("customMap"),
+            }
+            val mapPanel: @Composable (Modifier) -> Unit = { mapModifier ->
+            HuntMapPanel(modifier = mapModifier.testTag("customMap"),
                 bounds = bounds, camera = camera,
                 selectedCell = selected?.let { runCatching { GridReference.parse(it) }.getOrNull() },
                 completed = targets.take(step), viewport = viewport,
@@ -159,6 +162,8 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 onCamera = { camera = it }, onSelect = { selected = it },
                 markerPoint = if (objectiveMode == "gold") active?.let { WorldPoint(it.eastIndex * 1000.0 + 500.0, it.northIndex * 1000.0 + 500.0) } else null,
                 enableSelect = active != null && objectiveMode == "grid", mapLook = mapLook, onLook = onLook)
+            }
+            val controls: @Composable () -> Unit = {
             if (active == null) PuzzleFinishCard("Your hunt is complete!", "A little woodland adventure, all yours.",
                 "${targets.size} OF ${targets.size} FOUND", "New hunt", { nextMode = mode; count = targets.size; start() }, onHome)
             else if (objectiveMode in listOf("gold", "checklist")) {
@@ -227,6 +232,40 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                         prefs.edit().putInt("step",step).apply()
                     } else { hint = 0; feedback = "Not quite. Try another square." }
                 }, actionLabel = "Try this square")
+            }
+            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
+                val wide = maxWidth >= 600.dp
+                if (wide) {
+                    Row(Modifier.fillMaxSize().testTag("customWideLayout"),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        mapPanel(Modifier.weight(1.25f).fillMaxHeight())
+                        Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            prompt()
+                            controls()
+                        }
+                    }
+                } else {
+                    // On short viewports (including the open IME), keep a usable map
+                    // and allow the control area to scroll rather than collapsing it.
+                    val short = maxHeight < 420.dp
+                    if (short) {
+                        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).testTag("customShortLayout"),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            prompt()
+                            mapPanel(Modifier.fillMaxWidth().height(240.dp))
+                            controls()
+                        }
+                    } else {
+                        Column(Modifier.fillMaxSize().testTag("customPortraitLayout"),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            prompt()
+                            mapPanel(Modifier.fillMaxWidth().weight(1f))
+                            controls()
+                        }
+                    }
+                }
+            }
         }
     }
 }
