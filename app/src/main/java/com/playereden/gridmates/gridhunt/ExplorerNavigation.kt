@@ -44,7 +44,8 @@ internal fun ExplorerDeskHome(
     expeditionProgress: Int,
     onAdventure: () -> Unit,
     onQuickPlay: () -> Unit,
-    onCustom: () -> Unit
+    onCustom: () -> Unit,
+    onAcademy: () -> Unit
 ) {
     Column(
         Modifier.fillMaxSize().background(Paper)
@@ -110,6 +111,15 @@ internal fun ExplorerDeskHome(
         }
         Text("Or choose your own path", color = Ink, fontSize = 17.sp,
             fontWeight = FontWeight.Bold)
+        HomeDestinationStrip(
+            icon = "✦",
+            title = "Explorer’s Academy",
+            description = "New to maps? Learn at your own pace.",
+            actionLabel = "Learn",
+            color = Color(0xFFE4EDDA),
+            tag = "openAcademy",
+            onClick = onAcademy
+        )
         HomeDestinationStrip(
             icon = "◇",
             title = "Quick Play",
