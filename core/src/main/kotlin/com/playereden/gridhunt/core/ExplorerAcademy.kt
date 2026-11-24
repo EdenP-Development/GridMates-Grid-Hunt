@@ -129,6 +129,47 @@ object ExplorerAcademy {
             known + active.id else known
     }
     fun practiceComplete(ids: Set<String>) = restore(ids).size == exercises.size
-    // Graduation deliberately unavailable until the full foundational school
-    // and independent field expedition are authored and verified.
+    const val qualificationId = "junior-explorer-v1"
+    val graduation = listOf(
+        AcademyExercise("grad-start", "The Explorer's First Journey",
+            "Your field assignment begins at a recorded landmark.",
+            "Find Acorn Nook and select its square.",
+            listOf("2538", "2641", "2840", "2941"), WoodlandLandmarks.acorn.cell.reference,
+            "Acorn Nook is your starting point at 2641.", woodlandField = true),
+        AcademyExercise("grad-route", "The Explorer's First Journey",
+            "Follow the field assignment from your starting point.",
+            "From 2641, move two squares east and one south. Select the destination.",
+            listOf("2840", "2841", "2740", "2640"), "2840",
+            "Two east and one south leads to Buttercup Glade.",
+            woodlandField = true, route = AcademyRoute(GridReference.parse("2641"),
+                listOf(AcademyRouteLeg(AcademyDirection.EAST, 2), AcademyRouteLeg(AcademyDirection.SOUTH, 1)))),
+        AcademyExercise("grad-symbol", "The Explorer's First Journey",
+            "Your next checkpoint is recorded as a symbol.",
+            "Match the sample symbol to its square on the map.",
+            listOf("2538", "2641", "2840", "2941"), WoodlandLandmarks.waystone.cell.reference,
+            "You found the Old Waystone at 2941.", woodlandField = true,
+            symbolId = WoodlandLandmarks.waystone.id),
+        AcademyExercise("grad-deduction", "The Explorer's First Journey",
+            "Compare the grid columns of the landmarks.",
+            "Find the landmark in a column east of Mushroom Nook but west of Buttercup Glade. Select its square.",
+            listOf("2538", "2641", "2840", "2941"),
+            WoodlandSpatialClues.resolve("grad-deduction", WoodlandLandmarks.acorn.id,
+                listOf(ClueCondition.EastOf(WoodlandLandmarks.mushrooms.id),
+                    ClueCondition.WestOf(WoodlandLandmarks.flowers.id))).reference,
+            "Acorn Nook lies between the two landmarks. Your expedition is complete.",
+            woodlandField = true)
+    )
+    fun restoreGraduation(ids: Set<String>): Set<String> =
+        ids.intersect(graduation.map { it.id }.toSet())
+    fun graduationCurrent(practice: Set<String>, ids: Set<String>): AcademyExercise? =
+        if (!practiceComplete(practice)) null else graduation.firstOrNull { it.id !in restoreGraduation(ids) }
+    fun acceptGraduation(practice: Set<String>, ids: Set<String>, id: String, choice: String): Set<String> {
+        val known = restoreGraduation(ids)
+        val active = graduationCurrent(practice, known) ?: return known
+        return if (active.id == id && active.answer == choice) known + id else known
+    }
+    fun graduated(practice: Set<String>, ids: Set<String>): Boolean =
+        practiceComplete(practice) && restoreGraduation(ids).size == graduation.size
+    fun qualifications(previous: Set<String>, practice: Set<String>, ids: Set<String>): Set<String> =
+        previous + (if (graduated(practice, ids)) setOf(qualificationId) else emptySet())
 }
