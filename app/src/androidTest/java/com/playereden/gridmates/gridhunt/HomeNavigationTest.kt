@@ -278,7 +278,7 @@ class HomeNavigationTest {
         repeat(3) {
             compose.onNodeWithContentDescription("Expedition move south").performClick()
         }
-        compose.onNodeWithText("2437").assertExists()
+        compose.onNodeWithTag("mixedSquarePick").assertExists()
         compose.onNodeWithTag("mixedCheck").performClick()
     }
 
