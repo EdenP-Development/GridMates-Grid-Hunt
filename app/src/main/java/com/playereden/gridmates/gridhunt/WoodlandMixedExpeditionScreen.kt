@@ -76,7 +76,8 @@ internal fun WoodlandMixedExpeditionScreen(
     mapLook: MapLook,
     onLook: (MapLook) -> Unit,
     hapticsEnabled: Boolean,
-    chapterTwo: Boolean = false
+    chapterTwo: Boolean = false,
+    onNextChapter: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
@@ -106,6 +107,7 @@ internal fun WoodlandMixedExpeditionScreen(
     }
     var showGuide by rememberSaveable(mission.chapter.id) { mutableStateOf(false) }
     var showJournal by rememberSaveable(mission.chapter.id) { mutableStateOf(false) }
+    var discoveryEarned by rememberSaveable(mission.chapter.id) { mutableStateOf(false) }
     var feedback by rememberSaveable(mission.chapter.id) {
         mutableStateOf(mission.chapter.objectives.getOrNull(step - 1)?.discovery
             ?.takeIf { it.isNotBlank() } ?: if (chapterTwo)
@@ -197,12 +199,14 @@ internal fun WoodlandMixedExpeditionScreen(
                 selectedCell = null
                 enteredCode = ""
                 chosenLandmark = null
+                discoveryEarned = true
                 feedback = current.discovery.takeIf { it.isNotBlank() } ?: if (mission.finished(step)) {
                     if (chapterTwo) "The last stop has been found! The supplies trail is complete."
                     else "Every missing page recovered. Your woodland chapter is complete!"
                 } else if (chapterTwo) "A new trail note found! Follow the next clue."
                 else "A page found! The next clue asks for something different."
             } else {
+                discoveryEarned = false
                 feedback = when (current.verb) {
                     ExpeditionVerb.FIND_SQUARE ->
                         "Not quite. Use the eastings along the bottom, then northings up the side."
@@ -219,6 +223,7 @@ internal fun WoodlandMixedExpeditionScreen(
             .remove("selected_cell").remove("entered_code")
             .remove("chosen_landmark").apply()
         step = 0
+        discoveryEarned = false
         selectedCell = null
         enteredCode = ""
         chosenLandmark = null
@@ -263,12 +268,13 @@ internal fun WoodlandMixedExpeditionScreen(
                 ) {
                     MixedExpeditionHeader(mission.chapter.name, chapterTwo, step, mission.size,
                         onHome, onGuide = { showGuide = true }, onJournal = { showJournal = true })
-                    if (finished) MixedExpeditionFinish(chapterTwo, onHome, replay)
+                    if (finished) MixedExpeditionFinish(chapterTwo, onHome, replay,
+                        onJournal = { showJournal = true }, onNextChapter = onNextChapter)
                     else if (active != null) {
                         MixedExpeditionPrompt(active, chapterTwo, step + 1, mission.size)
                         MixedExpeditionControls(
                             active, mapLook, selectedCell, enteredCode, chosenLandmark,
-                            feedback, onSelected = { selectedCell = it },
+                            feedback, discoveryEarned, onSelected = { selectedCell = it },
                             onCode = { enteredCode = it }, onChoose = { chosenLandmark = it },
                             onMove = ::moveSelection, onZoom = ::zoomBy,
                             onFit = ::fit, onCheck = check
@@ -290,11 +296,12 @@ internal fun WoodlandMixedExpeditionScreen(
                     enableSelect = active?.verb == ExpeditionVerb.FIND_SQUARE,
                     mapLook = mapLook, onLook = onLook
                 )
-                if (finished) MixedExpeditionFinish(chapterTwo, onHome, replay)
+                if (finished) MixedExpeditionFinish(chapterTwo, onHome, replay,
+                        onJournal = { showJournal = true }, onNextChapter = onNextChapter)
                 else if (active != null) {
                     MixedExpeditionControls(
                         active, mapLook, selectedCell, enteredCode, chosenLandmark,
-                        feedback, onSelected = { selectedCell = it },
+                        feedback, discoveryEarned, onSelected = { selectedCell = it },
                         onCode = { enteredCode = it }, onChoose = { chosenLandmark = it },
                         onMove = ::moveSelection, onZoom = ::zoomBy,
                         onFit = ::fit, onCheck = check
@@ -365,6 +372,7 @@ private fun MixedExpeditionControls(
     enteredCode: String,
     chosenLandmark: String?,
     feedback: String,
+    discoveryEarned: Boolean,
     onSelected: (String?) -> Unit,
     onCode: (String) -> Unit,
     onChoose: (String) -> Unit,
@@ -460,7 +468,9 @@ private fun MixedExpeditionControls(
             }
         }
     }
-    Text(feedback, fontSize = 11.sp, color = Muted, maxLines = 2,
+    Text(if (discoveryEarned) "✓ $feedback" else feedback,
+        fontSize = 11.sp, color = if (discoveryEarned) Forest else Muted,
+        fontWeight = if (discoveryEarned) FontWeight.SemiBold else FontWeight.Normal,
         modifier = Modifier.fillMaxWidth().testTag("mixedFeedback"))
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -493,19 +503,34 @@ private fun MixedExpeditionControls(
 
 @Composable
 private fun MixedExpeditionFinish(
-    chapterTwo: Boolean, onHome: () -> Unit, onReplay: () -> Unit
+    chapterTwo: Boolean, onHome: () -> Unit, onReplay: () -> Unit,
+    onJournal: () -> Unit, onNextChapter: (() -> Unit)?
 ) {
-    PuzzleFinishCard(
-        title = if (chapterTwo) "The supply trail is complete!"
-            else "The field notes are together!",
-        description = if (chapterTwo)
-            "You followed every woodland clue to the supplies' last known stop."
-            else "Four kinds of clues, one woodland adventure. You recovered every page.",
-        discoveries = if (chapterTwo) "4 OF 4 CLUES SOLVED" else "4 OF 4 PAGES RECOVERED",
-        primaryLabel = "Explore again",
-        onPrimary = onReplay,
-        onHome = onHome
-    )
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        PuzzleFinishCard(
+            title = if (chapterTwo) "The supply trail is complete!"
+                else "The field notes are together!",
+            description = if (chapterTwo)
+                "You traced the supplies to their last known stop."
+                else "Every lost page has been recovered. Your field journal is whole.",
+            discoveries = if (chapterTwo) "4 OF 4 CLUES SOLVED" else "4 OF 4 PAGES RECOVERED",
+            primaryLabel = "Explore again",
+            onPrimary = onReplay,
+            onHome = onHome
+        )
+        if (!chapterTwo && onNextChapter != null) {
+            Button(onClick = onNextChapter,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                    .testTag("nextExpedition"),
+                colors = ButtonDefaults.buttonColors(containerColor = Forest)) {
+                Text("Continue · The Lost Supplies", fontWeight = FontWeight.Bold)
+            }
+        }
+        TextButton(onClick = onJournal,
+            modifier = Modifier.fillMaxWidth().testTag("finishJournal")) {
+            Text("Read completed journal", color = Forest)
+        }
+    }
 }
 
 /** Only earned entries and the active prompt are rendered; no future answers. */
