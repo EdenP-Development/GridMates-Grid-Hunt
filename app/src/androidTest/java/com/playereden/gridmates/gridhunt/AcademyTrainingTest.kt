@@ -27,6 +27,7 @@ class AcademyTrainingTest {
         val campaign = context.getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
         val before = campaign.all.toMap()
         compose.onNodeWithTag("openAcademy").performScrollTo().performClick()
+        compose.onNodeWithTag("academyContinueSchool").performScrollTo().performClick()
         compose.onNodeWithTag("academyChoice_0").performScrollTo().performClick()
         compose.onNodeWithTag("academyFeedback").assertExists()
         assertEquals(emptySet<String>(), prefs.getStringSet("earned", emptySet()))
@@ -42,6 +43,7 @@ class AcademyTrainingTest {
         compose.onNodeWithTag("academyWoodlandMap").assertExists()
         compose.onNodeWithTag("academyHome").performScrollTo().performClick()
         compose.onNodeWithTag("openAcademy").performScrollTo().performClick()
+        compose.onNodeWithTag("academyContinueSchool").performScrollTo().performClick()
         compose.onNodeWithTag("academyWoodlandMap").assertExists()
         compose.onNodeWithTag("academyZoomIn").performScrollTo().performClick()
         compose.onNodeWithTag("academyFit").performScrollTo().performClick()
@@ -73,6 +75,7 @@ class AcademyTrainingTest {
         compose.onNodeWithTag("academyCheckSquare").performScrollTo().performClick()
         compose.onNodeWithTag("academyHome").performScrollTo().performClick()
         compose.onNodeWithTag("openAcademy").performScrollTo().performClick()
+        compose.onNodeWithTag("academyContinueSchool").performScrollTo().performClick()
         compose.onNodeWithTag("academyRouteReset").performScrollTo().performClick()
         repeat(2) { compose.onNodeWithTag("academyMoveEast").performScrollTo().performClick() }
         compose.onNodeWithTag("academyMoveSouth").performScrollTo().performClick()
