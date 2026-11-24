@@ -25,4 +25,16 @@ class CustomHuntGeneratorTest {
             CustomHuntGenerator.restore("2942,2437,2640").map { it.reference })
         assertThrows(IllegalArgumentException::class.java) { CustomHuntGenerator.generate(4) }
     }
+    @Test fun generatedLandmarksAreUniqueCanonicalAndRestorable() {
+        val known = WoodlandLandmarks.all.map { it.cell }.toSet()
+        for (seed in 0..99) {
+            val targets = CustomHuntGenerator.generateLandmarks(Random(seed))
+            assertEquals(3, targets.size)
+            assertEquals(3, targets.toSet().size)
+            assertTrue(targets.all { it in known })
+            assertEquals(targets, CustomHuntGenerator.restoreLandmarks(CustomHuntGenerator.encode(targets)))
+        }
+        assertTrue(CustomHuntGenerator.restoreLandmarks("2437,2438,2439").isEmpty())
+    }
+
 }
