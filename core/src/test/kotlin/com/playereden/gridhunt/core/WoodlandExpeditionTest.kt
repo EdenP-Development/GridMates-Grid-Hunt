@@ -25,6 +25,22 @@ class WoodlandExpeditionTest {
         }
     }
 
+    @Test fun journalShowsOnlyEarnedEntriesAndIsIsolatedByChapter() {
+        val first = ExpeditionPlaythrough(mission.chapter, mission.saveName)
+        val second = WoodlandSupplyExpedition.run
+        for (run in listOf(first, second)) {
+            assertTrue(run.discoveries(-1).isEmpty())
+            assertTrue(run.discoveries(0).isEmpty())
+            for (step in 1..run.size) {
+                assertEquals(run.chapter.objectives.take(step), run.discoveries(step))
+                assertFalse(run.discoveries(step).any { it.id == run.objectiveAt(step)?.id })
+            }
+            assertEquals(run.size, run.discoveries(999).size)
+            assertTrue(run.discoveries(0).isEmpty())
+        }
+        assertNotEquals(first.discoveries(1).first().id, second.discoveries(1).first().id)
+    }
+
     @Test fun orderedAnswersOnlyAdvanceCurrentPuzzleVerb() {
         assertEquals(0, mission.acceptGrid(0, "2440"))
         assertEquals(0, mission.acceptGrid(0, "2941"))
