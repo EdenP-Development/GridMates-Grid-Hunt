@@ -83,35 +83,35 @@ internal fun WoodlandMixedExpeditionScreen(
         if (chapterTwo) WoodlandSupplyExpedition.run
         else ExpeditionPlaythrough(WoodlandExpedition.chapter, WoodlandExpedition.saveName)
     }
-    val prefs = remember(context) {
+    val prefs = remember(context, mission.saveName) {
         context.getSharedPreferences(mission.saveName, Context.MODE_PRIVATE)
     }
     var step by androidx.compose.runtime.saveable.rememberSaveable(mission.chapter.id) {
         mutableStateOf(mission.restoreStep(prefs.getInt("step", 0)))
     }
-    var selectedCell by rememberSaveable {
+    var selectedCell by rememberSaveable(mission.chapter.id) {
         mutableStateOf(prefs.getString("selected_cell", null)?.takeIf {
             runCatching { GridReference.parse(it).digits == 4 }.getOrDefault(false)
         })
     }
-    var enteredCode by rememberSaveable {
+    var enteredCode by rememberSaveable(mission.chapter.id) {
         mutableStateOf((prefs.getString("entered_code", "") ?: "")
             .filter { it in '0'..'9' }.take(4))
     }
-    var chosenLandmark by rememberSaveable {
+    var chosenLandmark by rememberSaveable(mission.chapter.id) {
         mutableStateOf(prefs.getString("chosen_landmark", null)?.takeIf { id ->
             WoodlandLandmarks.byId(id) != null
         })
     }
-    var showGuide by rememberSaveable { mutableStateOf(false) }
-    var feedback by rememberSaveable {
+    var showGuide by rememberSaveable(mission.chapter.id) { mutableStateOf(false) }
+    var feedback by rememberSaveable(mission.chapter.id) {
         mutableStateOf(if (chapterTwo)
             "Follow the journal notes to trace the missing supplies."
             else "Follow the next clue to recover the missing field notes.")
     }
     val active = mission.objectiveAt(step)
     val finished = mission.finished(step)
-    LaunchedEffect(step, selectedCell, enteredCode, chosenLandmark) {
+    LaunchedEffect(mission.chapter.id, step, selectedCell, enteredCode, chosenLandmark) {
         prefs.edit()
             .putInt("step", step)
             .putString("selected_cell", selectedCell)
@@ -185,6 +185,11 @@ internal fun WoodlandMixedExpeditionScreen(
             }
             if (next > step) {
                 if (hapticsEnabled) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                // Persist the earned objective before navigating away or
+                // recomposing. A sudden Home tap cannot lose the unlock.
+                prefs.edit().putInt("step", next)
+                    .remove("selected_cell").remove("entered_code")
+                    .remove("chosen_landmark").apply()
                 step = next
                 selectedCell = null
                 enteredCode = ""
@@ -207,6 +212,9 @@ internal fun WoodlandMixedExpeditionScreen(
         }
     }
     val replay: () -> Unit = {
+        prefs.edit().putInt("step", 0)
+            .remove("selected_cell").remove("entered_code")
+            .remove("chosen_landmark").apply()
         step = 0
         selectedCell = null
         enteredCode = ""
