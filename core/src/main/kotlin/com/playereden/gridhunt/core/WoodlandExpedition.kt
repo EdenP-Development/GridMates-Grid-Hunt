@@ -21,7 +21,8 @@ data class ExpeditionObjective(
     val prompt: String,
     val expectedCell: GridCell,
     val landmarkId: String? = null,
-    val markerId: String? = null
+    val markerId: String? = null,
+    val discovery: String = ""
 ) {
     init {
         require(id.isNotBlank() && title.isNotBlank() && prompt.isNotBlank())
@@ -76,27 +77,31 @@ object WoodlandExpedition {
         id = "woodland-missing-notes-v1",
         revision = 1,
         name = "The Missing Field Notes",
-        story = "Four clues are scattered through the woodland. Each asks for a different kind of discovery.",
+        story = "A woodland explorer has lost four pages of a field journal. Follow the notes to piece the journal together.",
         objectives = listOf(
             ExpeditionObjective(
                 "locate-trailhead", ExpeditionVerb.FIND_SQUARE, "Find the first page",
-                "One page has a four-digit address. Tap that square on the map: 2437.",
-                GridReference.parse("2437")
+                "The journal cover lists the first page at 2437. Tap that square to begin the trail.",
+                GridReference.parse("2437"),
+                discovery = "First page recovered. It mentions a golden light." 
             ),
             ExpeditionObjective(
                 "read-glow-a", ExpeditionVerb.READ_MARKER, "Follow the golden glow",
-                "A golden spot marks the next page. What four-digit square is the dot inside?",
-                ReverseTraining.markers.first { it.id == "A" }.cell, markerId = "A"
+                "The first page describes a golden light. Read the four-digit square containing the dot.",
+                ReverseTraining.markers.first { it.id == "A" }.cell, markerId = "A",
+                discovery = "Second page recovered. A mushroom sketch leads onward."
             ),
             ExpeditionObjective(
                 "find-mushrooms", ExpeditionVerb.LOCATE_LANDMARK, "Visit Mushroom Nook",
-                "Match the little mushrooms on the map, then enter their square's four digits.",
-                WoodlandLandmarks.mushrooms.cell, landmarkId = WoodlandLandmarks.mushrooms.id
+                "The mushroom sketch points to Mushroom Nook. Find it and enter its four-digit square.",
+                WoodlandLandmarks.mushrooms.cell, landmarkId = WoodlandLandmarks.mushrooms.id,
+                discovery = "Third page recovered. The final note gives a grid address."
             ),
             ExpeditionObjective(
                 "identify-waystone", ExpeditionVerb.IDENTIFY_LANDMARK, "The last mystery",
-                "Read square 2941. Which illustrated landmark can you find inside it?",
-                WoodlandLandmarks.waystone.cell, landmarkId = WoodlandLandmarks.waystone.id
+                "The third page gives the last address: 2941. Which illustrated landmark is inside?",
+                WoodlandLandmarks.waystone.cell, landmarkId = WoodlandLandmarks.waystone.id,
+                discovery = "Final page recovered. The field journal is whole again."
             )
         )
     )
