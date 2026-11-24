@@ -1,6 +1,8 @@
 package com.playereden.gridmates.gridhunt
 
 import android.content.Context
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -383,7 +385,8 @@ private fun AcademySchoolOverview(
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                ExplorerInsignia(Modifier.size(72.dp).testTag("academyCrest"))
+                Image(painterResource(R.drawable.gh_tool_compass), contentDescription = null,
+                    modifier = Modifier.size(72.dp).testTag("academyCrest"))
                 Column(Modifier.weight(1f)) {
                     Text("School of Exploration", color = Ink, fontSize = 21.sp, fontWeight = FontWeight.Bold)
                     Text("Your first steps from map reader to explorer.", color = Forest, fontSize = 12.sp)

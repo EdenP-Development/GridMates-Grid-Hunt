@@ -288,8 +288,7 @@ private fun CustomModeLabel(id: String, label: String) {
             "checklist" -> "openTreasure"
             else -> "mixed"
         }
-        if (id == "mixed") ExplorerInsignia(Modifier.size(32.dp))
-        else PuzzleModeIllustration(tag, "", Modifier.size(32.dp))
+        PuzzleModeIllustration(tag, "", Modifier.size(32.dp))
         Text(label, modifier = Modifier.weight(1f), fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold)
     }

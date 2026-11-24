@@ -80,6 +80,7 @@ internal fun PuzzleModeIllustration(tag: String, glyph: String, modifier: Modifi
         "openReverse" -> R.drawable.gh_tool_marker
         "openTreasure" -> R.drawable.gh_tool_checklist
         "openIdentify" -> R.drawable.gh_tool_magnifier
+        "mixed" -> R.drawable.gh_tool_notebook
         else -> null
     }
     if (asset == null) {
