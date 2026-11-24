@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -52,9 +53,12 @@ internal fun QuickPlayModeTile(
             Modifier.fillMaxWidth().padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            PuzzleModeIllustration(tag, glyph, Modifier.size(58.dp))
-            Text(label, fontSize = 14.sp, maxLines = 2,
-                fontWeight = FontWeight.ExtraBold, color = Ink)
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                PuzzleModeIllustration(tag, glyph, Modifier.size(38.dp))
+                Text(label, fontSize = 13.sp, maxLines = 3,
+                    fontWeight = FontWeight.ExtraBold, color = Ink, modifier = Modifier.weight(1f))
+            }
             Text(instruction, fontSize = 11.sp, maxLines = 2, color = Muted)
             Text(progress, fontSize = 11.sp, maxLines = 1,
                 fontWeight = FontWeight.Bold, color = Forest)
