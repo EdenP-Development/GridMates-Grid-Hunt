@@ -359,14 +359,11 @@ private fun TreasureChecklistAnswer(
         ) { Text("Mark found", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
     }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-        OutlinedButton(onClick = onHint, modifier = Modifier.weight(1f).heightIn(min = 44.dp),
-            contentPadding = PaddingValues(0.dp)) { Text("Clue") }
-        OutlinedButton(onClick = { onZoom(1.6) }, modifier = Modifier.weight(1f).heightIn(min = 44.dp),
-            contentPadding = PaddingValues(0.dp)) { Text("+") }
-        OutlinedButton(onClick = { onZoom(1.0 / 1.6) }, modifier = Modifier.weight(1f).heightIn(min = 44.dp),
-            contentPadding = PaddingValues(0.dp)) { Text("−") }
-        OutlinedButton(onClick = onFit, modifier = Modifier.weight(1f).heightIn(min = 44.dp),
-            contentPadding = PaddingValues(0.dp)) { Text("See all", fontSize = 11.sp) }
+        HuntToolButton(ExplorerTool.HINT, Modifier.weight(1f), onHint)
+        HuntToolButton(ExplorerTool.ZOOM_IN, Modifier.weight(1f), { onZoom(1.6) })
+        HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f), { onZoom(1.0 / 1.6) })
+        HuntToolButton(ExplorerTool.FIT, Modifier.weight(1f), onFit)
+
     }
 }
 
