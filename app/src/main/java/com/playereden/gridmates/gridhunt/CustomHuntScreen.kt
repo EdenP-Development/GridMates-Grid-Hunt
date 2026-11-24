@@ -27,19 +27,19 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
     val context = LocalContext.current
     val prefs = remember(context) { context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE) }
     var count by rememberSaveable { mutableIntStateOf(prefs.getInt("count", 3).let { if (it in CustomHuntGenerator.lengths) it else 3 }) }
-    var mode by rememberSaveable { mutableStateOf(prefs.getString("mode", "grid")?.takeIf { it in listOf("grid", "gold", "identify") } ?: "grid") }
+    var mode by rememberSaveable { mutableStateOf(prefs.getString("mode", "grid")?.takeIf { it in listOf("grid", "gold", "identify", "checklist") } ?: "grid") }
     var nextMode by rememberSaveable { mutableStateOf(mode) }
     var answer by rememberSaveable { mutableStateOf("") }
     var codes by rememberSaveable { mutableStateOf(prefs.getString("codes", "") ?: "") }
     val targets = remember(codes, mode) {
-        if (mode == "identify") CustomHuntGenerator.restoreLandmarks(codes) else CustomHuntGenerator.restore(codes)
+        if (mode in listOf("identify", "checklist")) CustomHuntGenerator.restoreLandmarks(codes) else CustomHuntGenerator.restore(codes)
     }
     var step by rememberSaveable { mutableIntStateOf(prefs.getInt("step", 0).coerceIn(0, targets.size)) }
     var playing by rememberSaveable { mutableStateOf(false) }
     var replaceHunt by rememberSaveable { mutableStateOf(false) }
     BackHandler(enabled = playing) { playing = false }
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
-    var feedback by rememberSaveable { mutableStateOf("Tap the matching square.") }
+    var feedback by rememberSaveable { mutableStateOf(when(mode) { "gold" -> "Read the gold dot’s square."; "identify" -> "Which landmark is there?"; "checklist" -> "Find the landmark and read its square."; else -> "Tap the matching square." }) }
     var hint by rememberSaveable { mutableIntStateOf(0) }
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
@@ -54,9 +54,9 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 PixelPoint(viewport.width/2.0,viewport.height/2.0),PixelPoint(0.0,0.0),scale)
     }
     fun start() {
-        codes = CustomHuntGenerator.encode(if (nextMode == "identify") CustomHuntGenerator.generateLandmarks() else CustomHuntGenerator.generate(count))
+        codes = CustomHuntGenerator.encode(if (nextMode in listOf("identify", "checklist")) CustomHuntGenerator.generateLandmarks() else CustomHuntGenerator.generate(count))
         mode = nextMode
-        step = 0; selected = null; answer = ""; hint = 0; feedback = when(mode) { "gold" -> "Read the gold dot’s square."; "identify" -> "Which landmark is there?"; else -> "Tap the matching square." }
+        step = 0; selected = null; answer = ""; hint = 0; feedback = when(mode) { "gold" -> "Read the gold dot’s square."; "identify" -> "Which landmark is there?"; "checklist" -> "Find the landmark and read its square."; else -> "Tap the matching square." }
         prefs.edit().putInt("count", count).putString("codes", codes).putString("mode", mode).putInt("step", 0).apply()
         playing = true
         fit()
@@ -88,18 +88,22 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                             label = { Text(label) }, modifier = Modifier.weight(1f).testTag("customMode_$id"))
                     }
                 }
-                FilterChip(selected = nextMode == "identify", onClick = { nextMode = "identify"; count = 3 },
-                    label = { Text("What's at This Grid?") }, modifier = Modifier.fillMaxWidth().testTag("customMode_identify"))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    listOf("identify" to "What's at This Grid?", "checklist" to "Treasure Checklist").forEach { (id,label) ->
+                        FilterChip(selected = nextMode == id, onClick = { nextMode = id; count = 3 },
+                            label = { Text(label) }, modifier = Modifier.weight(1f).testTag("customMode_$id"))
+                    }
+                }
                 Text("Discoveries", color = Ink, fontWeight = FontWeight.SemiBold)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    (if (nextMode == "identify") CustomHuntGenerator.landmarkLengths else CustomHuntGenerator.lengths).forEach { n ->
+                    (if (nextMode in listOf("identify", "checklist")) CustomHuntGenerator.landmarkLengths else CustomHuntGenerator.lengths).forEach { n ->
                         FilterChip(selected = count == n, onClick = { count = n },
                             label = { Text(n.toString()) }, modifier = Modifier.weight(1f).testTag("customLength_$n"))
                     }
                 }
                 if (targets.isNotEmpty() && step < targets.size) {
                     OutlinedButton(onClick = { playing = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("customResume")) {
-                        Text("Resume · " + (when(mode) { "gold" -> "Golden Spots"; "identify" -> "Landmark Identification"; else -> "Trail Treasures" }) + " · $step/${targets.size}")
+                        Text("Resume · " + (when(mode) { "gold" -> "Golden Spots"; "identify" -> "Landmark Identification"; "checklist" -> "Treasure Checklist"; else -> "Trail Treasures" }) + " · $step/${targets.size}")
                     }
                 }
                 Button(onClick = { if (targets.isNotEmpty() && step < targets.size) replaceHunt = true else start() }, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("customStart")) {
@@ -111,10 +115,27 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
             Button(onClick = { playing = false }) { Text("Return to setup") }
         } else {
             val active = targets.getOrNull(step)
+            val landmark = if (mode == "checklist") WoodlandLandmarks.all.firstOrNull { it.cell == active } else null
             if (active != null) {
                 if (mode == "gold") Text("Golden spot ${step+1} of ${targets.size}", color = Forest, fontWeight = FontWeight.Bold)
                 else if (mode == "identify") Text("Which landmark is at ${active.reference}? · ${step+1}/${targets.size}", fontWeight = FontWeight.Bold, color = Forest)
-                else ObjectiveRibbon(step, targets.size, active, "Little Woodland", false)
+                else if (mode == "checklist") {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                        targets.forEachIndexed { index, cell ->
+                            val item = WoodlandLandmarks.all.first { it.cell == cell }
+                            Surface(modifier = Modifier.weight(1f), color = if (index < step)
+                                androidx.compose.ui.graphics.Color(0xFFDDE9D4) else if (index == step)
+                                androidx.compose.ui.graphics.Color(0xFFF8DDA0) else androidx.compose.ui.graphics.Color(0xFFFFFAEC)) {
+                                Column(Modifier.padding(4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                    WoodlandLandmarkSwatch(item.id, mapLook, symbolSize = 32.dp)
+                                    Text((if (index < step) "✓ " else "") + item.name, fontSize = 10.sp,
+                                        modifier = Modifier.testTag("customChecklistItem_${item.id}"))
+                                }
+                            }
+                        }
+                    }
+                    Text("Find: " + (landmark?.name ?: ""), fontWeight = FontWeight.Bold, color = Forest)
+                } else ObjectiveRibbon(step, targets.size, active, "Little Woodland", false)
             }
             HuntMapPanel(modifier = Modifier.fillMaxWidth().weight(1f).testTag("customMap"),
                 bounds = bounds, camera = camera,
@@ -126,12 +147,12 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 enableSelect = active != null && mode == "grid", mapLook = mapLook, onLook = onLook)
             if (active == null) PuzzleFinishCard("Your hunt is complete!", "A little woodland adventure, all yours.",
                 "${targets.size} OF ${targets.size} FOUND", "New hunt", ::start, { playing = false })
-            else if (mode == "gold") {
+            else if (mode in listOf("gold", "checklist")) {
                 OutlinedTextField(value = answer, onValueChange = { answer = it.filter { c -> c in '0'..'9' }.take(4) },
                     label = { Text("Four-digit map code") }, singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth().testTag("customGoldInput"))
-                Text(when(hint) {
+                    modifier = Modifier.fillMaxWidth().testTag(if (mode == "gold") "customGoldInput" else "customChecklistInput"))
+                Text(if (mode == "checklist" && hint > 0) landmark?.clue ?: feedback else when(hint) {
                     1 -> "Read the grid line left of the dot."
                     2 -> "Then read the line below the dot."
                     else -> feedback
@@ -148,8 +169,8 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                         prefs.edit().putInt("step",step).apply()
                     } else feedback = "Not quite. Try another code."
                 }, enabled = answer.length == 4,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("customGoldCheck")) {
-                    Text("Try this code")
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag(if (mode == "gold") "customGoldCheck" else "customChecklistCheck")) {
+                    Text(if (mode == "gold") "Try this code" else "Mark found")
                 }
             } else if (mode == "identify") {
                 WoodlandLandmarks.all.chunked(2).forEach { pair ->
