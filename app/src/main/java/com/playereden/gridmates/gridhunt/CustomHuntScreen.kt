@@ -1,6 +1,7 @@
 package com.playereden.gridmates.gridhunt
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -32,6 +33,8 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
     }
     var step by rememberSaveable { mutableIntStateOf(prefs.getInt("step", 0).coerceIn(0, targets.size)) }
     var playing by rememberSaveable { mutableStateOf(false) }
+    var replaceHunt by rememberSaveable { mutableStateOf(false) }
+    BackHandler(enabled = playing) { playing = false }
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
     var feedback by rememberSaveable { mutableStateOf("Tap the matching square.") }
     var hint by rememberSaveable { mutableIntStateOf(0) }
@@ -50,6 +53,15 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
         playing = true
         fit()
     }
+    if (replaceHunt) AlertDialog(
+        onDismissRequest = { replaceHunt = false },
+        title = { Text("Start a new hunt?") },
+        text = { Text("Your unfinished custom hunt will be replaced.") },
+        confirmButton = { TextButton(onClick = { replaceHunt = false; start() },
+            modifier = Modifier.testTag("customConfirmReplace")) { Text("New hunt") } },
+        dismissButton = { TextButton(onClick = { replaceHunt = false },
+            modifier = Modifier.testTag("customCancelReplace")) { Text("Keep hunt") } }
+    )
     Column(Modifier.fillMaxSize().background(Paper).statusBarsPadding().navigationBarsPadding()
         .padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -75,7 +87,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                         Text("Resume · $step/${targets.size}")
                     }
                 }
-                Button(onClick = ::start, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("customStart")) {
+                Button(onClick = { if (targets.isNotEmpty() && step < targets.size) replaceHunt = true else start() }, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("customStart")) {
                     Text("New hunt")
                 }
             }
