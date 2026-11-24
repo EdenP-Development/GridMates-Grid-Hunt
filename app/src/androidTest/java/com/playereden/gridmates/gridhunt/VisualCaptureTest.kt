@@ -141,9 +141,10 @@ class VisualCaptureTest {
         capture("20_chapter_two_locked.png")
         compose.onNodeWithTag("adventureBack").performClick()
         compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
-        compose.onNodeWithTag("customNotReady").assertExists()
-        capture("18_custom_play_preview.png")
-        compose.onNodeWithTag("customOpenQuick").performClick()
+        compose.onNodeWithTag("customStart").assertExists()
+        capture("18_custom_play_setup.png")
+        compose.onNodeWithTag("customBack").performClick()
+        compose.onNodeWithTag("openQuickPlay").performScrollTo().performClick()
         compose.onNodeWithTag("openIdentify").assertExists()
         capture("19_compact_quick_play.png")
         // Activity recreation preserves the current route. Return to Home explicitly.
