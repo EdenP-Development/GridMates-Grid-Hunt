@@ -164,9 +164,13 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                 }
             }
         } else {
-            Text(if (graduated) "Congratulations, Junior Explorer!" else "Practice complete!", color = Forest, fontSize = 23.sp,
-                fontWeight = FontWeight.Bold, modifier = Modifier.testTag("academyPracticeComplete"))
-            Text(if (graduated) "You completed The Explorer’s First Journey. Your qualification is yours to keep, even when you replay." else "Your field assignment awaits. Apply your skills in four woodland challenges.", color = Ink)
+            if (graduated) {
+                AcademyGraduationCard()
+            } else {
+                Text("Practice complete!", color = Forest, fontSize = 23.sp,
+                    fontWeight = FontWeight.Bold, modifier = Modifier.testTag("academyPracticeComplete"))
+                Text("Your field assignment awaits. Apply your skills in four woodland challenges.", color = Ink)
+            }
             if (!graduated) Button(onClick = { inGraduation = true; success = "" },
                 modifier = Modifier.fillMaxWidth().testTag("academyStartGraduation")) {
                 Text("Begin graduation expedition")
@@ -300,8 +304,14 @@ private fun AcademySchoolOverview(
     Surface(color = Color(0xFFFFF0CF), shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth().testTag("academySchoolOverview")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("School of Exploration", color = Ink, fontSize = 23.sp, fontWeight = FontWeight.Bold)
-            Text("Your first steps from map reader to explorer.", color = Forest)
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                ExplorerInsignia(Modifier.size(72.dp).testTag("academyCrest"))
+                Column(Modifier.weight(1f)) {
+                    Text("School of Exploration", color = Ink, fontSize = 21.sp, fontWeight = FontWeight.Bold)
+                    Text("Your first steps from map reader to explorer.", color = Forest, fontSize = 12.sp)
+                }
+            }
             Text("Field training", color = Ink, fontWeight = FontWeight.Bold)
             ExplorerAcademy.exercises.groupBy { it.lesson }.forEach { (lesson, exercises) ->
                 val count = exercises.count { it.id in earned }
@@ -317,7 +327,14 @@ private fun AcademySchoolOverview(
             Text(if (practiceDone) "${fieldEarned.size} / ${ExplorerAcademy.graduation.size} checkpoints"
                 else "Complete field training to unlock graduation.", color = Forest)
             if (ExplorerAcademy.qualificationId in qualifications) {
-                Text("★ Junior Explorer · Qualification earned", color = Forest, fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ExplorerInsignia(Modifier.size(48.dp), medal = true)
+                    Column {
+                        Text("Junior Explorer", color = Forest, fontWeight = FontWeight.Bold)
+                        Text("Bronze Compass · Qualification earned", color = Muted, fontSize = 12.sp)
+                    }
+                }
             }
             Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                 .testTag("academyContinueSchool")) {
@@ -366,6 +383,26 @@ private fun AcademyCompass() {
             Text("S", Modifier.align(Alignment.BottomCenter), color = Forest)
             Text("W", Modifier.align(Alignment.CenterStart), color = Forest)
             Text("E", Modifier.align(Alignment.CenterEnd), color = Forest)
+        }
+    }
+}
+
+@Composable
+private fun AcademyGraduationCard() {
+    Surface(color = Color(0xFFFFF0CF), shape = RoundedCornerShape(18.dp),
+        modifier = Modifier.fillMaxWidth().border(1.dp, Gold, RoundedCornerShape(18.dp))) {
+        Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("SCHOOL OF EXPLORATION", color = Forest, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            ExplorerInsignia(Modifier.size(136.dp).testTag("academyGraduationMedal"), medal = true)
+            Text("Congratulations, Junior Explorer!", color = Forest, fontSize = 23.sp,
+                fontWeight = FontWeight.Bold, modifier = Modifier.testTag("academyPracticeComplete"),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            Text("Bronze Compass · Qualification earned", color = Ink, fontWeight = FontWeight.SemiBold,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            HorizontalDivider(color = Gold.copy(alpha = .45f))
+            Text("You completed The Explorer’s First Journey. Your qualification is yours to keep, even when you replay.",
+                color = Ink, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         }
     }
 }
