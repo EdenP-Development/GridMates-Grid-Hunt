@@ -72,7 +72,7 @@ jobs:
             echo 'Signer: PUBLIC, fixed test-only QA certificate (NOT a production signing key).'
             echo 'Future QA builds should install over this package when signed with the same key and a greater versionCode.'
             echo 'This is not a release-signed or phone-tested APK.'
-            echo 'Uninstall older ephemeral-key QA10 and previous versions ONCE before this fixed-key QA build.'
+            echo 'Older ephemeral-key QA10 and earlier may be incompatible. Preserve existing installs; do NOT uninstall or clear data to bypass a signature mismatch.'
             echo 'DO NOT install QA packages from unknown or untrusted sources.'
           } > INSTALL_NOTES.txt
           "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs GridHunt-VisionLab-QA.apk > SIGNER.txt
