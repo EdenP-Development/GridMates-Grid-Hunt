@@ -346,4 +346,52 @@ class VisualCaptureTest {
         }
     }
 
+    @Test fun customRotationPreservesSessionAndEnteredCode() {
+        val custom = target.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE)
+        check(custom.edit().clear().commit())
+        try {
+            compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+            compose.onNodeWithTag("customMode_gold").performScrollTo().performClick()
+            compose.onNodeWithTag("customLength_3").performScrollTo().performClick()
+            compose.onNodeWithTag("customStart").performScrollTo().performClick()
+            val codes = requireNotNull(custom.getString("codes", null))
+            val first = codes.substringBefore(",")
+            compose.onNodeWithTag("customGoldInput").performTextInput(first)
+            compose.onNodeWithTag("customGoldCheck").assertIsEnabled()
+            compose.activityRule.scenario.onActivity {
+                it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
+            compose.waitUntil(10_000) {
+                target.resources.configuration.orientation ==
+                    android.content.res.Configuration.ORIENTATION_LANDSCAPE
+            }
+            compose.waitForIdle()
+            compose.onNodeWithTag("customMap").assertExists()
+            compose.onNodeWithTag("customGoldCheck").assertIsEnabled()
+            org.junit.Assert.assertEquals(codes, custom.getString("codes", null))
+            org.junit.Assert.assertEquals(0, custom.getInt("step", -1))
+            capture("custom_gold_landscape.png")
+            compose.onNodeWithTag("customGoldCheck").performClick()
+            compose.waitForIdle()
+            org.junit.Assert.assertEquals(1, custom.getInt("step", -1))
+            compose.activityRule.scenario.onActivity {
+                it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
+            compose.waitUntil(10_000) {
+                target.resources.configuration.orientation ==
+                    android.content.res.Configuration.ORIENTATION_PORTRAIT
+            }
+            compose.waitForIdle()
+            compose.onNodeWithTag("customMap").assertExists()
+            org.junit.Assert.assertEquals(codes, custom.getString("codes", null))
+            org.junit.Assert.assertEquals(1, custom.getInt("step", -1))
+            capture("custom_gold_rotated_portrait.png")
+        } finally {
+            compose.activityRule.scenario.onActivity {
+                it.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
+            custom.edit().clear().commit()
+        }
+    }
+
 }
