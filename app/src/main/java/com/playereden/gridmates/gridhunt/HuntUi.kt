@@ -287,46 +287,48 @@ internal fun HuntControlPanel(
         maxLines = 3,
         modifier = Modifier.fillMaxWidth().heightIn(min = 30.dp)
     )
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text("MOVE YOUR PICK", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
-        Text("MAP VIEW", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
+    val context = LocalContext.current
+    val controls = remember(context) { context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE) }
+    var precise by remember { mutableStateOf(controls.getBoolean("precise_selection", false)) }
+    var options by rememberSaveable { mutableStateOf(false) }
+    if (precise) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        GridStepButton("←", "Move selected square west", Modifier.weight(1f)) { onMove(-1, 0) }
+        GridStepButton("→", "Move selected square east", Modifier.weight(1f)) { onMove(1, 0) }
+        GridStepButton("↑", "Move selected square north", Modifier.weight(1f)) { onMove(0, 1) }
+        GridStepButton("↓", "Move selected square south", Modifier.weight(1f)) { onMove(0, -1) }
     }
-    Row(
-        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        GridStepButton("←", "Move selected square west") { onMove(-1, 0) }
-        GridStepButton("→", "Move selected square east") { onMove(1, 0) }
-        GridStepButton("↑", "Move selected square north") { onMove(0, 1) }
-        GridStepButton("↓", "Move selected square south") { onMove(0, -1) }
-        Spacer(Modifier.width(6.dp))
-        GridStepButton("+", "Zoom in") { onZoom(1.6) }
-        GridStepButton("−", "Zoom out") { onZoom(1.0 / 1.6) }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        HuntToolButton(ExplorerTool.ZOOM_IN, Modifier.weight(1f)) { onZoom(1.6) }
+        HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f)) { onZoom(1.0 / 1.6) }
+        HuntToolButton(ExplorerTool.FIT, Modifier.weight(1f), onFit)
+        OutlinedButton(onClick = { options = true },
+            modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("huntToolOptions")
+                .semantics { contentDescription = "More map tools" },
+            contentPadding = PaddingValues(0.dp)) { Text("⋯", color = Forest, fontSize = 22.sp) }
     }
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        OutlinedButton(
-            onClick = onUndo, enabled = !finished,
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("Clear", fontSize = 12.sp) }
-        OutlinedButton(
-            onClick = onHint, enabled = !finished,
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("Clue", fontSize = 12.sp) }
-        OutlinedButton(
-            onClick = onFit,
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("See all", fontSize = 12.sp) }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        OutlinedButton(onClick = onUndo, enabled = !finished,
+            modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+            contentPadding = PaddingValues(0.dp)) { Text("Clear", fontSize = 12.sp) }
+        OutlinedButton(onClick = onHint, enabled = !finished,
+            modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+            contentPadding = PaddingValues(0.dp)) { Text("Clue", fontSize = 12.sp) }
     }
+    if (options) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { options = false },
+        title = { Text("Map tools") },
+        text = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Precise selection arrows", modifier = Modifier.weight(1f))
+                androidx.compose.material3.Switch(checked = precise, onCheckedChange = {
+                    precise = it
+                    controls.edit().putBoolean("precise_selection", it).apply()
+                }, modifier = Modifier.testTag("huntPreciseSelection"))
+            }
+        },
+        confirmButton = { TextButton(onClick = { options = false },
+            modifier = Modifier.testTag("huntCloseTools")) { Text("Done") } }
+    )
     Button(
         modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("checkChapter"),
         enabled = finished || selected != null,
@@ -338,10 +340,10 @@ internal fun HuntControlPanel(
 }
 
 @Composable
-private fun GridStepButton(label: String, description: String, onClick: () -> Unit) {
+private fun GridStepButton(label: String, description: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
-        modifier = Modifier.size(48.dp).semantics { contentDescription = description },
+        modifier = modifier.heightIn(min = 48.dp).semantics { contentDescription = description },
         contentPadding = PaddingValues(0.dp),
         shape = RoundedCornerShape(9.dp)
     ) {
@@ -349,3 +351,11 @@ private fun GridStepButton(label: String, description: String, onClick: () -> Un
     }
 }
 
+
+@Composable
+private fun HuntToolButton(tool: ExplorerTool, modifier: Modifier, action: () -> Unit) {
+    OutlinedButton(onClick = action, modifier = modifier.heightIn(min = 48.dp)
+        .semantics { contentDescription = tool.label }, contentPadding = PaddingValues(0.dp)) {
+        ExplorerToolIcon(tool)
+    }
+}
