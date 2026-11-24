@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
@@ -104,6 +105,7 @@ internal fun WoodlandMixedExpeditionScreen(
         })
     }
     var showGuide by rememberSaveable(mission.chapter.id) { mutableStateOf(false) }
+    var showJournal by rememberSaveable(mission.chapter.id) { mutableStateOf(false) }
     var feedback by rememberSaveable(mission.chapter.id) {
         mutableStateOf(mission.chapter.objectives.getOrNull(step - 1)?.discovery
             ?.takeIf { it.isNotBlank() } ?: if (chapterTwo)
@@ -260,7 +262,7 @@ internal fun WoodlandMixedExpeditionScreen(
                     verticalArrangement = Arrangement.spacedBy(7.dp)
                 ) {
                     MixedExpeditionHeader(mission.chapter.name, chapterTwo, step, mission.size,
-                        onHome, onGuide = { showGuide = true })
+                        onHome, onGuide = { showGuide = true }, onJournal = { showJournal = true })
                     if (finished) MixedExpeditionFinish(chapterTwo, onHome, replay)
                     else if (active != null) {
                         MixedExpeditionPrompt(active, chapterTwo, step + 1, mission.size)
@@ -277,7 +279,7 @@ internal fun WoodlandMixedExpeditionScreen(
         } else {
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 MixedExpeditionHeader(mission.chapter.name, chapterTwo, step, mission.size, onHome,
-                    onGuide = { showGuide = true })
+                    onGuide = { showGuide = true }, onJournal = { showJournal = true })
                 if (active != null) MixedExpeditionPrompt(active, chapterTwo, step + 1, mission.size)
                 HuntMapPanel(
                     modifier = Modifier.fillMaxWidth().weight(1f),
@@ -301,6 +303,9 @@ internal fun WoodlandMixedExpeditionScreen(
             }
         }
     }
+    if (showJournal) {
+        ExpeditionJournalDialog(mission, step, chapterTwo) { showJournal = false }
+    }
     if (showGuide) {
         WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showGuide = false })
     }
@@ -309,7 +314,7 @@ internal fun WoodlandMixedExpeditionScreen(
 @Composable
 private fun MixedExpeditionHeader(
     chapterName: String, chapterTwo: Boolean, step: Int, total: Int,
-    onHome: () -> Unit, onGuide: () -> Unit
+    onHome: () -> Unit, onGuide: () -> Unit, onJournal: () -> Unit
 ) {
     Column(Modifier.fillMaxWidth()) {
         Text(chapterName, color = Ink,
@@ -319,6 +324,9 @@ private fun MixedExpeditionHeader(
              else "$step of $total pages found", color = Forest, fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f).testTag("mixedProgress"))
+            TextButton(onClick = onJournal, modifier = Modifier.testTag("mixedJournal")) {
+                Text("Journal", color = Forest, fontSize = 11.sp)
+            }
             TextButton(onClick = onGuide, modifier = Modifier.testTag("mixedGuide")) {
                 Text("Map Guide", color = Forest, fontSize = 11.sp)
             }
@@ -497,5 +505,71 @@ private fun MixedExpeditionFinish(
         primaryLabel = "Explore again",
         onPrimary = onReplay,
         onHome = onHome
+    )
+}
+
+/** Only earned entries and the active prompt are rendered; no future answers. */
+@Composable
+private fun ExpeditionJournalDialog(
+    mission: ExpeditionPlaythrough, step: Int, chapterTwo: Boolean,
+    onDismiss: () -> Unit
+) {
+    val earned = mission.discoveries(step)
+    val active = mission.objectiveAt(step)
+    val unit = if (chapterTwo) "Clue" else "Page"
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.testTag("expeditionJournal"),
+        containerColor = Color(0xFFFFF0CF),
+        title = { Text("Explorer's Journal", color = Ink, fontWeight = FontWeight.Bold) },
+        text = {
+            Column(
+                Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text(mission.chapter.name, color = Ink, fontWeight = FontWeight.Bold)
+                Text(mission.chapter.story, color = Ink, fontSize = 13.sp)
+                Text(if (chapterTwo) "${earned.size} of ${mission.size} clues solved"
+                    else "${earned.size} of ${mission.size} pages found",
+                    color = Forest, fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.testTag("journalProgress"))
+                if (earned.isEmpty()) {
+                    Text("Your discoveries will appear here as you explore.",
+                        color = Muted, modifier = Modifier.testTag("journalEmpty"))
+                }
+                earned.forEachIndexed { index, objective ->
+                    Surface(
+                        color = Color(0xFFFFFBF2), shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth().testTag("journalEntry_${objective.id}")
+                    ) {
+                        Column(Modifier.padding(10.dp)) {
+                            Text("$unit ${index + 1} · ${objective.title}", color = Forest,
+                                fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            Text(objective.discovery.ifBlank { "Discovery recorded." },
+                                color = Ink, fontSize = 13.sp)
+                        }
+                    }
+                }
+                if (active != null) {
+                    Surface(color = Color(0xFFF8DCA0), shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth().testTag("journalCurrent")) {
+                        Column(Modifier.padding(10.dp)) {
+                            Text("CURRENT OBJECTIVE", color = Forest,
+                                fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                            Text(active.title, color = Ink, fontWeight = FontWeight.Bold)
+                            Text(active.prompt, color = Ink, fontSize = 13.sp)
+                        }
+                    }
+                } else {
+                    Text("Expedition complete. All discoveries recorded.", color = Forest,
+                        fontWeight = FontWeight.Bold, modifier = Modifier.testTag("journalComplete"))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss, modifier = Modifier.testTag("closeJournal")) {
+                Text("Return to exploration", color = Forest)
+            }
+        }
     )
 }
