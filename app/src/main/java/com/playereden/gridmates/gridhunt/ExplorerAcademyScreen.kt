@@ -19,14 +19,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.ExplorerAcademy
 import com.playereden.gridhunt.core.AcademyTrainingGrid
 import com.playereden.gridhunt.core.AcademyMapTask
+import com.playereden.gridhunt.core.GridReference
+import com.playereden.gridhunt.core.MapCamera
+import com.playereden.gridhunt.core.PixelPoint
+import com.playereden.gridhunt.core.WoodlandTrainingMap
 
 @Composable
-internal fun ExplorerAcademyScreen(onHome: () -> Unit) {
+internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook: (MapLook) -> Unit) {
     val context = LocalContext.current
     val prefs = remember(context) {
         context.getSharedPreferences(ExplorerAcademy.saveName, Context.MODE_PRIVATE)
@@ -84,7 +89,10 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit) {
                     if (task != null) {
                         AcademyGrid(task, selected) { selected = it }
                     }
-                    if (task?.selectSquare == true) {
+                    if (active.woodlandField) {
+                        AcademyWoodlandMap(mapLook, onLook, selected) { selected = it }
+                    }
+                    if (task?.selectSquare == true || active.woodlandField) {
                         Text("Selected: " + (selected ?: "Tap a square"), color = Forest)
                         Button(onClick = { selected?.let(submit) },
                             enabled = selected != null,
@@ -102,7 +110,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit) {
         } else {
             Text("Practice complete!", color = Forest, fontSize = 23.sp,
                 fontWeight = FontWeight.Bold, modifier = Modifier.testTag("academyPracticeComplete"))
-            Text("You've completed the first compass and grid exercises. More lessons and graduation are in development.", color = Ink)
+            Text("You've completed compass, grid and woodland field practice. More lessons and graduation are in development.", color = Ink)
             Button(onClick = {
                 prefs.edit().remove("earned").apply()
                 earned = emptySet()
@@ -160,4 +168,60 @@ private fun AcademyGrid(task: AcademyMapTask, selected: String?, onSelect: (Stri
         }
         Text("Read across first, then up.", color = Muted, fontSize = 12.sp)
     }
+}
+
+/** Same map renderer and camera as Adventure, without touching campaign saves. */
+@Composable
+private fun AcademyWoodlandMap(
+    mapLook: MapLook, onLook: (MapLook) -> Unit,
+    selected: String?, onSelect: (String) -> Unit
+) {
+    val bounds = WoodlandTrainingMap.bounds
+    var viewport by remember { mutableStateOf(IntSize.Zero) }
+    var camera by remember { mutableStateOf<MapCamera?>(null) }
+    var guide by rememberSaveable { mutableStateOf(false) }
+    fun fit() {
+        if (viewport.width > 80 && viewport.height > 80)
+            camera = MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble())
+    }
+    fun zoom(factor: Double) {
+        if (viewport.width > 80 && viewport.height > 80) {
+            camera = camera?.transform(bounds, viewport.width.toDouble(), viewport.height.toDouble(),
+                PixelPoint(viewport.width / 2.0, viewport.height / 2.0),
+                PixelPoint(0.0, 0.0), factor)
+        }
+    }
+    HuntMapPanel(
+        modifier = Modifier.fillMaxWidth().height(320.dp).testTag("academyWoodlandMap"),
+        bounds = bounds, camera = camera,
+        selectedCell = selected?.let { runCatching { GridReference.parse(it) }.getOrNull() },
+        completed = emptyList(), viewport = viewport,
+        onViewport = { size -> if (size != viewport) { viewport = size; fit() } },
+        onCamera = { camera = it }, onSelect = onSelect, markerPoint = null,
+        enableSelect = true, mapLook = mapLook, onLook = onLook
+    )
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        OutlinedButton(onClick = { zoom(1.6) }, modifier = Modifier.weight(1f).testTag("academyZoomIn"),
+            contentPadding = PaddingValues(0.dp)) { Text("+") }
+        OutlinedButton(onClick = { zoom(1.0 / 1.6) }, modifier = Modifier.weight(1f).testTag("academyZoomOut"),
+            contentPadding = PaddingValues(0.dp)) { Text("−") }
+        OutlinedButton(onClick = { fit() }, modifier = Modifier.weight(1.5f).testTag("academyFit"),
+            contentPadding = PaddingValues(0.dp)) { Text("See all") }
+        OutlinedButton(onClick = { guide = true }, modifier = Modifier.weight(1.6f).testTag("academyGuide"),
+            contentPadding = PaddingValues(0.dp)) { Text("Guide") }
+    }
+    // Accessible directional alternatives to map tapping; selection uses real grid addresses.
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        listOf(Triple("West", -1, 0), Triple("East", 1, 0),
+            Triple("North", 0, 1), Triple("South", 0, -1)).forEach { (label, dx, dy) ->
+            OutlinedButton(onClick = {
+                val base = GridReference.parse(selected ?: "2640")
+                val e = (base.eastIndex + dx).coerceIn(24, 29)
+                val n = (base.northIndex + dy).coerceIn(37, 42)
+                onSelect(com.playereden.gridhunt.core.GridCell(e, n).reference)
+            }, modifier = Modifier.weight(1f).testTag("academyMove$label"),
+                contentPadding = PaddingValues(0.dp)) { Text(label, fontSize = 11.sp) }
+        }
+    }
+    if (guide) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { guide = false })
 }
