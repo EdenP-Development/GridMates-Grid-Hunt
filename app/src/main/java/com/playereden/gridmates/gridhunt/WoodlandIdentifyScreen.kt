@@ -333,18 +333,9 @@ private fun IdentifyActions(
         modifier = Modifier.fillMaxWidth().testTag("identifyFeedback"))
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-        OutlinedButton(onClick = { onZoom(1.6) }, contentPadding = PaddingValues(0.dp),
-            modifier = Modifier.weight(0.54f).heightIn(min = 48.dp)) {
-            Text("+", color = Forest)
-        }
-        OutlinedButton(onClick = { onZoom(1.0 / 1.6) }, contentPadding = PaddingValues(0.dp),
-            modifier = Modifier.weight(0.54f).heightIn(min = 48.dp)) {
-            Text("−", color = Forest)
-        }
-        OutlinedButton(onClick = onFit, contentPadding = PaddingValues(0.dp),
-            modifier = Modifier.weight(0.90f).heightIn(min = 48.dp)) {
-            Text("See all", fontSize = 11.sp, color = Forest)
-        }
+        HuntToolButton(ExplorerTool.ZOOM_IN, Modifier.weight(0.85f), { onZoom(1.6) })
+        HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(0.85f), { onZoom(1.0 / 1.6) })
+        HuntToolButton(ExplorerTool.FIT, Modifier.weight(0.85f), onFit)
         Button(
             onClick = onCheck, enabled = selected,
             colors = ButtonDefaults.buttonColors(containerColor = Forest),
