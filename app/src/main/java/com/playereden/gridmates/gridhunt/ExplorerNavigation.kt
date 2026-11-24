@@ -133,8 +133,8 @@ internal fun ExplorerDeskHome(
         HomeDestinationStrip(
             icon = "✎",
             title = "Custom Play",
-            description = "Build a hunt · Preview",
-            actionLabel = "Preview",
+            description = "Build a fresh hunt",
+            actionLabel = "Play",
             color = Color(0xFFE5E9E3),
             tag = "openCustomPlay",
             onClick = onCustom
