@@ -39,7 +39,15 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
     var earned by remember { mutableStateOf(ExplorerAcademy.restore(
         prefs.getStringSet("earned", emptySet())?.toSet() ?: emptySet()
     )) }
-    val active = ExplorerAcademy.current(earned)
+    var fieldEarned by remember { mutableStateOf(ExplorerAcademy.restoreGraduation(
+        prefs.getStringSet("graduation", emptySet())?.toSet() ?: emptySet())) }
+    var qualifications by remember { mutableStateOf(
+        prefs.getStringSet("qualifications", emptySet())?.toSet() ?: emptySet()) }
+    var inGraduation by rememberSaveable { mutableStateOf(fieldEarned.isNotEmpty()) }
+    val practiceDone = ExplorerAcademy.practiceComplete(earned)
+    val graduated = ExplorerAcademy.graduated(earned, fieldEarned)
+    val active = if (inGraduation && practiceDone)
+        ExplorerAcademy.graduationCurrent(earned, fieldEarned) else ExplorerAcademy.current(earned)
     var feedback by rememberSaveable(active?.id) { mutableStateOf("") }
     var selected by rememberSaveable(active?.id) { mutableStateOf<String?>(active?.route?.start?.reference) }
     var success by rememberSaveable { mutableStateOf("") }
@@ -58,7 +66,12 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                 Text("Home")
             }
         }
-        Text("Beginner practice · ${earned.size} of ${ExplorerAcademy.exercises.size}",
+        if (ExplorerAcademy.qualificationId in qualifications) {
+            Text("★ Junior Explorer · School of Exploration", color = Forest,
+                fontWeight = FontWeight.Bold, modifier = Modifier.testTag("academyQualification"))
+        }
+        Text(if (inGraduation && practiceDone) "Graduation expedition · ${fieldEarned.size} of ${ExplorerAcademy.graduation.size}"
+            else "Beginner practice · ${earned.size} of ${ExplorerAcademy.exercises.size}",
             color = Forest, modifier = Modifier.testTag("academyProgress"))
         if (success.isNotBlank()) Text(success, color = Forest,
             modifier = Modifier.testTag("academySuccess"))
@@ -75,6 +88,20 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                     }
                     Text(active.prompt, color = Ink, fontWeight = FontWeight.Bold)
                     val submit: (String) -> Unit = { choice ->
+                        if (inGraduation && practiceDone) {
+                            val next = ExplorerAcademy.acceptGraduation(earned, fieldEarned, active.id, choice)
+                            if (next != fieldEarned) {
+                                val awards = ExplorerAcademy.qualifications(qualifications, earned, next)
+                                prefs.edit().putStringSet("graduation", next)
+                                    .putStringSet("qualifications", awards).apply()
+                                fieldEarned = next
+                                qualifications = awards
+                                success = "✓ " + active.explanation
+                            } else {
+                                success = ""
+                                feedback = "Not quite. Review the clue and Map Guide, then try again."
+                            }
+                        } else {
                         val next = ExplorerAcademy.accept(earned, active.id, choice)
                         if (next != earned) {
                             prefs.edit().putStringSet("earned", next).apply()
@@ -83,6 +110,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                         } else {
                             success = ""
                             feedback = active.explanation + " Try again."
+                        }
                         }
                     }
                     val task = active.mapTask
@@ -121,12 +149,18 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                 }
             }
         } else {
-            Text("Practice complete!", color = Forest, fontSize = 23.sp,
+            Text(if (graduated) "Congratulations, Junior Explorer!" else "Practice complete!", color = Forest, fontSize = 23.sp,
                 fontWeight = FontWeight.Bold, modifier = Modifier.testTag("academyPracticeComplete"))
-            Text("You've completed compass, grid, landmark and route practice. More lessons and graduation are in development.", color = Ink)
+            Text(if (graduated) "You completed The Explorer’s First Journey. Your qualification is yours to keep, even when you replay." else "Your field assignment awaits. Apply your skills in four woodland challenges.", color = Ink)
+            if (!graduated) Button(onClick = { inGraduation = true; success = "" },
+                modifier = Modifier.fillMaxWidth().testTag("academyStartGraduation")) {
+                Text("Begin graduation expedition")
+            }
             Button(onClick = {
-                prefs.edit().remove("earned").apply()
+                prefs.edit().remove("earned").remove("graduation").apply()
                 earned = emptySet()
+                fieldEarned = emptySet()
+                inGraduation = false
                 success = ""
             }, modifier = Modifier.fillMaxWidth().testTag("academyReplay")) {
                 Text("Practice again")
