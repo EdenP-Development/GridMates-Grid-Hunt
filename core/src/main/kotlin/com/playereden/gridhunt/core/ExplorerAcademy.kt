@@ -107,7 +107,16 @@ object ExplorerAcademy {
             listOf("2739", "2639", "2738", "2541"), "2739",
             "Two east brings you to 2738; one north brings you to 2739.",
             woodlandField = true, route = AcademyRoute(GridReference.parse("2538"),
-                listOf(AcademyRouteLeg(AcademyDirection.EAST, 2), AcademyRouteLeg(AcademyDirection.NORTH, 1))))
+                listOf(AcademyRouteLeg(AcademyDirection.EAST, 2), AcademyRouteLeg(AcademyDirection.NORTH, 1))),
+        AcademyExercise("woodland-deduction", "Thinking like an explorer",
+            "Compare landmarks one condition at a time. East means farther right; north means farther up.",
+            "Find the landmark east of Acorn Nook AND north of Buttercup Glade. Select its square.",
+            listOf("2538", "2641", "2840", "2941"),
+            WoodlandSpatialClues.resolve("academy-deduction", WoodlandLandmarks.waystone.id,
+                listOf(ClueCondition.EastOf(WoodlandLandmarks.acorn.id),
+                    ClueCondition.NorthOf(WoodlandLandmarks.flowers.id))).reference,
+            "Only the Old Waystone satisfies both directions. Its square is 2941.",
+            woodlandField = true)
     )
     fun restore(ids: Set<String>): Set<String> =
         ids.intersect(exercises.map { it.id }.toSet())
