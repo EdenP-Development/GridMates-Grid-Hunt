@@ -357,7 +357,7 @@ private fun GridStepButton(label: String, description: String, modifier: Modifie
 
 
 @Composable
-private fun HuntToolButton(tool: ExplorerTool, modifier: Modifier, action: () -> Unit, enabled: Boolean = true) {
+internal fun HuntToolButton(tool: ExplorerTool, modifier: Modifier, action: () -> Unit, enabled: Boolean = true) {
     OutlinedButton(onClick = action, enabled = enabled, modifier = modifier.heightIn(min = 48.dp)
         .semantics { contentDescription = tool.label }, contentPadding = PaddingValues(0.dp)) {
         ExplorerToolIcon(tool)
