@@ -42,3 +42,10 @@ Cozy native Android/Compose map puzzle adventure, practical readable UI, warm wo
 
 ## Resume prompt
 Continue GridMates: Grid Hunt from docs/CURRENT_DEVELOPMENT_HANDOFF.md on feature/gh-v02-in-puzzle-map-look in draft PR #12. Inspect live CI and source first. Continue the next unfinished Academy milestone with actual implementation, tests and commits. Preserve saves and approved product direction. Report verified versus pending, link latest verified APK when useful, and keep handoff current.
+
+## GH-V18-C through E — newer pending checkpoint
+- QA217 remains the last confirmed verified build in this handoff until new workflow results are inspected.
+- Added real flower symbol matching, bounded directional routes and uniquely validated spatial deduction. Nine practice IDs, adding woodland-symbol, woodland-route, woodland-deduction.
+- Added four graduation stages grad-start, grad-route, grad-symbol, grad-deduction. Graduation requires all nine practice exercises. Store graduation StringSet separately in existing Academy prefs; qualifications StringSet contains junior-explorer-v1, earned once and retained across replay. No dedicated collectible artwork/profile yet.
+- School overview now shows actual lesson progress, graduation checkpoints and qualification, with begin/resume action. Only one school is playable. Android tests extended to cover overview and full graduation including persistence; core tests cover route boundaries and qualification rules. All these changes are pending CI confirmation; inspect latest run and fix any failures before expanding content. Physical phone QA still open.
+- Next: verify and repair latest build; polish graduation presentation and Academy navigation/first-use guidance; obtain owner phone feedback. Then implement reusable spatial/route gameplay for Adventure and third chapter. Optional advanced schools remain planned.
