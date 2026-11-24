@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -243,6 +244,7 @@ internal fun WoodlandAdventureJourney(
                 androidx.compose.foundation.layout.Box(
                     modifier = Modifier.fillMaxWidth().height(210.dp)
                         .testTag("adventureRouteMap")
+                        .clip(RoundedCornerShape(14.dp))
                 ) {
                     Canvas(Modifier.fillMaxSize()) {
                         val w = size.width
@@ -274,21 +276,58 @@ internal fun WoodlandAdventureJourney(
                         }
                         drawPath(route, Color(0xFFB99762), style = Stroke(width = 15f))
                         drawPath(route, Color(0xFFF8E5B6), style = Stroke(width = 9f))
-                        // Gentle layered woodland crown silhouettes.
-                        listOf(
-                            Triple(0.13f,0.26f,0.12f),
-                            Triple(0.35f,0.16f,0.09f),
-                            Triple(0.89f,0.49f,0.13f),
-                            Triple(0.19f,0.61f,0.075f),
-                            Triple(0.67f,0.87f,0.12f)
-                        ).forEach { (x,y,r) ->
-                            val point = Offset(w*x,h*y)
-                            val radius = w*r
-                            drawCircle(Color(0xFF567F60),radius,point)
-                            drawCircle(Color(0xFF86AD83),radius*0.75f,
-                                point+Offset(-radius*0.17f,-radius*0.18f))
-                            drawCircle(Color(0xFFAAD19C),radius*0.27f,
-                                point+Offset(-radius*0.38f,-radius*0.4f))
+                        // Shared postcard-inspired palette and layered tree forms.
+                        // Decorative journey only: never infer puzzle geometry here.
+                        fun tree(x: Float, y: Float, t: Float, evergreen: Boolean) {
+                            val p = Offset(w*x,h*y)
+                            val s = h*t
+                            drawOval(Color(0x29405B3C), p+Offset(-s*.35f,-s*.035f),
+                                androidx.compose.ui.geometry.Size(s*.78f,s*.16f))
+                            drawLine(Color(0xFF806648),p,p+Offset(0f,-s*.62f),
+                                strokeWidth=s*.08f)
+                            if (evergreen) {
+                                for (tier in 0..2) {
+                                    val base=p.y-s*(.10f+tier*.22f)
+                                    val spread=s*(.32f-tier*.065f)
+                                    val crown=Path().apply {
+                                        moveTo(p.x,base-s*.48f)
+                                        quadraticBezierTo(p.x-spread*.35f,base-s*.22f,p.x-spread,base)
+                                        quadraticBezierTo(p.x,base+s*.08f,p.x+spread,base)
+                                        quadraticBezierTo(p.x+spread*.35f,base-s*.22f,p.x,base-s*.48f)
+                                        close()
+                                    }
+                                    drawPath(crown,Color(0xFF3F7156))
+                                    val light=Path().apply {
+                                        moveTo(p.x,base-s*.43f)
+                                        lineTo(p.x-spread*.82f,base-s*.015f)
+                                        lineTo(p.x,base-s*.045f)
+                                        close()
+                                    }
+                                    drawPath(light,Color(0xFF71965F))
+                                }
+                            } else {
+                                val crown=p+Offset(0f,-s*.62f)
+                                listOf(Triple(-.23f,.07f,.27f),Triple(.22f,.04f,.28f),
+                                    Triple(0f,-.20f,.31f),Triple(.02f,.13f,.30f)).forEach { (dx,dy,r) ->
+                                    drawCircle(Color(0xFF557C51),s*r,crown+Offset(dx*s,dy*s))
+                                }
+                                listOf(Triple(-.24f,-.02f,.19f),Triple(.13f,-.20f,.22f),
+                                    Triple(-.06f,-.32f,.17f)).forEach { (dx,dy,r) ->
+                                    drawCircle(Color(0xFF8DAD71),s*r,crown+Offset(dx*s,dy*s))
+                                }
+                            }
+                        }
+                        tree(.10f,.41f,.29f,true)
+                        tree(.22f,.40f,.24f,false)
+                        tree(.35f,.34f,.26f,true)
+                        tree(.10f,.65f,.21f,false)
+                        tree(.89f,.67f,.34f,true)
+                        tree(.77f,.76f,.27f,false)
+                        tree(.66f,.98f,.33f,true)
+                        tree(.96f,.97f,.30f,false)
+                        repeat(72) { i ->
+                            drawCircle(Color(0x12695335),.55.dp.toPx(),
+                                Offset(w*((i*43+7)%101)/101f,h*((i*67+13)%103)/103f))
                         }
                         // Trail starts at a compass-style dot and leads to one
                         // *actual* playable destination; no fake chapter nodes.
