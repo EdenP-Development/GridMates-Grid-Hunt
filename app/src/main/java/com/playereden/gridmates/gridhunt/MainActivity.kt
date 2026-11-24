@@ -220,7 +220,20 @@ private fun GridHuntScreen() {
             onHome = { screen = returnHub },
             mapLook = mapLook,
             onLook = { lookName = it.name },
-            hapticsEnabled = hapticsEnabled
+            hapticsEnabled = hapticsEnabled,
+            onNextChapter = if (returnHub == "adventure") ({
+                // Read current persisted progress, not the snapshot from before the final clue.
+                val snapshot = GridHuntCampaign.snapshot(
+                    expeditionPrefs.getInt("step", 0), supplyPrefs.getInt("step", 0)
+                )
+                val next = GridHuntCampaign.registry.state(
+                    WoodlandSupplyExpedition.chapter.id, snapshot
+                )
+                if (next != null && next.status != CampaignChapterStatus.LOCKED) {
+                    returnHub = "adventure"
+                    screen = "supplies"
+                }
+            }) else null
         )
         "supplies" -> {
             if (supplyState.status == CampaignChapterStatus.LOCKED) {
