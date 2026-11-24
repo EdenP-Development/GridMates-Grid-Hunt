@@ -26,7 +26,11 @@ class ExplorerAcademyTest {
         assertEquals("grid-field", ExplorerAcademy.current(restored)?.id)
         assertFalse(ExplorerAcademy.practiceComplete(restored))
         assertEquals(restored, ExplorerAcademy.accept(restored, "grid-field", "2739"))
-        val completed = ExplorerAcademy.accept(restored, "grid-field", "2740")
+        val field = ExplorerAcademy.accept(restored, "grid-field", "2740")
+        assertEquals("woodland-field", ExplorerAcademy.current(field)?.id)
+        assertFalse(ExplorerAcademy.practiceComplete(field))
+        assertEquals(field, ExplorerAcademy.accept(field, "woodland-field", "2641"))
+        val completed = ExplorerAcademy.accept(field, "woodland-field", WoodlandLandmarks.mushrooms.cell.reference)
         assertTrue(ExplorerAcademy.practiceComplete(completed))
         assertNull(ExplorerAcademy.current(completed))
     }
