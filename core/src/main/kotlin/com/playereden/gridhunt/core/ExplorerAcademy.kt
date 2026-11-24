@@ -107,7 +107,7 @@ object ExplorerAcademy {
             listOf("2739", "2639", "2738", "2541"), "2739",
             "Two east brings you to 2738; one north brings you to 2739.",
             woodlandField = true, route = AcademyRoute(GridReference.parse("2538"),
-                listOf(AcademyRouteLeg(AcademyDirection.EAST, 2), AcademyRouteLeg(AcademyDirection.NORTH, 1))),
+                listOf(AcademyRouteLeg(AcademyDirection.EAST, 2), AcademyRouteLeg(AcademyDirection.NORTH, 1)))),
         AcademyExercise("woodland-deduction", "Thinking like an explorer",
             "Compare landmarks one condition at a time. East means farther right; north means farther up.",
             "Find the landmark east of Acorn Nook AND north of Buttercup Glade. Select its square.",
