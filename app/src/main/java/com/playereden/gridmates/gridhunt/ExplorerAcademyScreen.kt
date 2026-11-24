@@ -437,10 +437,7 @@ private fun AcademyToolButton(tool: ExplorerTool, tag: String, modifier: Modifie
         modifier = modifier.heightIn(min = 48.dp).testTag(tag)
             .semantics { contentDescription = tool.label },
         contentPadding = PaddingValues(horizontal = 2.dp, vertical = 4.dp)) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            ExplorerToolIcon(tool)
-            Text(tool.label.removePrefix("Move "), fontSize = 10.sp, color = Forest,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-        }
+        ExplorerToolIcon(tool)
+
     }
 }
