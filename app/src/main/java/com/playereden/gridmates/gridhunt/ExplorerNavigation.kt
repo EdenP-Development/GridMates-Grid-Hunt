@@ -51,13 +51,13 @@ internal fun ExplorerDeskHome(
         Modifier.fillMaxSize().background(Paper)
             .statusBarsPadding().navigationBarsPadding()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 17.dp, vertical = 11.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+            .padding(horizontal = 17.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text("GRIDMATES  /  PUZZLE ADVENTURES", color = Forest,
             fontWeight = FontWeight.Bold, fontSize = 10.sp)
         Text("Grid Hunt", color = Ink, fontWeight = FontWeight.ExtraBold,
-            fontSize = 34.sp)
+            fontSize = 30.sp)
         Text("Little maps. Big discoveries.", color = Muted, fontSize = 13.sp)
 
         // One primary illustrated journey feature; don't repeat a big hero
@@ -69,10 +69,10 @@ internal fun ExplorerDeskHome(
             shadowElevation = 3.dp
         ) {
             Column(
-                Modifier.fillMaxWidth().padding(11.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                Modifier.fillMaxWidth().padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                WoodlandPostcard(Modifier.fillMaxWidth().height(142.dp))
+                WoodlandPostcard(Modifier.fillMaxWidth().height(104.dp))
                 Row(
                     Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -97,7 +97,7 @@ internal fun ExplorerDeskHome(
                 }
                 Button(
                     onClick = onAdventure,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                         .testTag("openAdventure"),
                     colors = ButtonDefaults.buttonColors(containerColor = Forest),
                     shape = RoundedCornerShape(15.dp)
@@ -109,12 +109,12 @@ internal fun ExplorerDeskHome(
                 }
             }
         }
-        Text("Or choose your own path", color = Ink, fontSize = 17.sp,
+        Text("Or choose your own path", color = Ink, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
         HomeDestinationStrip(
             icon = "✦",
             title = "Explorer’s Academy",
-            description = "New to maps? Learn at your own pace.",
+            description = "Learn to read maps.",
             actionLabel = "Learn",
             color = Color(0xFFE4EDDA),
             tag = "openAcademy",
@@ -123,7 +123,7 @@ internal fun ExplorerDeskHome(
         HomeDestinationStrip(
             icon = "◇",
             title = "Quick Play",
-            description = "Four puzzle styles. Jump straight in.",
+            description = "Choose a puzzle style.",
             actionLabel = "Choose",
             color = Color(0xFFF5E8C9),
             tag = "openQuickPlay",
@@ -132,7 +132,7 @@ internal fun ExplorerDeskHome(
         HomeDestinationStrip(
             icon = "✎",
             title = "Custom Play",
-            description = "Build your own hunt  ·  Coming later",
+            description = "Build a hunt · Preview",
             actionLabel = "Preview",
             color = Color(0xFFE5E9E3),
             tag = "openCustomPlay",
@@ -168,9 +168,9 @@ private fun HomeDestinationStrip(
                 color = Color(0xFFFFFAED),
                 shape = RoundedCornerShape(13.dp)
             ) {
-                Text(icon, modifier = Modifier.padding(10.dp),
+                Text(icon, modifier = Modifier.padding(7.dp),
                     color = Forest, fontWeight = FontWeight.Bold,
-                    fontSize = 23.sp)
+                    fontSize = 20.sp)
             }
             Column(Modifier.weight(1f)) {
                 Text(title, color = Ink, fontWeight = FontWeight.ExtraBold,
@@ -216,7 +216,7 @@ internal fun WoodlandAdventureJourney(
         Modifier.fillMaxSize().background(Paper)
             .statusBarsPadding().navigationBarsPadding()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 17.dp, vertical = 10.dp),
+            .padding(horizontal = 17.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -241,7 +241,7 @@ internal fun WoodlandAdventureJourney(
                     Text("2 chapters", color = Muted, fontSize = 11.sp)
                 }
                 androidx.compose.foundation.layout.Box(
-                    modifier = Modifier.fillMaxWidth().height(246.dp)
+                    modifier = Modifier.fillMaxWidth().height(210.dp)
                         .testTag("adventureRouteMap")
                 ) {
                     Canvas(Modifier.fillMaxSize()) {
