@@ -272,3 +272,18 @@ object WoodlandClueMap {
         publishedSymbolKeys = WoodlandLandmarks.all.mapTo(linkedSetOf()) { it.id }
     )
 }
+
+/** All four visible landmarks are candidates for spatial deduction, not just a named type. */
+object WoodlandSpatialClues {
+    val pack = WoodlandClueMap.pack.copy(
+        features = WoodlandClueMap.pack.features.map { it.copy(categoryId = "landmark") }
+    )
+
+    fun resolve(id: String, targetId: String, conditions: List<ClueCondition>): GridCell {
+        require(conditions.isNotEmpty()) { "Spatial clue needs a condition" }
+        val verdict = ClueValidation.validate(pack,
+            ClueObjective(id, targetId, "landmark", conditions))
+        require(verdict is ClueVerdict.Publishable) { "Unfair spatial clue: $id ($verdict)" }
+        return verdict.answer
+    }
+}
