@@ -53,6 +53,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
     var selected by rememberSaveable(active?.id) { mutableStateOf<String?>(active?.route?.start?.reference) }
     var success by rememberSaveable { mutableStateOf("") }
     var showLessonHelp by rememberSaveable(active?.id) { mutableStateOf(false) }
+    val mapLesson = !showOverview && active?.woodlandField == true
     val scroll = rememberScrollState()
     LaunchedEffect(active?.id, showOverview) { scroll.scrollTo(0) }
     Column(
@@ -64,7 +65,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
             Column(Modifier.weight(1f)) {
                 Text("Explorer's Academy", fontSize = 22.sp, color = Ink,
                     fontWeight = FontWeight.ExtraBold)
-                Text("School of Exploration", color = Forest)
+                if (!mapLesson) Text("School of Exploration", color = Forest)
             }
             TextButton(onClick = onHome, modifier = Modifier.testTag("academyHome")) {
                 Text("Home")
@@ -74,39 +75,55 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
             Text("★ Junior Explorer · School of Exploration", color = Forest,
                 fontWeight = FontWeight.Bold, modifier = Modifier.testTag("academyQualification"))
         }
-        Text(if (inGraduation && practiceDone) "Graduation expedition · ${fieldEarned.size} of ${ExplorerAcademy.graduation.size}"
-            else "Beginner practice · ${earned.size} of ${ExplorerAcademy.exercises.size}",
-            color = Forest, modifier = Modifier.testTag("academyProgress"))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(if (inGraduation && practiceDone) "Graduation · ${fieldEarned.size}/${ExplorerAcademy.graduation.size}"
+                else "Practice · ${earned.size}/${ExplorerAcademy.exercises.size}",
+                color = Forest, modifier = Modifier.weight(1f).testTag("academyProgress"))
+            if (mapLesson) TextButton(onClick = { showOverview = true }, modifier = Modifier.testTag("academyOverview")) { Text("Overview") }
+        }
         Column(Modifier.weight(1f).verticalScroll(scroll),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (showOverview) {
             AcademySchoolOverview(earned, fieldEarned, qualifications,
                 onContinue = { showOverview = false })
         } else {
-        TextButton(onClick = { showOverview = true }, modifier = Modifier.testTag("academyOverview")) {
+        if (!mapLesson) TextButton(onClick = { showOverview = true }, modifier = Modifier.testTag("academyOverview")) {
             Text("School overview")
         }
         if (success.isNotBlank() && active?.woodlandField != true) Text(success, color = Forest,
             fontSize = 12.sp, modifier = Modifier.testTag("academySuccess"))
         if (active != null) {
             Surface(color = Color(0xFFFFF0CF), shape = RoundedCornerShape(16.dp)) {
-                Column(Modifier.fillMaxWidth().padding(16.dp),
+                Column(Modifier.fillMaxWidth().padding(if (mapLesson) 8.dp else 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(active.lesson, color = Ink, fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold)
-                    if (active.woodlandField) {
-                        TextButton(onClick = { showLessonHelp = !showLessonHelp },
-                            contentPadding = PaddingValues(horizontal = 4.dp),
-                            modifier = Modifier.testTag("academyLessonHelp")) {
-                            Text(if (showLessonHelp) "Hide lesson help" else "Lesson help", color = Forest)
+                    if (mapLesson) {
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text(active.lesson, color = Ink, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                                modifier = Modifier.weight(1f))
+                            TextButton(onClick = { showLessonHelp = !showLessonHelp },
+                                contentPadding = PaddingValues(horizontal = 4.dp),
+                                modifier = Modifier.testTag("academyLessonHelp")) {
+                                Text("Help", color = Forest)
+                            }
                         }
-                        if (showLessonHelp) Text(active.teaching, color = Ink, fontSize = 13.sp)
-                    } else Text(active.teaching, color = Ink)
+                        if (showLessonHelp) AlertDialog(onDismissRequest = { showLessonHelp = false },
+                            title = { Text(active.lesson) }, text = { Text(active.teaching) },
+                            confirmButton = { TextButton(onClick = { showLessonHelp = false }) { Text("Got it") } })
+                    } else {
+                        Text(active.lesson, color = Ink, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(active.teaching, color = Ink)
+                    }
                     if (active.id == "north" || active.id == "south") {
                         AcademyCompass()
                     }
-                    Text(active.prompt, color = Ink, fontWeight = FontWeight.Bold,
-                        fontSize = if (active.woodlandField) 14.sp else 16.sp)
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(active.prompt, color = Ink, fontWeight = FontWeight.Bold,
+                            fontSize = if (mapLesson) 14.sp else 16.sp, modifier = Modifier.weight(1f))
+                        if (mapLesson) active.symbolId?.let { id ->
+                            WoodlandLandmarkSwatch(id, mapLook, symbolSize = 48.dp)
+                        }
+                    }
                     val submit: (String) -> Unit = { choice ->
                         if (inGraduation && practiceDone) {
                             val next = ExplorerAcademy.acceptGraduation(earned, fieldEarned, active.id, choice)
@@ -138,13 +155,6 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                         AcademyGrid(task, selected) { selected = it }
                     }
                     if (active.woodlandField) {
-                        active.symbolId?.let { id ->
-                            Row(verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                WoodlandLandmarkSwatch(id, mapLook, symbolSize = 48.dp)
-                                Text("Match this symbol", color = Forest)
-                            }
-                        }
                         AcademyWoodlandMap(mapLook, onLook, selected) { selected = it }
                         active.route?.let { route ->
                             OutlinedButton(onClick = { selected = route.start.reference },
@@ -154,11 +164,15 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                         }
                     }
                     if (task?.selectSquare == true || active.woodlandField) {
-                        Text("Selected: " + (selected ?: "Tap a square"), color = Forest)
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Selected: " + (selected ?: "Tap a square"), color = Forest,
+                            modifier = Modifier.weight(1f), fontSize = 12.sp)
                         Button(onClick = { selected?.let(submit) },
                             enabled = selected != null,
-                            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                                .testTag("academyCheckSquare")) { Text("Check square") }
+                            modifier = Modifier.weight(1f).heightIn(min = 48.dp)
+                                .testTag("academyCheckSquare"), contentPadding = PaddingValues(horizontal = 6.dp)) { Text("Check square") }
+                        }
                     } else active.choices.chunked(2).forEachIndexed { rowIndex, choices ->
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             choices.forEachIndexed { columnIndex, choice ->
