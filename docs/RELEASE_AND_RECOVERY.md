@@ -1,5 +1,7 @@
 # Grid Hunt release, signing and recovery policy
 
+**Organization:** [EdenP-Development/GridMates-Grid-Hunt](https://github.com/EdenP-Development/GridMates-Grid-Hunt). Original repository transferred intact; continue the existing draft PR and preserve the established QA identity. See the [shared standards](https://github.com/PlayerEden/Eden-Development-Standards).
+
 Updated 2026-11-24. Adopt [Eden Development Standards](https://github.com/PlayerEden/Eden-Development-Standards) and [central registry](https://github.com/PlayerEden/Eden-Development-Standards/blob/main/APP_REGISTRY.json). This project-specific supplement preserves existing identities.
 
 ## Verified inventory
@@ -7,7 +9,7 @@ Updated 2026-11-24. Adopt [Eden Development Standards](https://github.com/Player
 - Persistent QA: com.playereden.gridmates.gridhunt.qa; public certificate SHA-256 0ff2e763e5667bdfda45aab662639ea6c1c7efa813f82cd4a5cdba8225febd52. Existing public test-only PKCS12 is tracked in the repository by explicit legacy design. It is compromised by design and unsuitable for trusted or production distribution. Do not rotate this lineage automatically or copy it into production. Only install trusted project test artifacts.
 - Production: configured applicationId com.playereden.gridmates.gridhunt, versionName 0.3.0-gh02c, no release signer configured in inspected Gradle source. No accepted production APK, fingerprint or owner-controlled key verified. Do not generate a key until original distribution history and custody are established with owner.
 - Legacy ephemeral preview QA (QA10 and earlier): same QA package, differing temporary certificates. QA10 fingerprint bf54f0d3b2603353f6b3aa9d1ecb2ab1485151c7f53e7d27952d3df05b032231. Cannot install fixed QA as update over incompatible historical signer. Preserve old installation; no uninstall/data-clear workaround. No independent preview package verified.
-- QA292 verified source 63f0fc271eb731a1d9b6109ddd71164f4afdb19a, code 10292, name 0.3.0-gh02c-qa.292, APK SHA-256 8bf801d3df2a0b6e771b70b603f45f506426dee9ac839ee0c37cdf2bed6e3db8. [Full passing workflow](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45460697797): 32 Android tests, JVM tests, package/signature preflight and screenshot verification. [Artifact](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45460697797/artifacts/14951748911) expires 2026-12-08. Owner acceptance pending; not production.
+- QA292 verified source 63f0fc271eb731a1d9b6109ddd71164f4afdb19a, code 10292, name 0.3.0-gh02c-qa.292, APK SHA-256 8bf801d3df2a0b6e771b70b603f45f506426dee9ac839ee0c37cdf2bed6e3db8. [Full passing workflow](https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45460697797): 32 Android tests, JVM tests, package/signature preflight and screenshot verification. [Artifact](https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45460697797/artifacts/14951748911) expires 2026-12-08. Owner acceptance pending; not production.
 - CI uses versionCode 10000 + workflow run number; local build defaults to 10000 and is not a distributed update. Current preflight compares QA22 pinned baseline, not necessarily last installed APK. Compare actual installed/last accepted APK before distribution; never claim the baseline alone proves all upgrade paths.
 
 ## Custody and recovery
