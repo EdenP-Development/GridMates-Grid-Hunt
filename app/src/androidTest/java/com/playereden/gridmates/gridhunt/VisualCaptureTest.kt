@@ -80,7 +80,8 @@ class VisualCaptureTest {
 
     private fun prepare() {
         listOf("gridhunt_first_bearings_v1", "gridhunt_reverse_v1",
-            "gridhunt_treasure_checklist_v1", "gridhunt_identify_v1").forEach { name ->
+            "gridhunt_treasure_checklist_v1", "gridhunt_identify_v1",
+            "gridhunt_mixed_woodland_v1").forEach { name ->
             check(target.getSharedPreferences(name, Context.MODE_PRIVATE)
                 .edit().clear().commit()) { "Could not reset test-only $name" }
         }
@@ -148,6 +149,28 @@ class VisualCaptureTest {
             }
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         capture("13_identify_finish.png")
+    }
+
+    @Test fun captureMixedAdventureAndEarnedFinish() {
+        prepare()
+        compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
+        compose.onNodeWithTag("mixedCheck").assertExists()
+        capture("14_mixed_expedition.png")
+        repeat(2) {
+            compose.onNodeWithContentDescription("Expedition move west").performClick()
+        }
+        repeat(3) {
+            compose.onNodeWithContentDescription("Expedition move south").performClick()
+        }
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithTag("mixedCodeInput").performTextInput("2440")
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithTag("mixedCodeInput").performTextInput("2538")
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithTag("mixedOption_old-waystone").performClick()
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        capture("15_mixed_expedition_finish.png")
     }
 
     @Test fun captureLandscapePuzzleLayouts() {
