@@ -578,4 +578,38 @@ class HomeNavigationTest {
         org.junit.Assert.assertEquals(before, reverse.all.toMap())
     }
 
+    @Test fun generatedLandmarkModesCompleteWithoutChangingAuthoredSaves() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val custom = context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE)
+        val authored = listOf("gridhunt_treasure_checklist_v1", "gridhunt_woodland_identify_v1")
+            .map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
+        val before = authored.map { it.all.toMap() }
+        check(custom.edit().clear().commit())
+        compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+        compose.onNodeWithTag("customMode_identify").performScrollTo().performClick()
+        compose.onNodeWithTag("customStart").performScrollTo().performClick()
+        val ids = mapOf("2538" to "mushroom-nook", "2840" to "buttercup-glade",
+            "2641" to "acorn-nook", "2941" to "old-waystone")
+        val codes = custom.getString("codes", "")!!.split(",")
+        org.junit.Assert.assertEquals(3, codes.toSet().size)
+        codes.forEach { code ->
+            compose.onNodeWithTag("customIdentify_${ids.getValue(code)}").performClick()
+            compose.onNodeWithTag("customIdentifyCheck").performClick()
+        }
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithTag("finishHome").performClick()
+        compose.onNodeWithTag("customMode_checklist").performScrollTo().performClick()
+        compose.onNodeWithTag("customStart").performScrollTo().performClick()
+        val checklist = custom.getString("codes", "")!!.split(",")
+        org.junit.Assert.assertEquals(3, checklist.toSet().size)
+        checklist.forEach { code ->
+            compose.onNodeWithTag("customChecklistItem_${ids.getValue(code)}").assertExists()
+            compose.onNodeWithTag("customChecklistInput").performTextReplacement(code)
+            compose.onNodeWithTag("customChecklistCheck").performClick()
+        }
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        org.junit.Assert.assertEquals(3, custom.getInt("step", 0))
+        org.junit.Assert.assertEquals(before, authored.map { it.all.toMap() })
+    }
+
 }
