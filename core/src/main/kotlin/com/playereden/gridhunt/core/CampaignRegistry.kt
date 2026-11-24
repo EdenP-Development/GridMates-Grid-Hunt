@@ -139,14 +139,29 @@ object GridHuntCampaign {
                         worldId = littleWoodlandId,
                         order = 0,
                         progressKey = WoodlandExpedition.saveName
+                    ),
+                    CampaignChapter(
+                        chapter = WoodlandSupplyExpedition.chapter,
+                        worldId = littleWoodlandId,
+                        order = 1,
+                        prerequisiteChapterIds = setOf(WoodlandExpedition.chapter.id),
+                        progressKey = WoodlandSupplyExpedition.saveName
                     )
                 )
             )
         )
     )
 
-    /** Read-only bridge from the existing SharedPreferences step; no migration. */
+    /** Original read-only bridge kept for existing callers/tests. */
     fun snapshotForExistingExpedition(rawStep: Int) = CampaignSnapshot(
         mapOf(WoodlandExpedition.chapter.id to WoodlandExpedition.restoreStep(rawStep))
+    )
+
+    /** Two isolated save namespaces; Chapter 2 never alters Chapter 1. */
+    fun snapshot(rawFirst: Int, rawSecond: Int) = CampaignSnapshot(
+        mapOf(
+            WoodlandExpedition.chapter.id to WoodlandExpedition.restoreStep(rawFirst),
+            WoodlandSupplyExpedition.chapter.id to WoodlandSupplyExpedition.run.restoreStep(rawSecond)
+        )
     )
 }
