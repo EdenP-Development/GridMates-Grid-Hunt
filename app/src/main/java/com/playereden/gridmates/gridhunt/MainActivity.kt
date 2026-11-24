@@ -301,109 +301,55 @@ private fun GridHuntHome(
             }
         }
         Text("Choose your puzzle", color = Ink, fontSize = 19.sp,
-            fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
-        Surface(shape = RoundedCornerShape(19.dp), color = Color(0xFFFFFAEC),
-            shadowElevation = 2.dp) {
-            Column(Modifier.fillMaxWidth().padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("✦   TRAIL TREASURES", color = Forest, fontSize = 15.sp,
-                    fontWeight = FontWeight.ExtraBold)
-                Text("Follow a number clue to find its hiding place on the map.",
-                    color = Muted, fontSize = 12.sp)
-                Button(
-                    onClick = onChapter,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("openChapter"),
-                    colors = ButtonDefaults.buttonColors(containerColor = Forest)
-                ) {
-                    Text(when {
-                        allTrailsFinished -> "See your completed trails"
-                        chapterCompleted > 0 -> "Keep exploring"
-                        else -> "Let's find a square!"
-                    }, fontWeight = FontWeight.Bold)
-                }
-            }
+            fontWeight = FontWeight.Bold)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+            QuickPlayModeTile(
+                label = "Trail Treasures", glyph = "◇", instruction = "Find the square",
+                progress = "$chapterCompleted of 9 found",
+                tag = "openChapter", color = Color(0xFFE2EBD8),
+                onClick = onChapter, modifier = Modifier.weight(1f)
+            )
+            QuickPlayModeTile(
+                label = "Golden Spots", glyph = "✦", instruction = "Read the marker",
+                progress = "$reverseCompleted of 5 found",
+                tag = "openReverse", color = Color(0xFFF5E7C7),
+                onClick = onReverse, modifier = Modifier.weight(1f)
+            )
         }
-        Surface(shape = RoundedCornerShape(19.dp), color = Color(0xFFFFFAEC),
-            shadowElevation = 2.dp) {
-            Column(Modifier.fillMaxWidth().padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("✦   GOLDEN SPOTS", color = Forest, fontSize = 15.sp,
-                    fontWeight = FontWeight.ExtraBold)
-                Text("See the golden marker? Find its secret four-digit code.",
-                    color = Muted, fontSize = 12.sp)
-                OutlinedButton(
-                    onClick = onReverse,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("openReverse")
-                ) {
-                    Text(when {
-                        allGoldenSpotsFinished -> "See your golden discoveries"
-                        reverseCompleted > 0 -> "Find another golden spot"
-                        else -> "Try Golden Spots"
-                    }, fontWeight = FontWeight.Bold)
-                }
-            }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+            QuickPlayModeTile(
+                label = "Treasure Checklist", glyph = "☑",
+                instruction = "Locate the landmarks",
+                progress = "$treasureCount of 4 found",
+                tag = "openTreasure", color = Color(0xFFFFF4D8),
+                onClick = onTreasure, modifier = Modifier.weight(1f)
+            )
+            QuickPlayModeTile(
+                label = "What's at This Grid?", glyph = "⌖",
+                instruction = "Identify the object",
+                progress = "$identifyCount of 4 identified",
+                tag = "openIdentify", color = Color(0xFFE1ECE7),
+                onClick = onIdentify, modifier = Modifier.weight(1f)
+            )
         }
-        Surface(shape = RoundedCornerShape(19.dp), color = Color(0xFFFFF4D8),
-            shadowElevation = 2.dp) {
-            Column(Modifier.fillMaxWidth().padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("✦   TREASURE CHECKLIST", color = Forest, fontSize = 15.sp,
-                    fontWeight = FontWeight.ExtraBold)
-                Text("Spot the woodland landmarks, read their squares, and cross all four off.",
-                    color = Muted, fontSize = 12.sp)
-                OutlinedButton(
-                    onClick = onTreasure,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                        .testTag("openTreasure")
-                ) {
-                    Text(when (treasureCount) {
-                        0 -> "Start the woodland checklist"
-                        TreasureChecklistMission.targets.size -> "See your completed checklist"
-                        else -> "Continue checklist  ($treasureCount/4)"
-                    }, fontWeight = FontWeight.Bold)
+        Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFE8CA)) {
+            Row(
+                Modifier.fillMaxWidth().padding(11.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(9.dp)
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text("The Missing Field Notes", color = Ink,
+                        fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text("Mixed expedition  ·  $expeditionCount of 4 pages",
+                        color = Muted, fontSize = 11.sp)
                 }
-            }
-        }
-        Surface(shape = RoundedCornerShape(19.dp), color = Color(0xFFE7EEE4),
-            shadowElevation = 2.dp) {
-            Column(Modifier.fillMaxWidth().padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("✦   WHAT'S AT THIS GRID?", color = Forest, fontSize = 15.sp,
-                    fontWeight = FontWeight.ExtraBold)
-                Text("Read a square, explore the map, and pick the matching landmark.",
-                    color = Muted, fontSize = 12.sp)
-                OutlinedButton(
-                    onClick = onIdentify,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                        .testTag("openIdentify")
-                ) {
-                    Text(when (identifyCount) {
-                        0 -> "Identify your first landmark"
-                        WoodlandIdentifyMission.questions.size -> "See your identified places"
-                        else -> "Continue identifying  ($identifyCount/4)"
-                    }, fontWeight = FontWeight.Bold)
-                }
-            }
-        }
-        Surface(shape = RoundedCornerShape(19.dp), color = Color(0xFFFFE8CA),
-            shadowElevation = 3.dp) {
-            Column(Modifier.fillMaxWidth().padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("✦   THE MISSING FIELD NOTES", color = Forest,
-                    fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
-                Text("A little story with four different kinds of map mystery.",
-                    color = Muted, fontSize = 12.sp)
                 Button(
                     onClick = onExpedition,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                        .testTag("openExpedition"),
+                    modifier = Modifier.heightIn(min = 48.dp).testTag("openExpedition"),
                     colors = ButtonDefaults.buttonColors(containerColor = Forest)
                 ) {
-                    Text(when (expeditionCount) {
-                        0 -> "Begin the woodland expedition"
-                        WoodlandExpedition.size -> "View your completed expedition"
-                        else -> "Continue the adventure  ($expeditionCount/4)"
-                    }, fontWeight = FontWeight.Bold)
+                    Text("Play", fontWeight = FontWeight.Bold)
                 }
             }
         }
