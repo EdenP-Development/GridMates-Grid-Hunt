@@ -474,21 +474,9 @@ private fun MixedExpeditionControls(
         modifier = Modifier.fillMaxWidth().testTag("mixedFeedback"))
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-        OutlinedButton(onClick = { onZoom(1.6) },
-            modifier = Modifier.weight(0.5f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)) {
-            Text("+", color = Forest)
-        }
-        OutlinedButton(onClick = { onZoom(1.0 / 1.6) },
-            modifier = Modifier.weight(0.5f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)) {
-            Text("−", color = Forest)
-        }
-        OutlinedButton(onClick = onFit,
-            modifier = Modifier.weight(0.85f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)) {
-            Text("See all", color = Forest, fontSize = 11.sp)
-        }
+        HuntToolButton(ExplorerTool.ZOOM_IN, Modifier.weight(0.85f), { onZoom(1.6) })
+        HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(0.85f), { onZoom(1.0 / 1.6) })
+        HuntToolButton(ExplorerTool.FIT, Modifier.weight(0.85f), onFit)
         Button(
             onClick = onCheck, enabled = actionReady,
             modifier = Modifier.weight(1.6f).heightIn(min = 50.dp)
