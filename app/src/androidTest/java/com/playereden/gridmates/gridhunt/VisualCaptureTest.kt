@@ -198,6 +198,10 @@ class VisualCaptureTest {
         compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
         compose.onNodeWithTag("mixedCheck").assertExists()
         capture("14_mixed_expedition.png")
+        compose.onNodeWithTag("mixedJournal").performClick()
+        compose.onNodeWithTag("journalEmpty").assertExists()
+        compose.onNodeWithTag("journalCurrent").assertExists()
+        compose.onNodeWithTag("closeJournal").performClick()
         repeat(2) {
             compose.onNodeWithContentDescription("Expedition move west").performClick()
         }
@@ -205,6 +209,12 @@ class VisualCaptureTest {
             compose.onNodeWithContentDescription("Expedition move south").performClick()
         }
         compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithTag("mixedJournal").performClick()
+        compose.onNodeWithTag("journalEntry_locate-trailhead").assertExists()
+        compose.onNodeWithTag("journalCurrent").assertExists()
+        check(compose.onAllNodesWithTag("journalEntry_read-glow-a")
+            .fetchSemanticsNodes().isEmpty())
+        compose.onNodeWithTag("closeJournal").performClick()
         compose.onNodeWithTag("mixedCodeInput").performTextInput("2440")
         compose.onNodeWithTag("mixedCheck").performClick()
         compose.onNodeWithTag("mixedCodeInput").performTextInput("2538")
