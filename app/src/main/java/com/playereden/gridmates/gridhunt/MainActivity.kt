@@ -133,54 +133,102 @@ private fun GridHuntScreen() {
         prefs.edit().putString("map_look", lookName)
             .putBoolean("haptics", hapticsEnabled).apply()
     }
-    BackHandler(enabled = screen != "home") { screen = "home" }
+    // Preserve the originating hub when returning from a puzzle.
+    var returnHub by rememberSaveable { mutableStateOf("quick") }
+    val goBack = {
+        screen = when (screen) {
+            "quick", "adventure", "custom" -> "home"
+            else -> returnHub
+        }
+    }
+    BackHandler(enabled = screen != "home") { goBack() }
+    val expeditionPrefs = remember(context) {
+        context.getSharedPreferences(WoodlandExpedition.saveName, Context.MODE_PRIVATE)
+    }
+    val expeditionProgress = WoodlandExpedition.restoreStep(
+        expeditionPrefs.getInt("step", 0)
+    )
 
     when (screen) {
+        "home" -> ExplorerDeskHome(
+            expeditionProgress = expeditionProgress,
+            onAdventure = { screen = "adventure" },
+            onQuickPlay = { screen = "quick" },
+            onCustom = { screen = "custom" }
+        )
+        "adventure" -> WoodlandAdventureJourney(
+            progress = expeditionProgress,
+            onChapter = {
+                returnHub = "adventure"
+                screen = "expedition"
+            },
+            onBack = { screen = "home" }
+        )
+        "custom" -> WoodlandCustomPlayPreview(
+            onQuickPlay = { screen = "quick" },
+            onBack = { screen = "home" }
+        )
         "chapter" -> FirstBearingsScreen(
-            onHome = { screen = "home" },
+            onHome = { screen = returnHub },
             mapLook = mapLook,
             onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled
         )
         "reverse" -> ReversePracticeScreen(
-            onBack = { screen = "home" },
+            onBack = { screen = returnHub },
             mapLook = mapLook,
             onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled
         )
         "treasure" -> TreasureChecklistScreen(
-            onHome = { screen = "home" },
+            onHome = { screen = returnHub },
             mapLook = mapLook,
             onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled
         )
         "identify" -> WoodlandIdentifyScreen(
-            onHome = { screen = "home" },
+            onHome = { screen = returnHub },
             mapLook = mapLook,
             onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled
         )
         "expedition" -> WoodlandMixedExpeditionScreen(
-            onHome = { screen = "home" },
+            onHome = { screen = returnHub },
             mapLook = mapLook,
             onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled
         )
-        else -> GridHuntHome(
+        "quick" -> GridHuntHome(
             mapLook = mapLook,
             onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled,
             onHaptics = { hapticsEnabled = it },
-            onChapter = { screen = "chapter" },
-            onReverse = { screen = "reverse" },
-            onTreasure = { screen = "treasure" },
-            onIdentify = { screen = "identify" },
-            onExpedition = { screen = "expedition" }
+            onChapter = {
+                returnHub = "quick"
+                screen = "chapter"
+            },
+            onReverse = {
+                returnHub = "quick"
+                screen = "reverse"
+            },
+            onTreasure = {
+                returnHub = "quick"
+                screen = "treasure"
+            },
+            onIdentify = {
+                returnHub = "quick"
+                screen = "identify"
+            },
+            onExpedition = {
+                returnHub = "quick"
+                screen = "expedition"
+            },
+            onReturnHome = { screen = "home" }
         )
     }
 }
 
-/** Player-facing home: a cozy puzzle-book hub rather than a training dashboard. */
+/** GH-V14 Quick Play: existing modes and settings moved out of the main Home hub. */
 @Composable
 private fun GridHuntHome(
     mapLook: MapLook,
@@ -191,7 +239,8 @@ private fun GridHuntHome(
     onReverse: () -> Unit,
     onTreasure: () -> Unit,
     onIdentify: () -> Unit,
-    onExpedition: () -> Unit
+    onExpedition: () -> Unit,
+    onReturnHome: () -> Unit
 ) {
     val context = LocalContext.current
     val chapterPrefs = remember(context) {
@@ -235,13 +284,13 @@ private fun GridHuntHome(
             .padding(horizontal = 18.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(11.dp)
     ) {
-        Text("GRIDMATES  •  PUZZLE ADVENTURES", fontWeight = FontWeight.Bold,
-            color = Forest, fontSize = 10.sp)
-        Text("Grid Hunt", fontWeight = FontWeight.ExtraBold,
-            color = Ink, fontSize = 36.sp)
-        Text("A little map. A new mystery. Where will you explore?",
-            color = Muted, fontSize = 13.sp)
-        WoodlandPostcard(modifier = Modifier.height(144.dp))
+        Text("Quick Play", fontWeight = FontWeight.ExtraBold,
+            color = Ink, fontSize = 28.sp)
+        Text("Pick a favorite kind of puzzle.", color = Muted, fontSize = 13.sp)
+        TextButton(onClick = onReturnHome,
+            modifier = Modifier.testTag("quickBack")) {
+            Text("←  Back to Home", color = Forest)
+        }
         Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFDFEAD4)) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 11.dp)) {
                 Text("✦  YOUR LITTLE DISCOVERIES", color = Forest,
@@ -251,7 +300,7 @@ private fun GridHuntHome(
                     color = Ink, fontSize = 12.sp)
             }
         }
-        Text("Choose your next puzzle", color = Ink, fontSize = 19.sp,
+        Text("Choose your puzzle", color = Ink, fontSize = 19.sp,
             fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
         Surface(shape = RoundedCornerShape(19.dp), color = Color(0xFFFFFAEC),
             shadowElevation = 2.dp) {
