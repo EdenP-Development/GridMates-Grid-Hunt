@@ -16,6 +16,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.testTag
@@ -30,6 +32,8 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 internal fun WoodlandPostcard(modifier: Modifier = Modifier) {
+    val oakArt = ImageBitmap.imageResource(R.drawable.gh_wood_oak_sm)
+    val pineArt = ImageBitmap.imageResource(R.drawable.gh_wood_pine_sm)
     Box(
         modifier = modifier.fillMaxWidth()
             .clip(RoundedCornerShape(22.dp))
@@ -76,66 +80,26 @@ internal fun WoodlandPostcard(modifier: Modifier = Modifier) {
             // Original layered storybook woodland: tapered evergreens,
             // broadleaf silhouettes, trunk details and tiny meadow marks.
             // All positions are decorative and independent of puzzle data.
-            fun pine(x: Float, y: Float, tall: Float, dark: Color, light: Color) {
-                val p = point(x, y)
+            fun pine(x: Float, y: Float, tall: Float, alpha: Float = 1f) {
                 val t = h * tall
-                drawOval(Color(0x29405B3C), topLeft = p + Offset(-t*.29f,-t*.035f),
-                    size = androidx.compose.ui.geometry.Size(t*.66f,t*.15f))
-                drawLine(Color(0xFF806648), p, p + Offset(0f,-t*.48f),
-                    strokeWidth = (t*.065f).coerceAtLeast(1f))
-                for (tier in 0..2) {
-                    val base = p.y-t*(.12f+tier*.22f)
-                    val spread = t*(.32f-tier*.065f)
-                    val crown = Path().apply {
-                        moveTo(p.x,base-t*.48f)
-                        quadraticBezierTo(p.x-spread*.35f,base-t*.22f,p.x-spread,base)
-                        quadraticBezierTo(p.x,base+t*.08f,p.x+spread,base)
-                        quadraticBezierTo(p.x+spread*.35f,base-t*.22f,p.x,base-t*.48f)
-                        close()
-                    }
-                    drawPath(crown,dark)
-                    val lit = Path().apply {
-                        moveTo(p.x,base-t*.43f)
-                        lineTo(p.x-spread*.82f,base-t*.015f)
-                        quadraticBezierTo(p.x-spread*.35f,base+t*.025f,p.x,base-t*.045f)
-                        close()
-                    }
-                    drawPath(lit,light)
-                }
+                drawWoodlandSprite(pineArt, point(x, y) - Offset(0f, t * .40f), t * 1.18f, alpha)
             }
-            fun oak(x: Float,y: Float,tall: Float) {
-                val p = point(x,y)
-                val t = h*tall
-                drawOval(Color(0x30405B3C),topLeft=p+Offset(-t*.38f,-t*.04f),
-                    size=androidx.compose.ui.geometry.Size(t*.85f,t*.17f))
-                drawLine(Color(0xFF826A4C),p,p+Offset(0f,-t*.66f),strokeWidth=t*.09f)
-                val canopy = p+Offset(0f,-t*.61f)
-                listOf(Triple(-.25f,.07f,.27f),Triple(.22f,.04f,.28f),
-                    Triple(0f,-.20f,.31f),Triple(.02f,.13f,.30f)).forEach { (dx,dy,r) ->
-                    drawCircle(Color(0xFF557C51), t*r, canopy+Offset(dx*t,dy*t))
-                }
-                listOf(Triple(-.24f,-.02f,.19f),Triple(.13f,-.20f,.22f),
-                    Triple(-.06f,-.32f,.17f)).forEach { (dx,dy,r) ->
-                    drawCircle(Color(0xFF8DAD71),t*r,canopy+Offset(dx*t,dy*t))
-                }
-                repeat(5) { i ->
-                    val leaf = canopy + Offset((i%3-1)*t*.13f,(-.22f+(i/3)*.16f)*t)
-                    drawOval(Color(0xFFB3C98D),topLeft=leaf,
-                        size=androidx.compose.ui.geometry.Size(t*.09f,t*.035f))
-                }
+            fun oak(x: Float, y: Float, tall: Float) {
+                val t = h * tall
+                drawWoodlandSprite(oakArt, point(x, y) - Offset(0f, t * .40f), t * 1.18f)
             }
             // Distant silhouettes, then foreground grove, avoiding the trail.
             listOf(Triple(.05f,.52f,.28f),Triple(.15f,.52f,.23f),
                 Triple(.39f,.47f,.24f),Triple(.46f,.47f,.19f),
                 Triple(.89f,.45f,.26f),Triple(.96f,.49f,.30f)).forEach { (x,y,t) ->
-                pine(x,y,t,Color(0xFF78986C),Color(0xFF9BB780))
+                pine(x,y,t,alpha=.66f)
             }
             oak(.12f,.78f,.54f)
-            pine(.23f,.73f,.42f,Color(0xFF3F7156),Color(0xFF71965F))
+            pine(.23f,.73f,.42f)
             oak(.38f,.75f,.39f)
-            pine(.91f,.79f,.56f,Color(0xFF3F7156),Color(0xFF71965F))
+            pine(.91f,.79f,.56f)
             oak(.82f,.85f,.38f)
-            pine(.98f,.91f,.47f,Color(0xFF345F49),Color(0xFF648D5D))
+            pine(.98f,.91f,.47f)
             // Fine meadow marks and golden blossoms at fixed decorative points.
             repeat(26) { i ->
                 val x = ((i*37+11)%97)/100f

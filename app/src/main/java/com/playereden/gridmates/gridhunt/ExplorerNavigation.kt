@@ -28,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -213,6 +215,8 @@ internal fun WoodlandAdventureJourney(
     secondProgress: Int = 0,
     onSecondChapter: () -> Unit = {}
 ) {
+    val oakArt = ImageBitmap.imageResource(R.drawable.gh_wood_oak_sm)
+    val pineArt = ImageBitmap.imageResource(R.drawable.gh_wood_pine_sm)
     Column(
         Modifier.fillMaxSize().background(Paper)
             .statusBarsPadding().navigationBarsPadding()
@@ -279,43 +283,12 @@ internal fun WoodlandAdventureJourney(
                         // Shared postcard-inspired palette and layered tree forms.
                         // Decorative journey only: never infer puzzle geometry here.
                         fun tree(x: Float, y: Float, t: Float, evergreen: Boolean) {
-                            val p = Offset(w*x,h*y)
-                            val s = h*t
-                            drawOval(Color(0x29405B3C), p+Offset(-s*.35f,-s*.035f),
-                                androidx.compose.ui.geometry.Size(s*.78f,s*.16f))
-                            drawLine(Color(0xFF806648),p,p+Offset(0f,-s*.62f),
-                                strokeWidth=s*.08f)
-                            if (evergreen) {
-                                for (tier in 0..2) {
-                                    val base=p.y-s*(.10f+tier*.22f)
-                                    val spread=s*(.32f-tier*.065f)
-                                    val crown=Path().apply {
-                                        moveTo(p.x,base-s*.48f)
-                                        quadraticBezierTo(p.x-spread*.35f,base-s*.22f,p.x-spread,base)
-                                        quadraticBezierTo(p.x,base+s*.08f,p.x+spread,base)
-                                        quadraticBezierTo(p.x+spread*.35f,base-s*.22f,p.x,base-s*.48f)
-                                        close()
-                                    }
-                                    drawPath(crown,Color(0xFF3F7156))
-                                    val light=Path().apply {
-                                        moveTo(p.x,base-s*.43f)
-                                        lineTo(p.x-spread*.82f,base-s*.015f)
-                                        lineTo(p.x,base-s*.045f)
-                                        close()
-                                    }
-                                    drawPath(light,Color(0xFF71965F))
-                                }
-                            } else {
-                                val crown=p+Offset(0f,-s*.62f)
-                                listOf(Triple(-.23f,.07f,.27f),Triple(.22f,.04f,.28f),
-                                    Triple(0f,-.20f,.31f),Triple(.02f,.13f,.30f)).forEach { (dx,dy,r) ->
-                                    drawCircle(Color(0xFF557C51),s*r,crown+Offset(dx*s,dy*s))
-                                }
-                                listOf(Triple(-.24f,-.02f,.19f),Triple(.13f,-.20f,.22f),
-                                    Triple(-.06f,-.32f,.17f)).forEach { (dx,dy,r) ->
-                                    drawCircle(Color(0xFF8DAD71),s*r,crown+Offset(dx*s,dy*s))
-                                }
-                            }
+                            val s = h * t
+                            drawWoodlandSprite(
+                                if (evergreen) pineArt else oakArt,
+                                Offset(w * x, h * y - s * .40f),
+                                s * 1.18f
+                            )
                         }
                         tree(.10f,.41f,.29f,true)
                         tree(.22f,.40f,.24f,false)
