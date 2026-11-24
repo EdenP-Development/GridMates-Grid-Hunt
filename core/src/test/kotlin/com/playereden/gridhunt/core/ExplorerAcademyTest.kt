@@ -4,6 +4,17 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ExplorerAcademyTest {
+    @Test fun routesResolveAndRejectOutOfBounds() {
+        val route = AcademyRoute(GridReference.parse("2538"), listOf(
+            AcademyRouteLeg(AcademyDirection.EAST, 2),
+            AcademyRouteLeg(AcademyDirection.NORTH, 1)))
+        assertEquals("2739", route.destination.reference)
+        assertThrows(IllegalArgumentException::class.java) {
+            AcademyRoute(GridReference.parse("2942"), listOf(
+                AcademyRouteLeg(AcademyDirection.NORTH, 1)))
+        }
+    }
+
     @Test fun gridUsesWestAndSouthBoundaries() {
         assertEquals("2437", AcademyTrainingGrid.reference(24, 37))
         assertEquals("2740", AcademyTrainingGrid.reference(27, 40))
@@ -30,7 +41,12 @@ class ExplorerAcademyTest {
         assertEquals("woodland-field", ExplorerAcademy.current(field)?.id)
         assertFalse(ExplorerAcademy.practiceComplete(field))
         assertEquals(field, ExplorerAcademy.accept(field, "woodland-field", "2641"))
-        val completed = ExplorerAcademy.accept(field, "woodland-field", WoodlandLandmarks.mushrooms.cell.reference)
+        val woodland = ExplorerAcademy.accept(field, "woodland-field", WoodlandLandmarks.mushrooms.cell.reference)
+        assertEquals("woodland-symbol", ExplorerAcademy.current(woodland)?.id)
+        val symbol = ExplorerAcademy.accept(woodland, "woodland-symbol", WoodlandLandmarks.flowers.cell.reference)
+        assertEquals("woodland-route", ExplorerAcademy.current(symbol)?.id)
+        assertEquals(symbol, ExplorerAcademy.accept(symbol, "woodland-route", "2738"))
+        val completed = ExplorerAcademy.accept(symbol, "woodland-route", "2739")
         assertTrue(ExplorerAcademy.practiceComplete(completed))
         assertNull(ExplorerAcademy.current(completed))
     }
