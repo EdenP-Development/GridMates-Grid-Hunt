@@ -85,6 +85,7 @@ import com.playereden.gridhunt.core.ChapterPosition
 import com.playereden.gridhunt.core.FirstBearingsChapter
 import com.playereden.gridhunt.core.TreasureChecklistMission
 import com.playereden.gridhunt.core.WoodlandIdentifyMission
+import com.playereden.gridhunt.core.WoodlandExpedition
 import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.GridCell
 import com.playereden.gridhunt.core.GridReference
@@ -159,6 +160,12 @@ private fun GridHuntScreen() {
             onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled
         )
+        "expedition" -> WoodlandMixedExpeditionScreen(
+            onHome = { screen = "home" },
+            mapLook = mapLook,
+            onLook = { lookName = it.name },
+            hapticsEnabled = hapticsEnabled
+        )
         else -> GridHuntHome(
             mapLook = mapLook,
             onLook = { lookName = it.name },
@@ -167,7 +174,8 @@ private fun GridHuntScreen() {
             onChapter = { screen = "chapter" },
             onReverse = { screen = "reverse" },
             onTreasure = { screen = "treasure" },
-            onIdentify = { screen = "identify" }
+            onIdentify = { screen = "identify" },
+            onExpedition = { screen = "expedition" }
         )
     }
 }
@@ -182,7 +190,8 @@ private fun GridHuntHome(
     onChapter: () -> Unit,
     onReverse: () -> Unit,
     onTreasure: () -> Unit,
-    onIdentify: () -> Unit
+    onIdentify: () -> Unit,
+    onExpedition: () -> Unit
 ) {
     val context = LocalContext.current
     val chapterPrefs = remember(context) {
@@ -197,6 +206,10 @@ private fun GridHuntHome(
     val identifyPrefs = remember(context) {
         context.getSharedPreferences(WoodlandIdentifyMission.saveName, Context.MODE_PRIVATE)
     }
+    val expeditionPrefs = remember(context) {
+        context.getSharedPreferences(WoodlandExpedition.saveName, Context.MODE_PRIVATE)
+    }
+    val expeditionCount = WoodlandExpedition.restoreStep(expeditionPrefs.getInt("step", 0))
     val identifyCount = WoodlandIdentifyMission.restoreStep(
         identifyPrefs.getInt("step", 0)
     )
@@ -319,6 +332,28 @@ private fun GridHuntHome(
                         0 -> "Identify your first landmark"
                         WoodlandIdentifyMission.questions.size -> "See your identified places"
                         else -> "Continue identifying  ($identifyCount/4)"
+                    }, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+        Surface(shape = RoundedCornerShape(19.dp), color = Color(0xFFFFE8CA),
+            shadowElevation = 3.dp) {
+            Column(Modifier.fillMaxWidth().padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("✦   THE MISSING FIELD NOTES", color = Forest,
+                    fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
+                Text("A little story with four different kinds of map mystery.",
+                    color = Muted, fontSize = 12.sp)
+                Button(
+                    onClick = onExpedition,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                        .testTag("openExpedition"),
+                    colors = ButtonDefaults.buttonColors(containerColor = Forest)
+                ) {
+                    Text(when (expeditionCount) {
+                        0 -> "Begin the woodland expedition"
+                        WoodlandExpedition.size -> "View your completed expedition"
+                        else -> "Continue the adventure  ($expeditionCount/4)"
                     }, fontWeight = FontWeight.Bold)
                 }
             }
