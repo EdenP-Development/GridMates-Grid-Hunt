@@ -11,6 +11,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import kotlin.math.roundToInt
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -26,8 +32,13 @@ internal fun DrawScope.drawWoodlandLandmark(
     landmarkId: String,
     center: Offset,
     landmarkScale: Float,
-    surveyStyle: Boolean
+    surveyStyle: Boolean,
+    sprite: ImageBitmap? = null
 ) {
+    if (!surveyStyle && sprite != null) {
+        drawWoodlandSprite(sprite, center, landmarkScale * 3.2f)
+        return
+    }
     val moss = if (surveyStyle) Color(0xFF69958D) else Color(0xFF6E956A)
     val deepMoss = if (surveyStyle) Color(0xFF426F72) else Color(0xFF416D4E)
     val terracotta = if (surveyStyle) Color(0xFF9C7D70) else Color(0xFFC17B55)
@@ -101,6 +112,7 @@ internal fun WoodlandLandmarkSwatch(
     symbolSize: androidx.compose.ui.unit.Dp = 66.dp
 ) {
     val surveyStyle = mapLook == MapLook.SURVEY_TABLE
+    val sprite = if (surveyStyle) null else woodlandLandmarkSprite(landmarkId)
     val color = if (surveyStyle) Color(0xFFDCEFEB) else Color(0xFFF3E8CE)
     Box(
         modifier = modifier
@@ -117,8 +129,30 @@ internal fun WoodlandLandmarkSwatch(
                 landmarkId = landmarkId,
                 center = Offset(size.width / 2f, size.height / 2f),
                 landmarkScale = size.minDimension * 0.25f,
-                surveyStyle = surveyStyle
+                surveyStyle = surveyStyle,
+                sprite = sprite
             )
         }
     }
+}
+
+/** The warm map and guide share exact bitmap resources; cool sketch retains its vector symbols. */
+@Composable
+internal fun woodlandLandmarkSprite(id: String): ImageBitmap? {
+    val resource = when (id) {
+        WoodlandLandmarks.mushrooms.id -> R.drawable.gh_wood_mushroom_sm
+        WoodlandLandmarks.flowers.id -> R.drawable.gh_wood_buttercups_sm
+        WoodlandLandmarks.acorn.id -> R.drawable.gh_wood_acorn_sm
+        WoodlandLandmarks.waystone.id -> R.drawable.gh_wood_waystone_sm
+        else -> return null
+    }
+    return ImageBitmap.imageResource(resource)
+}
+
+/** Center remains the canonical world point; only the visual representation changes. */
+internal fun DrawScope.drawWoodlandSprite(bitmap: ImageBitmap, center: Offset, side: Float, alpha: Float = 1f) {
+    val extent = side.roundToInt().coerceAtLeast(1)
+    drawImage(bitmap, dstOffset = IntOffset((center.x - extent / 2f).roundToInt(),
+        (center.y - extent / 2f).roundToInt()), dstSize = IntSize(extent, extent),
+        alpha = alpha, filterQuality = FilterQuality.Medium)
 }

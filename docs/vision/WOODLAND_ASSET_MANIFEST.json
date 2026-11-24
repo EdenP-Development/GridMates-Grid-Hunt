@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "source": "Generated Woodland Sprite Pack v1.0 reference sheet; extracted original compact candidates",
+  "method": "Cropped and neutral-background masked; transparent RGBA; visual acceptance pending",
+  "resource_directory": "app/src/main/res/drawable-nodpi",
+  "assets": [
+    {
+      "id": "gh_wood_oak_sm",
+      "file": "gh_wood_oak_sm.png",
+      "size": [
+        256,
+        256
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "sha256": "b2c475129c7367561c9b68426443659fc6dc8ec610fa8f87b1f712b77deed02c",
+      "status": "integration_candidate",
+      "source_crop": [
+        59,
+        576,
+        243,
+        718
+      ]
+    },
+    {
+      "id": "gh_wood_pine_sm",
+      "file": "gh_wood_pine_sm.png",
+      "size": [
+        256,
+        256
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "sha256": "21e3e1b1a2e52739affa4a4a1dd7bd63dec04635a81ae387aeba91c8c95d61c8",
+      "status": "integration_candidate",
+      "source_crop": [
+        280,
+        576,
+        414,
+        718
+      ]
+    },
+    {
+      "id": "gh_wood_mushroom_sm",
+      "file": "gh_wood_mushroom_sm.png",
+      "size": [
+        256,
+        256
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "sha256": "fd99da0eb1960fcb92bc6b12dbe1f6fd2c26d68c1dd18f5e7851e22291a8cdb9",
+      "status": "integration_candidate",
+      "source_crop": [
+        470,
+        590,
+        600,
+        718
+      ]
+    },
+    {
+      "id": "gh_wood_buttercups_sm",
+      "file": "gh_wood_buttercups_sm.png",
+      "size": [
+        256,
+        256
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "sha256": "35f746e385e5295f6d0bac4b13e213929bd4da0f853ce30b3ff097be8ec77791",
+      "status": "integration_candidate",
+      "source_crop": [
+        655,
+        592,
+        784,
+        718
+      ]
+    },
+    {
+      "id": "gh_wood_acorn_sm",
+      "file": "gh_wood_acorn_sm.png",
+      "size": [
+        256,
+        256
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "sha256": "6809ad92e3889f87aa1fd177264a9262c529486ae68d9551938b14c282f7a094",
+      "status": "integration_candidate",
+      "source_crop": [
+        849,
+        592,
+        962,
+        718
+      ]
+    },
+    {
+      "id": "gh_wood_waystone_sm",
+      "file": "gh_wood_waystone_sm.png",
+      "size": [
+        256,
+        256
+      ],
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "sha256": "b50d46b2fbc62eaa1e0a91597460ad22383f17ff56cffb278b100a8380cec605",
+      "status": "integration_candidate",
+      "source_crop": [
+        1020,
+        584,
+        1180,
+        718
+      ]
+    }
+  ]
+}

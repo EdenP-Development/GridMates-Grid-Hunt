@@ -63,6 +63,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -184,6 +186,14 @@ private fun TrainingMapCanvas(
     val liveOnSelect by rememberUpdatedState(onSelect)
     val liveEnableSelect by rememberUpdatedState(enableSelect)
     val surveyStyle = mapLook == MapLook.SURVEY_TABLE
+    val landmarkSprites = if (surveyStyle) emptyMap() else mapOf(
+        WoodlandLandmarks.mushrooms.id to woodlandLandmarkSprite(WoodlandLandmarks.mushrooms.id),
+        WoodlandLandmarks.flowers.id to woodlandLandmarkSprite(WoodlandLandmarks.flowers.id),
+        WoodlandLandmarks.acorn.id to woodlandLandmarkSprite(WoodlandLandmarks.acorn.id),
+        WoodlandLandmarks.waystone.id to woodlandLandmarkSprite(WoodlandLandmarks.waystone.id)
+    )
+    val oakSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_wood_oak_sm)
+    val pineSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_wood_pine_sm)
     val mapBackdrop = if (surveyStyle) Color(0xFFB1C7C6) else Color(0xFFD1DFCF)
     val mapPaper = if (surveyStyle) Color(0xFFDCEBE7) else Color(0xFFEDE4CB)
     val treeDark = if (surveyStyle) Color(0xFF68938F) else Color(0xFF88AA84)
@@ -335,6 +345,11 @@ private fun TrainingMapCanvas(
                 val center = p(pair.first, pair.second)
                 val base = (205.0 * cam.pixelsPerMeter).toFloat().coerceIn(7f, 40f)
                 val radius = base * (0.9f + (i % 4) * 0.07f)
+                val treeSprite = if (i % 3 == 0) pineSprite else oakSprite
+                if (treeSprite != null) {
+                    drawWoodlandSprite(treeSprite, center, radius * 2.65f, alpha = 0.78f)
+                    return@forEachIndexed
+                }
                 drawCircle(groveShadow, radius * 1.08f, center + Offset(radius * 0.16f, radius * 0.18f))
                 val foliage = if (i % 3 == 0) treeDark else treeLight
                 drawCircle(foliage, radius, center)
@@ -380,7 +395,8 @@ private fun TrainingMapCanvas(
                     landmarkId = landmark.id,
                     center = p(landmark.point.easting, landmark.point.northing),
                     landmarkScale = landmarkScale,
-                    surveyStyle = surveyStyle
+                    surveyStyle = surveyStyle,
+                    sprite = landmarkSprites[landmark.id]
                 )
             }
             // Labels belong to the kilometer GRID LINES, not cell centers.
