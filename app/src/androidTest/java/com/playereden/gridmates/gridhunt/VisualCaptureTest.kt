@@ -146,6 +146,8 @@ class VisualCaptureTest {
         compose.onNodeWithTag("customOpenQuick").performClick()
         compose.onNodeWithTag("openIdentify").assertExists()
         capture("19_compact_quick_play.png")
+        // Activity recreation preserves the current route. Return to Home explicitly.
+        compose.onNodeWithTag("quickBack").performClick()
         check(target.getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
             .edit().putInt("step", 4).commit())
         compose.activityRule.scenario.recreate()
