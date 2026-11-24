@@ -1,19 +1,18 @@
 # Roadmap — GridMates: Grid Hunt
 
-**Original baseline:** 2026-11-21; historical GH-00–GH-05 goals below remain for context.  
-**Current implementation:** Four native playable puzzle families (9 Trail Treasures squares, 5 Golden Spots, four-object Treasure Checklist and four-question **What's at This Grid?**), original map, Map Guide, saved progress and earned replay cards.  
-**Last fully green code source:** [QA132](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45295252097), source SHA `d065937e1847e2e09d2157b5304f6979d167144b`, with passing Kotlin tests, Android build/signing/update checks, emulator gameplay and **13** required screenshots. Owner physical-device experience and install-over still pending.  
-**Development branch:** [draft PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12); not merged, not a production release.  
-**Forward roadmap source:** [Campaign Blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md) and [GH-V12 test/handoff](vision/GH_V12_IDENTIFY_BY_GRID_VERTICAL_SLICE.md).  
-**Method:** tested small vertical slices, exact authored grid truth, accessible game feel, original artwork only when warranted.
+**Original baseline:** 2026-11-21. Historical GH-00–GH-05 proposals below are retained for context.  
+**Current game:** Four standalone woodland puzzle modes plus the playable first **GH-V13 Mixed Expedition story chapter**. The chapter combines a map square tap, golden marker reading, landmark coordinate reading and object identification in one native screen, with isolated saves and real 4/4 completion.  
+**Last source-matched fully green Android QA:** [QA146](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45298114810), source SHA `351ca9bb138998218fb758c63e33c1c4e86e03c6`, with passing Kotlin/core, Android/signing/update tests, executed emulator UI and **15** captured screenshots. Owner real-device appearance, feel and install-over not yet approved. [QA146 ZIP](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45298114810/artifacts/14877122779).  
+**Development:** [Draft PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12), **unmerged**; not Play Store release-signed.  
+**Forward spec:** [Gameplay Blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md) · [GH-V13 test/handoff](vision/GH_V13_MIXED_EXPEDITION_VERTICAL_SLICE.md). Small testable steps, canonical coordinates, game-first UX, just-in-time illustration.
 
 ## Active next phases (2026-11-23)
 
-1. **Phone QA:** actually install/play QA132, inspect the four picture/name choices, map scale, answer feedback, guide, saved progress, earned finish, landscape and menu navigation. Physical QA update proof still open.
-2. **GH-V11 fair clue engine — IMPLEMENTED + CI-TESTED:** typed target/category/relationship/direction/region validation, explicit ambiguity reasons, synthetic multi-church fixtures; no fictitious churches added to the woodland art.
-3. **GH-V12 What's at This Grid? — IMPLEMENTED + QA132 GREEN:** four genuine coordinate→object questions; landmark art tiles, wrong-answer protection, distinct save state, replay. Physical owner testing remains.
-4. **Next: chapter/mixed-mode controller:** organize the four existing puzzle verbs into intentional progression while preserving stable IDs and old data. Prototype on current content before building multiple worlds or generator tooling.
-5. **Later: Quick/Custom Play, story chapters and professional game UI:** deterministic authored/seeded content, distinct native game-style hub, accessible overlays, and cohesive art audit, followed by production signing/store gates. No large upfront asset-library generation.
+1. **GH-V13 — IMPLEMENTED + QA146 GREEN:** first four-verb Mixed Expedition; phone check for portrait/landscape map size, navigation, symbol guide, numeric keyboard, selection, progression, completion/replay and saved state.
+2. **GH-V11 — IMPLEMENTED core:** typed clue fairness gate with synthetic multiple-same-category fixtures; only reviewed authored relations may be published, never guessed creek proximity/elevation.
+3. **GH-V12 — IMPLEMENTED + QA132 GREEN:** picture/name grid identification, four canonical woodland landmark questions and isolated saved progress; phone feedback pending.
+4. **GH-V14 — NEXT:** chapter navigation and light mission registry grouping **Adventure Chapters / Quick Play**, with eventual Custom Play, avoiding six-plus generic cards on Home. Preserve all existing saved games and old chapter IDs.
+5. **Later:** additional authored map/landmark content, unique relation clues, difficulty progression, Quick/Custom generation, native game UI/illustration polish, then full beta and production signing/store compliance. Don't generate a huge art catalogue before the mechanics need it.
 
 **Explicit owner rule:** organize systems and content first; make individual assets when needed for legibility/fairness, with a fuller cohesive art pass after the core modes prove fun.
 
