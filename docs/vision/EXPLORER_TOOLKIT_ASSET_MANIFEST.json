@@ -31,6 +31,17 @@
       "git_blob_sha": "3a8a6f8cebeb65c26eea67650f5c0d83d67b760b"
     }
   ],
-  "status": "byte-verified import; UI visual acceptance pending",
-  "launcher_icon": "deferred; not included"
+  "status": "byte-verified and integrated; QA307 passed; physical visual acceptance pending",
+  "launcher_icon": "deferred; not included",
+  "last_verified": {
+    "source": "312701abdcc2086d9771fb80d024ef804bc11a88",
+    "qa_run": 45510779210,
+    "status": "automated tested; physical visual acceptance pending"
+  },
+  "reuse": [
+    "Home",
+    "Quick Play",
+    "Custom Play",
+    "Academy overview"
+  ]
 }
