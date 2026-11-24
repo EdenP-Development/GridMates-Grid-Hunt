@@ -293,24 +293,53 @@ internal fun WoodlandAdventureJourney(
                             .padding(start = 11.dp, bottom = 9.dp),
                         color = Forest, fontWeight = FontWeight.Bold, fontSize = 10.sp
                     )
-                    // The only actual chapter is prominently reachable in the
-                    // route itself. A 50dp-tall action gives a proper target.
+                    // Two real chapters now share the trail. Distinct accessible
+                    // buttons are the interactive nodes; Canvas remains scenery.
                     Button(
                         onClick = onChapter,
-                        modifier = Modifier.align(Alignment.Center)
-                            .padding(top = 18.dp)
-                            .heightIn(min = 54.dp)
+                        modifier = Modifier.align(Alignment.BottomStart)
+                            .padding(start = 12.dp, bottom = 35.dp)
+                            .heightIn(min = 50.dp)
                             .testTag("openAdventureChapter"),
                         colors = ButtonDefaults.buttonColors(containerColor = Forest),
-                        shape = RoundedCornerShape(17.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                            horizontal = 12.dp, vertical = 5.dp
+                        )
                     ) {
                         Text(
-                            if (progress == WoodlandExpedition.size)
-                                "✓  Revisit Chapter 1"
-                            else if (progress > 0)
-                                "▶  Continue Chapter 1"
-                            else "★  Begin Chapter 1",
-                            fontSize = 13.sp, fontWeight = FontWeight.Bold
+                            when {
+                                progress == WoodlandExpedition.size -> "✓  1 · Field Notes"
+                                progress > 0 -> "▶  1 · Field Notes"
+                                else -> "1 · Field Notes"
+                            },
+                            fontSize = 12.sp, fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Button(
+                        onClick = onSecondChapter,
+                        enabled = secondStatus != CampaignChapterStatus.LOCKED,
+                        modifier = Modifier.align(Alignment.TopEnd)
+                            .padding(end = 10.dp, top = 39.dp)
+                            .heightIn(min = 50.dp)
+                            .testTag("openSecondChapter"),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Forest,
+                            disabledContainerColor = Color(0xFFEFE5D2),
+                            disabledContentColor = Color(0xFF53685E)
+                        ),
+                        shape = RoundedCornerShape(14.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                            horizontal = 10.dp, vertical = 5.dp
+                        )
+                    ) {
+                        Text(
+                            when (secondStatus) {
+                                CampaignChapterStatus.LOCKED -> "🔒  2 · Supplies"
+                                CampaignChapterStatus.COMPLETE -> "✓  2 · Supplies"
+                                else -> "2 · Supplies"
+                            },
+                            fontSize = 12.sp, fontWeight = FontWeight.Bold
                         )
                     }
                 }
@@ -347,20 +376,7 @@ internal fun WoodlandAdventureJourney(
                     CampaignChapterStatus.COMPLETE -> "4 of 4 clues solved · Complete"
                 }, color = Muted, fontSize = 12.sp,
                     modifier = Modifier.testTag("secondChapterStatus"))
-                Button(
-                    onClick = onSecondChapter,
-                    enabled = secondStatus != CampaignChapterStatus.LOCKED,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)
-                        .testTag("openSecondChapter"),
-                    colors = ButtonDefaults.buttonColors(containerColor = Forest)
-                ) {
-                    Text(when (secondStatus) {
-                        CampaignChapterStatus.LOCKED -> "Finish Chapter 1 to unlock"
-                        CampaignChapterStatus.READY -> "Begin Chapter 2"
-                        CampaignChapterStatus.IN_PROGRESS -> "Continue Chapter 2"
-                        CampaignChapterStatus.COMPLETE -> "Revisit Chapter 2"
-                    }, fontWeight = FontWeight.Bold)
-                }
+
             }
         }
         Text("More woodland destinations will follow as we build new puzzles.",
