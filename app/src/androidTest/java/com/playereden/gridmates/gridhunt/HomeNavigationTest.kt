@@ -21,6 +21,12 @@ import org.junit.runner.RunWith
 class HomeNavigationTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
+    private fun openQuickIfAtHome() {
+        if (compose.onAllNodesWithTag("openQuickPlay").fetchSemanticsNodes().isNotEmpty()) {
+            compose.onNodeWithTag("openQuickPlay").performScrollTo().performClick()
+        }
+    }
+
     private fun dismissGuideIfShown() {
         if (compose.onAllNodesWithTag("dismissGridGuide").fetchSemanticsNodes().isNotEmpty()) {
             compose.onNodeWithTag("dismissGridGuide").performClick()
@@ -29,33 +35,63 @@ class HomeNavigationTest {
 
     @Test fun hubOffersBothPlayableModes() {
         compose.onNodeWithText("Grid Hunt").assertExists()
+        compose.onNodeWithTag("openAdventure").assertExists()
+        compose.onNodeWithTag("openQuickPlay").assertExists()
+        compose.onNodeWithTag("openCustomPlay").assertExists()
+        compose.onNodeWithTag("homeIllustration").assertExists()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").assertExists()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openReverse").assertExists()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openTreasure").assertExists()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openIdentify").assertExists()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openExpedition").assertExists()
         compose.onNodeWithTag("homeIllustration").assertExists()
-        compose.onNodeWithText("Choose your next puzzle").assertExists()
+        compose.onNodeWithText("Choose your puzzle").assertExists()
+    }
+
+    @Test fun threePillarNavigationAndAdventureChapterAreReal() {
+        compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithText("The Missing Field Notes").assertExists()
+        compose.onNodeWithTag("adventureProgress").assertExists()
+        compose.onNodeWithTag("openAdventureChapter").performClick()
+        compose.onNodeWithText("The Missing Field Notes").assertExists()
+        compose.onNodeWithTag("mixedHome").performClick()
+        compose.onNodeWithTag("adventureBack").performClick()
+        compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+        compose.onNodeWithTag("customNotReady").assertExists()
+        compose.onNodeWithTag("customOpenQuick").performClick()
+        compose.onNodeWithText("Quick Play").assertExists()
+        compose.onNodeWithTag("quickBack").performClick()
+        compose.onNodeWithTag("openAdventure").assertExists()
     }
 
     @Test fun journeyCanEnterAndLeaveEachMode() {
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuideIfShown()
         compose.onNodeWithText("Trail Treasures").assertExists()
         compose.onNodeWithTag("chapterHome").performClick()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
         compose.onNodeWithText("Golden Spots").assertExists()
         compose.onNodeWithTag("reverseHome").performClick()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").assertExists()
     }
 
     @Test fun mapLookSwitchKeepsBothPuzzlesOpen() {
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuideIfShown()
         compose.onNodeWithTag("mapLookToggle").assertExists().performClick()
         compose.onNodeWithText("Trail Treasures").assertExists()
         compose.onNodeWithTag("chapterHome").performClick()
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
         compose.onNodeWithTag("mapLookToggle").assertExists().performClick()
         compose.onNodeWithText("Golden Spots").assertExists()
@@ -68,6 +104,7 @@ class HomeNavigationTest {
             .edit().clear().commit()
         compose.activityRule.scenario.recreate()
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuideIfShown()
         compose.onNodeWithText("CLUE 1 OF 3").assertExists()
@@ -89,6 +126,7 @@ class HomeNavigationTest {
         compose.onNodeWithText("CLUE 2 OF 3").assertExists()
         compose.onNodeWithTag("chapterHome").performClick()
         compose.activityRule.scenario.recreate()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuideIfShown()
         compose.onNodeWithText("CLUE 2 OF 3").assertExists()
@@ -100,6 +138,7 @@ class HomeNavigationTest {
             .edit().clear().commit()
         compose.activityRule.scenario.recreate()
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
         compose.onNodeWithText("GOLDEN SPOT 1 OF 5").assertExists()
         // Golden spot A is at E=24650, N=40620, so its containing square is 2440.
@@ -110,6 +149,7 @@ class HomeNavigationTest {
         compose.onNodeWithText("0000").assertDoesNotExist()
         compose.onNodeWithTag("reverseHome").performClick()
         compose.activityRule.scenario.recreate()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
         compose.onNodeWithText("GOLDEN SPOT 2 OF 5").assertExists()
     }
@@ -121,10 +161,12 @@ class HomeNavigationTest {
             .putBoolean("guide_seen", true).commit()
         compose.activityRule.scenario.recreate()
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performClick()
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithText("Woodland adventure complete!").assertExists()
         compose.onNodeWithTag("finishHome").performClick()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performScrollTo().performClick()
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishContinue").performClick()
@@ -137,10 +179,12 @@ class HomeNavigationTest {
             .edit().putInt("step", 5).commit()
         compose.activityRule.scenario.recreate()
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithText("Every golden spot found!").assertExists()
         compose.onNodeWithTag("finishHome").performClick()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishContinue").performClick()
@@ -153,6 +197,7 @@ class HomeNavigationTest {
             .edit().clear().commit()
         compose.activityRule.scenario.recreate()
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
         compose.onNodeWithText("0 of 4 woodland discoveries").assertExists()
         compose.onNodeWithTag("treasureItem_mushroom-nook").assertExists()
@@ -170,6 +215,7 @@ class HomeNavigationTest {
         compose.onNodeWithText("2 of 4 woodland discoveries").assertExists()
         compose.onNodeWithTag("treasureHome").performClick()
         compose.activityRule.scenario.recreate()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
         compose.onNodeWithText("2 of 4 woodland discoveries").assertExists()
     }
@@ -180,6 +226,7 @@ class HomeNavigationTest {
             .edit().clear().commit()
         compose.activityRule.scenario.recreate()
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
         compose.onNodeWithTag("openWoodlandMapGuide").performClick()
         compose.onNodeWithTag("woodlandMapGuide").assertExists()
@@ -206,6 +253,7 @@ class HomeNavigationTest {
             .getSharedPreferences("gridhunt_treasure_checklist_v1", Context.MODE_PRIVATE)
             .edit().clear().commit()
         compose.activityRule.scenario.recreate()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
         listOf("2538", "2840", "2641", "2941").forEachIndexed { index, ref ->
             compose.onNodeWithTag("treasureCodeInput").performTextInput(ref)
@@ -214,6 +262,7 @@ class HomeNavigationTest {
         }
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishHome").performClick()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishContinue").performClick()
@@ -226,6 +275,7 @@ class HomeNavigationTest {
             .edit().clear().commit()
         compose.activityRule.scenario.recreate()
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openIdentify").performScrollTo().performClick()
         compose.onNodeWithText("0 of 4 identified").assertExists()
         compose.onNodeWithTag("identifyReference").assertExists()
@@ -244,6 +294,7 @@ class HomeNavigationTest {
 
         compose.onNodeWithTag("identifyHome").performClick()
         compose.activityRule.scenario.recreate()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openIdentify").performScrollTo().performClick()
         compose.onNodeWithText("1 of 4 identified").assertExists()
         compose.onNodeWithText("2840").assertExists()
@@ -254,6 +305,7 @@ class HomeNavigationTest {
             .getSharedPreferences("gridhunt_identify_v1", Context.MODE_PRIVATE)
             .edit().clear().commit()
         compose.activityRule.scenario.recreate()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openIdentify").performScrollTo().performClick()
 
         listOf("mushroom-nook", "buttercup-glade", "acorn-nook", "old-waystone")
@@ -264,6 +316,7 @@ class HomeNavigationTest {
             }
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishHome").performClick()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openIdentify").performScrollTo().performClick()
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishContinue").performClick()
@@ -287,6 +340,7 @@ class HomeNavigationTest {
             .getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
             .edit().clear().commit()
         compose.activityRule.scenario.recreate()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
         compose.onNodeWithText("0 of 4 pages found").assertExists()
 
@@ -304,6 +358,7 @@ class HomeNavigationTest {
 
         compose.onNodeWithTag("mixedHome").performClick()
         compose.activityRule.scenario.recreate()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
         compose.onNodeWithText("2 of 4 pages found").assertExists()
 
@@ -328,10 +383,12 @@ class HomeNavigationTest {
             .edit().putInt("step", 4).commit()
         compose.activityRule.scenario.recreate()
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("mixedHome").performClick()
         compose.activityRule.scenario.recreate()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishContinue").performClick()
@@ -339,9 +396,11 @@ class HomeNavigationTest {
     }
 
     @Test fun visualMapChoiceIsReachable() {
+        openQuickIfAtHome()
         compose.onNodeWithTag("appearanceToggle").performScrollTo().performClick()
         compose.onNodeWithTag("style_SURVEY_TABLE").performScrollTo().performClick()
         compose.onNodeWithTag("style_FIELD_GUIDE").assertExists()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performScrollTo().performClick()
         dismissGuideIfShown()
         compose.onNodeWithText("Trail Treasures").assertExists()
