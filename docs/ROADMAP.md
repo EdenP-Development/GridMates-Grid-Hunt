@@ -1,17 +1,19 @@
 # Roadmap — GridMates: Grid Hunt
 
-**Original baseline:** 2026-11-21; historical GH-00–GH-05 milestones below.  
-**Current state (2026-11-23):** Android playable prototype exists; 9 square finds, 5 Golden Spots and a new 4-item Treasure Checklist pilot, recent owner screenshots, [QA98 full CI pass](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45267677473), draft [PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12). **Not merged or release-approved.**  
-**Current forward roadmap:** [Gameplay, Campaign & UI Blueprint — phases P0–P7](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md). Historical proposal milestones below do not imply source is still absent.  
-**Method:** small vertical slices, evidence-gated; do not generate a large art set before the mechanics/data/UI warrant it.
+**Original baseline:** 2026-11-21; historical GH-00–GH-05 goals below remain for context.  
+**Current implementation:** Four native playable puzzle families (9 Trail Treasures squares, 5 Golden Spots, four-object Treasure Checklist and four-question **What's at This Grid?**), original map, Map Guide, saved progress and earned replay cards.  
+**Last fully green code source:** [QA132](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45295252097), source SHA `d065937e1847e2e09d2157b5304f6979d167144b`, with passing Kotlin tests, Android build/signing/update checks, emulator gameplay and **13** required screenshots. Owner physical-device experience and install-over still pending.  
+**Development branch:** [draft PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12); not merged, not a production release.  
+**Forward roadmap source:** [Campaign Blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md) and [GH-V12 test/handoff](vision/GH_V12_IDENTIFY_BY_GRID_VERTICAL_SLICE.md).  
+**Method:** tested small vertical slices, exact authored grid truth, accessible game feel, original artwork only when warranted.
 
-## Active next phases (as of 2026-11-23)
+## Active next phases (2026-11-23)
 
-1. **P0 — Phone-quality checkpoint:** Review QA98's new Treasure Checklist, compact header, golden markers, keyboard and saved progress on a real phone. Record installer behavior separately.
-2. **P1–P2 — Treasure Checklist:** **First pilot IMPLEMENTED + CI-TESTED**: four canonical existing woodland landmarks, exact four-digit cells, isolated save format, four-item cross-off Android screen and finish/replay. Owner phone validation remains pending.
-3. **P3 — What's at This Grid? (NEXT):** Implement one small coordinate→object identification puzzle with clear answer tiles and uniqueness/multiple-answer validation.
-4. **P4–P5 — Campaign & Custom Play:** Compose mixed chapter objectives on the same engine; then Quick Play and compatible, deterministic Custom Play presets.
-5. **P6–P7 — Game UI integration, carefully justified art, and beta readiness:** Make it feel like a native Play Store puzzle game, run content/visual/accessibility audits, and only later handle production signing/store requirements.
+1. **Phone QA:** actually install/play QA132, inspect the four picture/name choices, map scale, answer feedback, guide, saved progress, earned finish, landscape and menu navigation. Physical QA update proof still open.
+2. **GH-V11 fair clue engine — IMPLEMENTED + CI-TESTED:** typed target/category/relationship/direction/region validation, explicit ambiguity reasons, synthetic multi-church fixtures; no fictitious churches added to the woodland art.
+3. **GH-V12 What's at This Grid? — IMPLEMENTED + QA132 GREEN:** four genuine coordinate→object questions; landmark art tiles, wrong-answer protection, distinct save state, replay. Physical owner testing remains.
+4. **Next: chapter/mixed-mode controller:** organize the four existing puzzle verbs into intentional progression while preserving stable IDs and old data. Prototype on current content before building multiple worlds or generator tooling.
+5. **Later: Quick/Custom Play, story chapters and professional game UI:** deterministic authored/seeded content, distinct native game-style hub, accessible overlays, and cohesive art audit, followed by production signing/store gates. No large upfront asset-library generation.
 
 **Explicit owner rule:** organize systems and content first; make individual assets when needed for legibility/fairness, with a fuller cohesive art pass after the core modes prove fun.
 
