@@ -314,4 +314,36 @@ class VisualCaptureTest {
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         capture("06_golden_finish.png")
     }
+    @Test fun captureGeneratedCustomGameplayWithDefaultTouchControls() {
+        val custom = target.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE)
+        val precision = target.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE)
+        val previous = precision.getBoolean("precise_selection", false)
+        check(custom.edit().clear().commit())
+        check(precision.edit().putBoolean("precise_selection", false).commit())
+        try {
+            compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+            listOf("grid", "gold", "identify", "checklist", "mixed").forEachIndexed { index, mode ->
+                compose.onNodeWithTag("customMode_$mode").performScrollTo().performClick()
+                compose.onNodeWithTag("customStart").performScrollTo().performClick()
+                if (index > 0) compose.onNodeWithTag("customConfirmReplace").performClick()
+                compose.onNodeWithTag("customMap").assertExists()
+                when(mode) {
+                    "grid" -> {
+                        compose.onNodeWithContentDescription("Move selected square west").assertDoesNotExist()
+                        compose.onNodeWithTag("checkChapter").assertIsNotEnabled()
+                    }
+                    "gold" -> compose.onNodeWithTag("customGoldInput").assertExists()
+                    "identify" -> compose.onNodeWithTag("customIdentifyCheck").assertExists()
+                    "checklist" -> compose.onNodeWithTag("customChecklistInput").assertExists()
+                }
+                capture("custom_${mode}_portrait.png")
+                compose.onNodeWithTag("customBack").performClick()
+            }
+            compose.onNodeWithTag("customBack").performClick()
+        } finally {
+            precision.edit().putBoolean("precise_selection", previous).commit()
+            custom.edit().clear().commit()
+        }
+    }
+
 }
