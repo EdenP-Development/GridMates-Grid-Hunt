@@ -190,10 +190,7 @@ private fun GridHuntScreen() {
             },
             onBack = { screen = "home" }
         )
-        "custom" -> WoodlandCustomPlayPreview(
-            onQuickPlay = { screen = "quick" },
-            onBack = { screen = "home" }
-        )
+        "custom" -> CustomHuntScreen(mapLook = mapLook, onLook = { lookName = it.name }, onHome = { screen = "home" })
         "chapter" -> FirstBearingsScreen(
             onHome = { screen = returnHub },
             mapLook = mapLook,
