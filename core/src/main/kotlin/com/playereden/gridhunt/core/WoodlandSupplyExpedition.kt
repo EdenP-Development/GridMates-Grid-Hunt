@@ -15,6 +15,9 @@ class ExpeditionPlaythrough(
     fun objectiveAt(raw: Int): ExpeditionObjective? =
         chapter.objectives.getOrNull(restoreStep(raw))
     fun finished(raw: Int): Boolean = restoreStep(raw) == size
+    // Journal history is derived from earned progress, never a second save.
+    fun discoveries(raw: Int): List<ExpeditionObjective> =
+        chapter.objectives.take(restoreStep(raw))
     fun solvedCells(raw: Int): List<GridCell> =
         chapter.objectives.take(restoreStep(raw)).map { it.expectedCell }
 
