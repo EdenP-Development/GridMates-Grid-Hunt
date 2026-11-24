@@ -52,14 +52,16 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
     var feedback by rememberSaveable(active?.id) { mutableStateOf("") }
     var selected by rememberSaveable(active?.id) { mutableStateOf<String?>(active?.route?.start?.reference) }
     var success by rememberSaveable { mutableStateOf("") }
+    val scroll = rememberScrollState()
+    LaunchedEffect(active?.id, showOverview) { scroll.scrollTo(0) }
     Column(
         Modifier.fillMaxSize().background(Paper).statusBarsPadding()
-            .navigationBarsPadding().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .navigationBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Row(Modifier.fillMaxWidth()) {
             Column(Modifier.weight(1f)) {
-                Text("Explorer's Academy", fontSize = 26.sp, color = Ink,
+                Text("Explorer's Academy", fontSize = 22.sp, color = Ink,
                     fontWeight = FontWeight.ExtraBold)
                 Text("School of Exploration", color = Forest)
             }
@@ -74,6 +76,8 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
         Text(if (inGraduation && practiceDone) "Graduation expedition · ${fieldEarned.size} of ${ExplorerAcademy.graduation.size}"
             else "Beginner practice · ${earned.size} of ${ExplorerAcademy.exercises.size}",
             color = Forest, modifier = Modifier.testTag("academyProgress"))
+        Column(Modifier.weight(1f).verticalScroll(scroll),
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (showOverview) {
             AcademySchoolOverview(earned, fieldEarned, qualifications,
                 onContinue = { showOverview = false })
@@ -86,13 +90,12 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
         if (active != null) {
             Surface(color = Color(0xFFFFF0CF), shape = RoundedCornerShape(16.dp)) {
                 Column(Modifier.fillMaxWidth().padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(active.lesson, color = Ink, fontSize = 20.sp,
                         fontWeight = FontWeight.Bold)
                     Text(active.teaching, color = Ink)
                     if (active.id == "north" || active.id == "south") {
-                        Text("↑ N    ·    E →\n← W    ·    S ↓", color = Forest,
-                            fontSize = 22.sp)
+                        AcademyCompass()
                     }
                     Text(active.prompt, color = Ink, fontWeight = FontWeight.Bold)
                     val submit: (String) -> Unit = { choice ->
@@ -147,10 +150,14 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                             enabled = selected != null,
                             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                                 .testTag("academyCheckSquare")) { Text("Check square") }
-                    } else active.choices.forEachIndexed { index, choice ->
-                        OutlinedButton(onClick = { submit(choice) },
-                            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                                .testTag("academyChoice_$index")) { Text(choice) }
+                    } else active.choices.chunked(2).forEachIndexed { rowIndex, choices ->
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            choices.forEachIndexed { columnIndex, choice ->
+                                OutlinedButton(onClick = { submit(choice) },
+                                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)
+                                        .testTag("academyChoice_${rowIndex * 2 + columnIndex}")) { Text(choice) }
+                            }
+                        }
                     }
                     if (feedback.isNotBlank()) Text(feedback, color = Forest,
                         modifier = Modifier.testTag("academyFeedback"))
@@ -175,7 +182,8 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
             }
         }
         }
-        Text("Learn at your own pace. No timer or penalties.", color = Muted)
+        Text("Learn at your own pace. No timer or penalties.", color = Muted, fontSize = 12.sp)
+        }
     }
 }
 
@@ -188,7 +196,7 @@ private fun AcademyGrid(task: AcademyMapTask, selected: String?, onSelect: (Stri
         Text("N ↑", color = Forest, fontWeight = FontWeight.Bold)
         for (n in AcademyTrainingGrid.northings.reversed()) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-                Text(n.toString(), color = Forest, modifier = Modifier.width(26.dp),
+                Text(n.toString(), color = Forest, modifier = Modifier.width(26.dp).offset(y = 8.dp),
                     fontWeight = if (task.guided && n == targetN) FontWeight.Bold else FontWeight.Normal)
                 for (e in AcademyTrainingGrid.eastings) {
                     val code = AcademyTrainingGrid.reference(e, n)
@@ -320,6 +328,44 @@ private fun AcademySchoolOverview(
                     else -> "Continue field training"
                 })
             }
+        }
+    }
+}
+
+@Composable
+private fun AcademyCompass() {
+    Box(Modifier.fillMaxWidth().height(132.dp)
+        .semantics { contentDescription = "Compass rose: north up, east right, south down, west left" },
+        contentAlignment = Alignment.Center) {
+        Box(Modifier.size(132.dp)) {
+            androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+                val r = size.minDimension * 0.31f
+                val center = this.center
+                drawCircle(Forest.copy(alpha = 0.10f), r, center)
+                drawCircle(Forest, r, center,
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(1.dp.toPx()))
+                val needle = androidx.compose.ui.graphics.Path().apply {
+                    moveTo(center.x, center.y-r)
+                    lineTo(center.x+r*0.23f, center.y)
+                    lineTo(center.x, center.y+r)
+                    lineTo(center.x-r*0.23f, center.y)
+                    close()
+                }
+                drawPath(needle, Forest)
+                val south = androidx.compose.ui.graphics.Path().apply {
+                    moveTo(center.x-r*0.23f, center.y)
+                    lineTo(center.x+r*0.23f, center.y)
+                    lineTo(center.x, center.y+r)
+                    close()
+                }
+                drawPath(south, Color(0xFFC69D53))
+                drawLine(Forest, center.copy(x = center.x-r), center.copy(x = center.x+r), 1.dp.toPx())
+                drawCircle(Paper, 3.dp.toPx(), center)
+            }
+            Text("N", Modifier.align(Alignment.TopCenter), color = Forest, fontWeight = FontWeight.Bold)
+            Text("S", Modifier.align(Alignment.BottomCenter), color = Forest)
+            Text("W", Modifier.align(Alignment.CenterStart), color = Forest)
+            Text("E", Modifier.align(Alignment.CenterEnd), color = Forest)
         }
     }
 }
