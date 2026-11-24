@@ -84,6 +84,7 @@ import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.ChapterPosition
 import com.playereden.gridhunt.core.FirstBearingsChapter
 import com.playereden.gridhunt.core.TreasureChecklistMission
+import com.playereden.gridhunt.core.WoodlandIdentifyMission
 import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.GridCell
 import com.playereden.gridhunt.core.GridReference
@@ -152,6 +153,12 @@ private fun GridHuntScreen() {
             onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled
         )
+        "identify" -> WoodlandIdentifyScreen(
+            onHome = { screen = "home" },
+            mapLook = mapLook,
+            onLook = { lookName = it.name },
+            hapticsEnabled = hapticsEnabled
+        )
         else -> GridHuntHome(
             mapLook = mapLook,
             onLook = { lookName = it.name },
@@ -159,7 +166,8 @@ private fun GridHuntScreen() {
             onHaptics = { hapticsEnabled = it },
             onChapter = { screen = "chapter" },
             onReverse = { screen = "reverse" },
-            onTreasure = { screen = "treasure" }
+            onTreasure = { screen = "treasure" },
+            onIdentify = { screen = "identify" }
         )
     }
 }
@@ -173,7 +181,8 @@ private fun GridHuntHome(
     onHaptics: (Boolean) -> Unit,
     onChapter: () -> Unit,
     onReverse: () -> Unit,
-    onTreasure: () -> Unit
+    onTreasure: () -> Unit,
+    onIdentify: () -> Unit
 ) {
     val context = LocalContext.current
     val chapterPrefs = remember(context) {
@@ -185,6 +194,12 @@ private fun GridHuntHome(
     val treasurePrefs = remember(context) {
         context.getSharedPreferences("gridhunt_treasure_checklist_v1", Context.MODE_PRIVATE)
     }
+    val identifyPrefs = remember(context) {
+        context.getSharedPreferences(WoodlandIdentifyMission.saveName, Context.MODE_PRIVATE)
+    }
+    val identifyCount = WoodlandIdentifyMission.restoreStep(
+        identifyPrefs.getInt("step", 0)
+    )
     val treasureCount = TreasureChecklistMission.restoreCompleted(
         (treasurePrefs.getString("completed_ids", "") ?: "")
             .split(',').filter { it.isNotBlank() }.toSet()
@@ -283,6 +298,27 @@ private fun GridHuntHome(
                         0 -> "Start the woodland checklist"
                         TreasureChecklistMission.targets.size -> "See your completed checklist"
                         else -> "Continue checklist  ($treasureCount/4)"
+                    }, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+        Surface(shape = RoundedCornerShape(19.dp), color = Color(0xFFE7EEE4),
+            shadowElevation = 2.dp) {
+            Column(Modifier.fillMaxWidth().padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("✦   WHAT'S AT THIS GRID?", color = Forest, fontSize = 15.sp,
+                    fontWeight = FontWeight.ExtraBold)
+                Text("Read a square, explore the map, and pick the matching landmark.",
+                    color = Muted, fontSize = 12.sp)
+                OutlinedButton(
+                    onClick = onIdentify,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                        .testTag("openIdentify")
+                ) {
+                    Text(when (identifyCount) {
+                        0 -> "Identify your first landmark"
+                        WoodlandIdentifyMission.questions.size -> "See your identified places"
+                        else -> "Continue identifying  ($identifyCount/4)"
                     }, fontWeight = FontWeight.Bold)
                 }
             }
