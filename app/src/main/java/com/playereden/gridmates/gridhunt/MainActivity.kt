@@ -87,6 +87,8 @@ import com.playereden.gridhunt.core.TreasureChecklistMission
 import com.playereden.gridhunt.core.WoodlandIdentifyMission
 import com.playereden.gridhunt.core.WoodlandExpedition
 import com.playereden.gridhunt.core.GridHuntCampaign
+import com.playereden.gridhunt.core.WoodlandSupplyExpedition
+import com.playereden.gridhunt.core.CampaignChapterStatus
 import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.GridCell
 import com.playereden.gridhunt.core.GridReference
@@ -148,13 +150,20 @@ private fun GridHuntScreen() {
     }
     // Read the original GH-V13 save; the versioned campaign registry adds
     // world/chapter metadata but never rewrites or migrates the old progress.
-    val campaignState = GridHuntCampaign.registry.state(
-        WoodlandExpedition.chapter.id,
-        GridHuntCampaign.snapshotForExistingExpedition(
-            expeditionPrefs.getInt("step", 0)
-        )
+    val supplyPrefs = remember(context) {
+        context.getSharedPreferences(WoodlandSupplyExpedition.saveName, Context.MODE_PRIVATE)
+    }
+    val campaignSnapshot = GridHuntCampaign.snapshot(
+        expeditionPrefs.getInt("step", 0),
+        supplyPrefs.getInt("step", 0)
     )
-    val expeditionProgress = requireNotNull(campaignState).completedObjectives
+    val campaignState = requireNotNull(GridHuntCampaign.registry.state(
+        WoodlandExpedition.chapter.id, campaignSnapshot
+    ))
+    val supplyState = requireNotNull(GridHuntCampaign.registry.state(
+        WoodlandSupplyExpedition.chapter.id, campaignSnapshot
+    ))
+    val expeditionProgress = campaignState.completedObjectives
 
     when (screen) {
         "home" -> ExplorerDeskHome(
@@ -165,6 +174,14 @@ private fun GridHuntScreen() {
         )
         "adventure" -> WoodlandAdventureJourney(
             progress = expeditionProgress,
+            secondStatus = supplyState.status,
+            secondProgress = supplyState.completedObjectives,
+            onSecondChapter = {
+                if (supplyState.status != CampaignChapterStatus.LOCKED) {
+                    returnHub = "adventure"
+                    screen = "supplies"
+                }
+            },
             onChapter = {
                 returnHub = "adventure"
                 screen = "expedition"
@@ -205,6 +222,28 @@ private fun GridHuntScreen() {
             onLook = { lookName = it.name },
             hapticsEnabled = hapticsEnabled
         )
+        "supplies" -> {
+            if (supplyState.status == CampaignChapterStatus.LOCKED) {
+                // Guard even against restored screen state from older versions.
+                WoodlandAdventureJourney(
+                    progress = expeditionProgress,
+                    secondStatus = supplyState.status,
+                    secondProgress = supplyState.completedObjectives,
+                    onChapter = {
+                        returnHub = "adventure"
+                        screen = "expedition"
+                    },
+                    onSecondChapter = {},
+                    onBack = { screen = "home" }
+                )
+            } else WoodlandMixedExpeditionScreen(
+                onHome = { screen = "adventure" },
+                mapLook = mapLook,
+                onLook = { lookName = it.name },
+                hapticsEnabled = hapticsEnabled,
+                chapterTwo = true
+            )
+        }
         "quick" -> GridHuntHome(
             mapLook = mapLook,
             onLook = { lookName = it.name },
