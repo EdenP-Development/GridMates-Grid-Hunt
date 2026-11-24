@@ -538,6 +538,8 @@ class HomeNavigationTest {
             }
             compose.onNodeWithTag("puzzleFinishCard").assertExists()
             compose.onNodeWithTag("finishHome").performClick()
+            compose.onNodeWithTag("openCustomPlay").assertExists()
+            compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
             compose.onNodeWithTag("customResume").assertDoesNotExist()
             org.junit.Assert.assertEquals(before, authored.map { it.all.toMap() })
         } finally {
@@ -598,6 +600,7 @@ class HomeNavigationTest {
         }
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishHome").performClick()
+        compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
         compose.onNodeWithTag("customMode_checklist").performScrollTo().performClick()
         compose.onNodeWithTag("customStart").performScrollTo().performClick()
         val checklist = custom.getString("codes", "")!!.split(",")
@@ -610,6 +613,70 @@ class HomeNavigationTest {
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         org.junit.Assert.assertEquals(3, custom.getInt("step", 0))
         org.junit.Assert.assertEquals(before, authored.map { it.all.toMap() })
+    }
+
+    @Test fun mixedCustomExpeditionResumesExactSequenceAndCompletes() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val custom = context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE)
+        val precision = context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE)
+        val oldPrecision = precision.getBoolean("precise_selection", false)
+        check(custom.edit().clear().commit())
+        check(precision.edit().putBoolean("precise_selection", true).commit())
+        try {
+            compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+            compose.onNodeWithTag("customMode_mixed").performScrollTo().performClick()
+            compose.onNodeWithTag("customLength_6").performScrollTo().performClick()
+            compose.onNodeWithTag("customStart").performScrollTo().performClick()
+            val codes = custom.getString("codes", "")!!
+            val kinds = custom.getString("kinds", "")!!
+            val objectives = kinds.split(",").zip(codes.split(","))
+            org.junit.Assert.assertEquals(6, objectives.size)
+            org.junit.Assert.assertEquals(setOf("grid", "gold", "identify", "checklist"), objectives.map { it.first }.toSet())
+            val ids = mapOf("2538" to "mushroom-nook", "2840" to "buttercup-glade", "2641" to "acorn-nook", "2941" to "old-waystone")
+            objectives.forEachIndexed { index, (kind, code) ->
+                when (kind) {
+                    "grid" -> {
+                        val e = code.take(2).toInt()
+                        val n = code.takeLast(2).toInt()
+                        val startE = if (e == 26 && n == 40) 25 else 26
+                        if (startE == 25) compose.onNodeWithContentDescription("Move selected square west").performClick()
+                        repeat((startE-e).coerceAtLeast(0)) { compose.onNodeWithContentDescription("Move selected square west").performClick() }
+                        repeat((e-startE).coerceAtLeast(0)) { compose.onNodeWithContentDescription("Move selected square east").performClick() }
+                        repeat((40-n).coerceAtLeast(0)) { compose.onNodeWithContentDescription("Move selected square south").performClick() }
+                        repeat((n-40).coerceAtLeast(0)) { compose.onNodeWithContentDescription("Move selected square north").performClick() }
+                        compose.onNodeWithTag("checkChapter").performClick()
+                    }
+                    "gold", "checklist" -> {
+                        val prefix = if (kind == "gold") "customGold" else "customChecklist"
+                        compose.onNodeWithTag(prefix + "Input").performTextReplacement(code)
+                        compose.onNodeWithTag(prefix + "Check").performClick()
+                    }
+                    "identify" -> {
+                        compose.onNodeWithTag("customIdentify_${ids.getValue(code)}").performClick()
+                        compose.onNodeWithTag("customIdentifyCheck").performClick()
+                    }
+                }
+                compose.waitForIdle()
+                org.junit.Assert.assertEquals(index+1, custom.getInt("step",0))
+                if (index == 2) {
+                    compose.onNodeWithTag("customBack").performClick()
+                    compose.onNodeWithTag("customBack").performClick()
+                    compose.activityRule.scenario.recreate()
+                    compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+                    compose.onNodeWithTag("customResume").performScrollTo().performClick()
+                    org.junit.Assert.assertEquals(codes, custom.getString("codes",""))
+                    org.junit.Assert.assertEquals(kinds, custom.getString("kinds",""))
+                    org.junit.Assert.assertEquals(3, custom.getInt("step",0))
+                }
+            }
+            compose.onNodeWithTag("puzzleFinishCard").assertExists()
+            compose.onNodeWithTag("finishContinue").performClick()
+            org.junit.Assert.assertEquals("mixed", custom.getString("mode",""))
+            org.junit.Assert.assertEquals(6, custom.getInt("count",0))
+            org.junit.Assert.assertEquals(0, custom.getInt("step",0))
+        } finally {
+            precision.edit().putBoolean("precise_selection", oldPrecision).commit()
+        }
     }
 
 }
