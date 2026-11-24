@@ -1,6 +1,9 @@
 package com.playereden.gridmates.gridhunt
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -171,9 +174,20 @@ private fun HomeDestinationStrip(
                 color = Color(0xFFFFFAED),
                 shape = RoundedCornerShape(13.dp)
             ) {
-                Text(icon, modifier = Modifier.padding(7.dp),
-                    color = Forest, fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp)
+                val artwork = when (tag) {
+                    "openAcademy" -> R.drawable.gh_tool_compass
+                    "openQuickPlay" -> R.drawable.gh_tool_map
+                    "openCustomPlay" -> R.drawable.gh_tool_notebook
+                    else -> null
+                }
+                if (artwork != null) {
+                    Image(painterResource(artwork), contentDescription = null,
+                        modifier = Modifier.size(38.dp).padding(2.dp))
+                } else {
+                    Text(icon, modifier = Modifier.padding(7.dp),
+                        color = Forest, fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp)
+                }
             }
             Column(Modifier.weight(1f)) {
                 Text(title, color = Ink, fontWeight = FontWeight.ExtraBold,
