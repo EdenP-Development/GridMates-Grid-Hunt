@@ -54,6 +54,8 @@ import com.playereden.gridhunt.core.MapCamera
 import com.playereden.gridhunt.core.PixelPoint
 import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.WoodlandExpedition
+import com.playereden.gridhunt.core.WoodlandSupplyExpedition
+import com.playereden.gridhunt.core.ExpeditionPlaythrough
 import com.playereden.gridhunt.core.WoodlandIdentifyMission
 import com.playereden.gridhunt.core.WoodlandLandmarks
 import com.playereden.gridhunt.core.WoodlandTrainingMap
@@ -72,15 +74,19 @@ internal fun WoodlandMixedExpeditionScreen(
     onHome: () -> Unit,
     mapLook: MapLook,
     onLook: (MapLook) -> Unit,
-    hapticsEnabled: Boolean
+    hapticsEnabled: Boolean,
+    chapterTwo: Boolean = false
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    val mission = WoodlandExpedition
+    val mission = remember(chapterTwo) {
+        if (chapterTwo) WoodlandSupplyExpedition.run
+        else ExpeditionPlaythrough(WoodlandExpedition.chapter, WoodlandExpedition.saveName)
+    }
     val prefs = remember(context) {
         context.getSharedPreferences(mission.saveName, Context.MODE_PRIVATE)
     }
-    var step by rememberSaveable {
+    var step by androidx.compose.runtime.saveable.rememberSaveable(mission.chapter.id) {
         mutableStateOf(mission.restoreStep(prefs.getInt("step", 0)))
     }
     var selectedCell by rememberSaveable {
@@ -99,7 +105,9 @@ internal fun WoodlandMixedExpeditionScreen(
     }
     var showGuide by rememberSaveable { mutableStateOf(false) }
     var feedback by rememberSaveable {
-        mutableStateOf("Follow the next clue to recover the missing field notes.")
+        mutableStateOf(if (chapterTwo)
+            "Follow the journal notes to trace the missing supplies."
+            else "Follow the next clue to recover the missing field notes.")
     }
     val active = mission.objectiveAt(step)
     val finished = mission.finished(step)
@@ -182,8 +190,10 @@ internal fun WoodlandMixedExpeditionScreen(
                 enteredCode = ""
                 chosenLandmark = null
                 feedback = if (mission.finished(step)) {
-                    "Every missing page recovered. Your woodland chapter is complete!"
-                } else "A page found! The next clue asks for something different."
+                    if (chapterTwo) "The last stop has been found! The supplies trail is complete."
+                    else "Every missing page recovered. Your woodland chapter is complete!"
+                } else if (chapterTwo) "A new trail note found! Follow the next clue."
+                else "A page found! The next clue asks for something different."
             } else {
                 feedback = when (current.verb) {
                     ExpeditionVerb.FIND_SQUARE ->
@@ -201,7 +211,8 @@ internal fun WoodlandMixedExpeditionScreen(
         selectedCell = null
         enteredCode = ""
         chosenLandmark = null
-        feedback = "All four notes have been hidden again. Enjoy the hunt!"
+        feedback = if (chapterTwo) "The supply clues are ready to trace again."
+            else "All four notes have been hidden again. Enjoy the hunt!"
         fit()
     }
     val onMapSelect: (String) -> Unit = { reference ->
@@ -239,9 +250,9 @@ internal fun WoodlandMixedExpeditionScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(7.dp)
                 ) {
-                    MixedExpeditionHeader(step, mission.size,
+                    MixedExpeditionHeader(mission.chapter.name, step, mission.size,
                         onHome, onGuide = { showGuide = true })
-                    if (finished) MixedExpeditionFinish(onHome, replay)
+                    if (finished) MixedExpeditionFinish(chapterTwo, onHome, replay)
                     else if (active != null) {
                         MixedExpeditionPrompt(active, step + 1, mission.size)
                         MixedExpeditionControls(
@@ -256,7 +267,7 @@ internal fun WoodlandMixedExpeditionScreen(
             }
         } else {
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                MixedExpeditionHeader(step, mission.size, onHome,
+                MixedExpeditionHeader(mission.chapter.name, step, mission.size, onHome,
                     onGuide = { showGuide = true })
                 if (active != null) MixedExpeditionPrompt(active, step + 1, mission.size)
                 HuntMapPanel(
@@ -268,7 +279,7 @@ internal fun WoodlandMixedExpeditionScreen(
                     enableSelect = active?.verb == ExpeditionVerb.FIND_SQUARE,
                     mapLook = mapLook, onLook = onLook
                 )
-                if (finished) MixedExpeditionFinish(onHome, replay)
+                if (finished) MixedExpeditionFinish(chapterTwo, onHome, replay)
                 else if (active != null) {
                     MixedExpeditionControls(
                         active, mapLook, selectedCell, enteredCode, chosenLandmark,
@@ -288,10 +299,10 @@ internal fun WoodlandMixedExpeditionScreen(
 
 @Composable
 private fun MixedExpeditionHeader(
-    step: Int, total: Int, onHome: () -> Unit, onGuide: () -> Unit
+    chapterName: String, step: Int, total: Int, onHome: () -> Unit, onGuide: () -> Unit
 ) {
     Column(Modifier.fillMaxWidth()) {
-        Text("The Missing Field Notes", color = Ink,
+        Text(chapterName, color = Ink,
             fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, maxLines = 1)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("$step of $total pages found", color = Forest, fontSize = 11.sp,
@@ -462,11 +473,16 @@ private fun MixedExpeditionControls(
 }
 
 @Composable
-private fun MixedExpeditionFinish(onHome: () -> Unit, onReplay: () -> Unit) {
+private fun MixedExpeditionFinish(
+    chapterTwo: Boolean, onHome: () -> Unit, onReplay: () -> Unit
+) {
     PuzzleFinishCard(
-        title = "The field notes are together!",
-        description = "Four kinds of clues, one woodland adventure. You recovered every page.",
-        discoveries = "4 OF 4 PAGES RECOVERED",
+        title = if (chapterTwo) "The supply trail is complete!"
+            else "The field notes are together!",
+        description = if (chapterTwo)
+            "You followed every woodland clue to the supplies' last known stop."
+            else "Four kinds of clues, one woodland adventure. You recovered every page.",
+        discoveries = if (chapterTwo) "4 OF 4 CLUES SOLVED" else "4 OF 4 PAGES RECOVERED",
         primaryLabel = "Explore again",
         onPrimary = onReplay,
         onHome = onHome
