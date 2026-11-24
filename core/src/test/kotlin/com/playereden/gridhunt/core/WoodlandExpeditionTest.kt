@@ -17,6 +17,14 @@ class WoodlandExpeditionTest {
         assertEquals(WoodlandLandmarks.waystone.id, steps[3].landmarkId)
     }
 
+    @Test fun publishedChaptersHaveDistinctEarnedDiscoveryMessages() {
+        listOf(mission.chapter, WoodlandSupplyExpedition.chapter).forEach { chapter ->
+            val discoveries = chapter.objectives.map { it.discovery }
+            assertTrue(discoveries.all { it.isNotBlank() })
+            assertEquals(chapter.objectives.size, discoveries.distinct().size)
+        }
+    }
+
     @Test fun orderedAnswersOnlyAdvanceCurrentPuzzleVerb() {
         assertEquals(0, mission.acceptGrid(0, "2440"))
         assertEquals(0, mission.acceptGrid(0, "2941"))
