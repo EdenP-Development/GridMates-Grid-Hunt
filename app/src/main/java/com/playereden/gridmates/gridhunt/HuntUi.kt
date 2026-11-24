@@ -297,22 +297,26 @@ internal fun HuntControlPanel(
         GridStepButton("↑", "Move selected square north", Modifier.weight(1f)) { onMove(0, 1) }
         GridStepButton("↓", "Move selected square south", Modifier.weight(1f)) { onMove(0, -1) }
     }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        HuntToolButton(ExplorerTool.ZOOM_IN, Modifier.weight(1f)) { onZoom(1.6) }
-        HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f)) { onZoom(1.0 / 1.6) }
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val compactTools = maxWidth < 308.dp
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        HuntToolButton(ExplorerTool.ZOOM_IN, Modifier.weight(1f), { onZoom(1.6) })
+        HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f), { onZoom(1.0 / 1.6) })
         HuntToolButton(ExplorerTool.FIT, Modifier.weight(1f), onFit)
-        OutlinedButton(onClick = { options = true },
-            modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("huntToolOptions")
-                .semantics { contentDescription = "More map tools" },
-            contentPadding = PaddingValues(0.dp)) { Text("⋯", color = Forest, fontSize = 22.sp) }
-    }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        OutlinedButton(onClick = onUndo, enabled = !finished,
-            modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-            contentPadding = PaddingValues(0.dp)) { Text("Clear", fontSize = 12.sp) }
-        OutlinedButton(onClick = onHint, enabled = !finished,
-            modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-            contentPadding = PaddingValues(0.dp)) { Text("Clue", fontSize = 12.sp) }
+        if (compactTools) { Spacer(Modifier.weight(1f)) }
+        if (!compactTools) {
+        HuntToolButton(ExplorerTool.CLEAR, Modifier.weight(1f), onUndo, enabled = !finished)
+        HuntToolButton(ExplorerTool.HINT, Modifier.weight(1f), onHint, enabled = !finished)
+        HuntToolButton(ExplorerTool.MORE, Modifier.weight(1f).testTag("huntToolOptions"), { options = true })
+        }
+        }
+        if (compactTools) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            HuntToolButton(ExplorerTool.CLEAR, Modifier.weight(1f), onUndo, enabled = !finished)
+            HuntToolButton(ExplorerTool.HINT, Modifier.weight(1f), onHint, enabled = !finished)
+            HuntToolButton(ExplorerTool.MORE, Modifier.weight(1f).testTag("huntToolOptions"), { options = true })
+        }
+        }
     }
     if (options) androidx.compose.material3.AlertDialog(
         onDismissRequest = { options = false },
@@ -353,8 +357,8 @@ private fun GridStepButton(label: String, description: String, modifier: Modifie
 
 
 @Composable
-private fun HuntToolButton(tool: ExplorerTool, modifier: Modifier, action: () -> Unit) {
-    OutlinedButton(onClick = action, modifier = modifier.heightIn(min = 48.dp)
+private fun HuntToolButton(tool: ExplorerTool, modifier: Modifier, action: () -> Unit, enabled: Boolean = true) {
+    OutlinedButton(onClick = action, enabled = enabled, modifier = modifier.heightIn(min = 48.dp)
         .semantics { contentDescription = tool.label }, contentPadding = PaddingValues(0.dp)) {
         ExplorerToolIcon(tool)
     }
