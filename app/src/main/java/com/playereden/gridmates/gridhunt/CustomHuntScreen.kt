@@ -1,6 +1,8 @@
 package com.playereden.gridmates.gridhunt
 
 import android.content.Context
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -25,6 +27,9 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
     val context = LocalContext.current
     val prefs = remember(context) { context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE) }
     var count by rememberSaveable { mutableIntStateOf(prefs.getInt("count", 3).let { if (it in CustomHuntGenerator.lengths) it else 3 }) }
+    var mode by rememberSaveable { mutableStateOf(if (prefs.getString("mode", "grid") == "gold") "gold" else "grid") }
+    var nextMode by rememberSaveable { mutableStateOf(mode) }
+    var answer by rememberSaveable { mutableStateOf("") }
     var codes by rememberSaveable { mutableStateOf(prefs.getString("codes", "") ?: "") }
     val targets = remember(codes) {
         CustomHuntGenerator.restore(codes)
@@ -43,10 +48,16 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
         if (viewport.width > 80 && viewport.height > 80)
             camera = MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble())
     }
+    fun zoom(scale: Double) {
+        if (viewport.width > 80 && viewport.height > 80)
+            camera = camera?.transform(bounds, viewport.width.toDouble(), viewport.height.toDouble(),
+                PixelPoint(viewport.width/2.0,viewport.height/2.0),PixelPoint(0.0,0.0),scale)
+    }
     fun start() {
         codes = CustomHuntGenerator.encode(CustomHuntGenerator.generate(count))
-        step = 0; selected = null; hint = 0; feedback = "Tap the matching square."
-        prefs.edit().putInt("count", count).putString("codes", codes).putInt("step", 0).apply()
+        mode = nextMode
+        step = 0; selected = null; answer = ""; hint = 0; feedback = if (mode == "gold") "Read the gold dot’s square." else "Tap the matching square."
+        prefs.edit().putInt("count", count).putString("codes", codes).putString("mode", mode).putInt("step", 0).apply()
         playing = true
         fit()
     }
@@ -71,7 +82,12 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 WoodlandPostcard(Modifier.fillMaxWidth().height(130.dp))
                 Text("Little Woodland", fontWeight = FontWeight.Bold, color = Ink, fontSize = 18.sp)
-                Text("Find the grid square", color = Forest)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    listOf("grid" to "Trail Treasures", "gold" to "Golden Spots").forEach { (id,label) ->
+                        FilterChip(selected = nextMode == id, onClick = { nextMode = id },
+                            label = { Text(label) }, modifier = Modifier.weight(1f).testTag("customMode_$id"))
+                    }
+                }
                 Text("Discoveries", color = Ink, fontWeight = FontWeight.SemiBold)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     CustomHuntGenerator.lengths.forEach { n ->
@@ -81,7 +97,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 }
                 if (targets.isNotEmpty() && step < targets.size) {
                     OutlinedButton(onClick = { playing = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("customResume")) {
-                        Text("Resume · $step/${targets.size}")
+                        Text("Resume · " + (if (mode == "gold") "Golden Spots" else "Trail Treasures") + " · $step/${targets.size}")
                     }
                 }
                 Button(onClick = { if (targets.isNotEmpty() && step < targets.size) replaceHunt = true else start() }, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("customStart")) {
@@ -93,17 +109,46 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
             Button(onClick = { playing = false }) { Text("Return to setup") }
         } else {
             val active = targets.getOrNull(step)
-            if (active != null) ObjectiveRibbon(step, targets.size, active, "Little Woodland", false)
+            if (active != null) {
+                if (mode == "gold") Text("Golden spot ${step+1} of ${targets.size}", color = Forest, fontWeight = FontWeight.Bold)
+                else ObjectiveRibbon(step, targets.size, active, "Little Woodland", false)
+            }
             HuntMapPanel(modifier = Modifier.fillMaxWidth().weight(1f).testTag("customMap"),
                 bounds = bounds, camera = camera,
                 selectedCell = selected?.let { runCatching { GridReference.parse(it) }.getOrNull() },
                 completed = targets.take(step), viewport = viewport,
                 onViewport = { if (it != viewport || camera == null) { viewport = it; fit() } },
-                onCamera = { camera = it }, onSelect = { selected = it }, markerPoint = null,
-                enableSelect = active != null, mapLook = mapLook, onLook = onLook)
+                onCamera = { camera = it }, onSelect = { selected = it },
+                markerPoint = if (mode == "gold") active?.let { WorldPoint(it.eastIndex * 1000.0 + 500.0, it.northIndex * 1000.0 + 500.0) } else null,
+                enableSelect = active != null && mode == "grid", mapLook = mapLook, onLook = onLook)
             if (active == null) PuzzleFinishCard("Your hunt is complete!", "A little woodland adventure, all yours.",
                 "${targets.size} OF ${targets.size} FOUND", "New hunt", ::start, { playing = false })
-            else HuntControlPanel(step, targets.size, selected, feedback, hint, false,
+            else if (mode == "gold") {
+                OutlinedTextField(value = answer, onValueChange = { answer = it.filter { c -> c in '0'..'9' }.take(4) },
+                    label = { Text("Four-digit map code") }, singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth().testTag("customGoldInput"))
+                Text(when(hint) {
+                    1 -> "Read the grid line left of the dot."
+                    2 -> "Then read the line below the dot."
+                    else -> feedback
+                }, color = Forest, fontSize = 12.sp)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    HuntToolButton(ExplorerTool.HINT, Modifier.weight(1f), { hint = (hint+1).coerceAtMost(2) })
+                    HuntToolButton(ExplorerTool.ZOOM_IN, Modifier.weight(1f), { zoom(1.6) })
+                    HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f), { zoom(1.0/1.6) })
+                    HuntToolButton(ExplorerTool.FIT, Modifier.weight(1f), ::fit)
+                }
+                Button(onClick = {
+                    if (answer == active.reference) {
+                        step += 1; answer = ""; hint = 0; feedback = "Found it!"
+                        prefs.edit().putInt("step",step).apply()
+                    } else feedback = "Not quite. Try another code."
+                }, enabled = answer.length == 4,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("customGoldCheck")) {
+                    Text("Try this code")
+                }
+            } else HuntControlPanel(step, targets.size, selected, feedback, hint, false,
                 onMove = { dx,dy ->
                     val cell = GridReference.parse(selected ?: "2640")
                     selected = GridCell((cell.eastIndex+dx).coerceIn(24,29),(cell.northIndex+dy).coerceIn(37,42)).reference
