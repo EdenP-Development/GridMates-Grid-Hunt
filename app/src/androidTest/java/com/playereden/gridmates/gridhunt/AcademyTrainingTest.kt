@@ -24,6 +24,7 @@ class AcademyTrainingTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val prefs = context.getSharedPreferences(ExplorerAcademy.saveName, Context.MODE_PRIVATE)
         check(prefs.edit().clear().commit())
+        check(context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE).edit().remove("precise_selection").commit())
         val campaign = context.getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
         val before = campaign.all.toMap()
         compose.onNodeWithTag("openAcademy").performScrollTo().performClick()
@@ -47,8 +48,14 @@ class AcademyTrainingTest {
         compose.onNodeWithTag("academyWoodlandMap").assertExists()
         compose.onNodeWithTag("academyZoomIn").performScrollTo().performClick()
         compose.onNodeWithTag("academyFit").performScrollTo().performClick()
+        compose.onNodeWithTag("academyMoveWest").assertDoesNotExist()
         compose.onNodeWithTag("academyGuide").performScrollTo().performClick()
+        compose.onNodeWithTag("academyOpenLegend").performClick()
         compose.onNodeWithTag("dismissWoodlandMapGuide").performClick()
+        compose.onNodeWithTag("academyGuide").performScrollTo().performClick()
+        compose.onNodeWithTag("academyPreciseSelection").performClick()
+        compose.onNodeWithTag("academyCloseTools").performClick()
+        compose.onNodeWithTag("academyMoveWest").assertExists()
         compose.onNodeWithTag("academyMoveWest").performScrollTo().performClick()
         repeat(2) {
             compose.onNodeWithTag("academyMoveSouth").performScrollTo().performClick()
