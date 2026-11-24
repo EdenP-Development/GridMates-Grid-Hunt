@@ -4,6 +4,27 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ExplorerAcademyTest {
+    @Test fun graduationRequiresPracticeAndAwardsOnceAcrossReplay() {
+        val academy = ExplorerAcademy
+        val practice = academy.exercises.map { it.id }.toSet()
+        val empty = emptySet<String>()
+        assertNull(academy.graduationCurrent(empty, empty))
+        assertEquals(empty, academy.acceptGraduation(empty, empty, "grad-start", "2641"))
+        assertEquals(empty, academy.qualifications(empty, practice, empty))
+        assertEquals(empty, academy.acceptGraduation(practice, empty, "grad-route", "2840"))
+        var earned = empty
+        for (exercise in academy.graduation) {
+            assertEquals(earned, academy.acceptGraduation(practice, earned, exercise.id, "0000"))
+            earned = academy.acceptGraduation(practice, earned, exercise.id, exercise.answer)
+        }
+        assertTrue(academy.graduated(practice, earned))
+        val award = academy.qualifications(empty, practice, earned)
+        assertEquals(setOf(academy.qualificationId), award)
+        assertEquals(award, academy.qualifications(award, practice, earned))
+        assertEquals(award, academy.qualifications(award, empty, empty))
+        assertFalse(academy.graduated(empty, empty))
+    }
+
     @Test fun routesResolveAndRejectOutOfBounds() {
         val route = AcademyRoute(GridReference.parse("2538"), listOf(
             AcademyRouteLeg(AcademyDirection.EAST, 2),
