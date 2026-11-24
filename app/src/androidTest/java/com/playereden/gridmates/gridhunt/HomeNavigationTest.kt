@@ -32,6 +32,7 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openChapter").assertExists()
         compose.onNodeWithTag("openReverse").assertExists()
         compose.onNodeWithTag("openTreasure").assertExists()
+        compose.onNodeWithTag("openIdentify").assertExists()
         compose.onNodeWithTag("homeIllustration").assertExists()
         compose.onNodeWithText("Choose your next puzzle").assertExists()
     }
@@ -216,6 +217,57 @@ class HomeNavigationTest {
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishContinue").performClick()
         compose.onNodeWithText("0 of 4 woodland discoveries").assertExists()
+    }
+
+    @Test fun identifyGridRejectsWrongPictureThenResumesWithNextQuestion() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_identify_v1", Context.MODE_PRIVATE)
+            .edit().clear().commit()
+        compose.activityRule.scenario.recreate()
+
+        compose.onNodeWithTag("openIdentify").performScrollTo().performClick()
+        compose.onNodeWithText("0 of 4 identified").assertExists()
+        compose.onNodeWithTag("identifyReference").assertExists()
+        compose.onNodeWithTag("identifyOption_buttercup-glade").performClick()
+        compose.onNodeWithTag("identifyCheck").performClick()
+        compose.onNodeWithText("0 of 4 identified").assertExists()
+        compose.onNodeWithTag("identifyOption_mushroom-nook").performClick()
+        compose.onNodeWithTag("identifyCheck").performClick()
+        compose.onNodeWithText("1 of 4 identified").assertExists()
+        compose.onNodeWithText("2840").assertExists()
+
+        compose.onNodeWithTag("identifyGuide").performClick()
+        compose.onNodeWithTag("woodlandMapGuide").assertExists()
+        compose.onNodeWithTag("dismissWoodlandMapGuide").performClick()
+        compose.onNodeWithText("1 of 4 identified").assertExists()
+
+        compose.onNodeWithTag("identifyHome").performClick()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openIdentify").performScrollTo().performClick()
+        compose.onNodeWithText("1 of 4 identified").assertExists()
+        compose.onNodeWithText("2840").assertExists()
+    }
+
+    @Test fun identifyGridFourCorrectPicturesEarnFinishAndExplicitReplay() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_identify_v1", Context.MODE_PRIVATE)
+            .edit().clear().commit()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openIdentify").performScrollTo().performClick()
+
+        listOf("mushroom-nook", "buttercup-glade", "acorn-nook", "old-waystone")
+            .forEachIndexed { index, id ->
+                compose.onNodeWithTag("identifyOption_$id").performClick()
+                compose.onNodeWithTag("identifyCheck").performClick()
+                compose.onNodeWithText("${index + 1} of 4 identified").assertExists()
+            }
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithTag("finishHome").performClick()
+        compose.onNodeWithTag("openIdentify").performScrollTo().performClick()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithTag("finishContinue").performClick()
+        compose.onNodeWithText("0 of 4 identified").assertExists()
+        compose.onNodeWithText("2538").assertExists()
     }
 
     @Test fun visualMapChoiceIsReachable() {
