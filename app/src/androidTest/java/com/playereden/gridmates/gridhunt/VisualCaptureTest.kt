@@ -78,6 +78,12 @@ class VisualCaptureTest {
         }
     }
 
+    private fun openQuickIfAtHome() {
+        if (compose.onAllNodesWithTag("openQuickPlay").fetchSemanticsNodes().isNotEmpty()) {
+            compose.onNodeWithTag("openQuickPlay").performScrollTo().performClick()
+        }
+    }
+
     private fun prepare() {
         listOf("gridhunt_first_bearings_v1", "gridhunt_reverse_v1",
             "gridhunt_treasure_checklist_v1", "gridhunt_identify_v1",
@@ -120,8 +126,22 @@ class VisualCaptureTest {
         compose.onNodeWithTag("checkReverse").performClick()
     }
 
+    @Test fun captureExplorerHomeAdventureAndCustomShell() {
+        prepare()
+        compose.onNodeWithTag("openAdventure").assertExists()
+        capture("16_explorer_desk_home.png")
+        compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("openAdventureChapter").assertExists()
+        capture("17_adventure_journey.png")
+        compose.onNodeWithTag("adventureBack").performClick()
+        compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+        compose.onNodeWithTag("customNotReady").assertExists()
+        capture("18_custom_play_preview.png")
+    }
+
     @Test fun captureIntroTreasureChecklistAndEarnedFinish() {
         prepare()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openTreasure").performScrollTo().performClick()
         compose.onNodeWithTag("treasureCodeInput").assertExists()
         capture("09_woodland_checklist.png")
@@ -139,6 +159,7 @@ class VisualCaptureTest {
 
     @Test fun captureIdentifyByGridOpeningAndFourCorrectAnswers() {
         prepare()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openIdentify").performScrollTo().performClick()
         compose.onNodeWithTag("identifyReference").assertExists()
         capture("12_identify_woodland.png")
@@ -153,6 +174,7 @@ class VisualCaptureTest {
 
     @Test fun captureMixedAdventureAndEarnedFinish() {
         prepare()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
         compose.onNodeWithTag("mixedCheck").assertExists()
         capture("14_mixed_expedition.png")
@@ -183,11 +205,13 @@ class VisualCaptureTest {
                 target.resources.configuration.orientation ==
                     android.content.res.Configuration.ORIENTATION_LANDSCAPE
             }
+        openQuickIfAtHome()
             compose.onNodeWithTag("openChapter").performScrollTo().performClick()
             dismissGuide()
             compose.onNodeWithTag("checkChapter").assertExists()
             capture("07_trail_landscape.png")
             compose.onNodeWithTag("chapterHome").performClick()
+        openQuickIfAtHome()
             compose.onNodeWithTag("openReverse").performScrollTo().performClick()
             compose.onNodeWithTag("reverseCodeInput").assertExists()
             capture("08_golden_landscape.png")
@@ -203,6 +227,7 @@ class VisualCaptureTest {
         compose.onNodeWithTag("homeIllustration").assertExists()
         capture("01_home.png")
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuide()
         compose.onNodeWithTag("checkChapter").assertExists()
@@ -211,12 +236,14 @@ class VisualCaptureTest {
         capture("03_trail_other_map_style.png")
 
         compose.onNodeWithTag("chapterHome").performClick()
+        openQuickIfAtHome()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
         compose.onNodeWithTag("reverseCodeInput").assertExists()
         capture("04_golden_spots.png")
         compose.onNodeWithTag("reverseHome").performClick()
 
         // Return to the live chapter and earn every finish state legitimately.
+        openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performScrollTo().performClick()
         dismissGuide()
         val trails = listOf(
@@ -234,6 +261,7 @@ class VisualCaptureTest {
         capture("05_treasure_finish.png")
         compose.onNodeWithTag("finishHome").performClick()
 
+        openQuickIfAtHome()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
         listOf("2440", "2742", "2838", "2541", "2942").forEach(::enterSpotCode)
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
