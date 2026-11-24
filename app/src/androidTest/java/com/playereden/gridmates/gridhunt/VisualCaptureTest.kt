@@ -131,6 +131,7 @@ class VisualCaptureTest {
         compose.onNodeWithTag("openAdventure").assertExists()
         capture("16_explorer_desk_home.png")
         compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("adventureRouteMap").assertExists()
         compose.onNodeWithTag("openAdventureChapter").assertExists()
         capture("17_adventure_journey.png")
         compose.onNodeWithTag("adventureBack").performClick()
