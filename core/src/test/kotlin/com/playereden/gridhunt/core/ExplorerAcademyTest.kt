@@ -46,7 +46,10 @@ class ExplorerAcademyTest {
         val symbol = ExplorerAcademy.accept(woodland, "woodland-symbol", WoodlandLandmarks.flowers.cell.reference)
         assertEquals("woodland-route", ExplorerAcademy.current(symbol)?.id)
         assertEquals(symbol, ExplorerAcademy.accept(symbol, "woodland-route", "2738"))
-        val completed = ExplorerAcademy.accept(symbol, "woodland-route", "2739")
+        val route = ExplorerAcademy.accept(symbol, "woodland-route", "2739")
+        assertEquals("woodland-deduction", ExplorerAcademy.current(route)?.id)
+        assertEquals(route, ExplorerAcademy.accept(route, "woodland-deduction", "2840"))
+        val completed = ExplorerAcademy.accept(route, "woodland-deduction", "2941")
         assertTrue(ExplorerAcademy.practiceComplete(completed))
         assertNull(ExplorerAcademy.current(completed))
     }
