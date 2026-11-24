@@ -39,6 +39,8 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openQuickPlay").assertExists()
         compose.onNodeWithTag("openCustomPlay").assertExists()
         compose.onNodeWithTag("homeIllustration").assertExists()
+        compose.onNodeWithTag("homeAdventureProgress").assertExists()
+        compose.onNodeWithText("Little Woodland").assertExists()
         openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").assertExists()
         openQuickIfAtHome()
