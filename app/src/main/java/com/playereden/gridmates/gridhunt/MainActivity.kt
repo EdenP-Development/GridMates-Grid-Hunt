@@ -140,7 +140,7 @@ private fun GridHuntScreen() {
     var returnHub by rememberSaveable { mutableStateOf("quick") }
     val goBack = {
         screen = when (screen) {
-            "quick", "adventure", "custom" -> "home"
+            "quick", "adventure", "custom", "academy" -> "home"
             else -> returnHub
         }
     }
@@ -170,8 +170,10 @@ private fun GridHuntScreen() {
             expeditionProgress = expeditionProgress,
             onAdventure = { screen = "adventure" },
             onQuickPlay = { screen = "quick" },
-            onCustom = { screen = "custom" }
+            onCustom = { screen = "custom" },
+            onAcademy = { screen = "academy" }
         )
+        "academy" -> ExplorerAcademyScreen(onHome = { screen = "home" })
         "adventure" -> WoodlandAdventureJourney(
             progress = expeditionProgress,
             secondStatus = supplyState.status,
