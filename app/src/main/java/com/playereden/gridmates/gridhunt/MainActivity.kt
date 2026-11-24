@@ -86,6 +86,7 @@ import com.playereden.gridhunt.core.FirstBearingsChapter
 import com.playereden.gridhunt.core.TreasureChecklistMission
 import com.playereden.gridhunt.core.WoodlandIdentifyMission
 import com.playereden.gridhunt.core.WoodlandExpedition
+import com.playereden.gridhunt.core.GridHuntCampaign
 import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.GridCell
 import com.playereden.gridhunt.core.GridReference
@@ -145,9 +146,15 @@ private fun GridHuntScreen() {
     val expeditionPrefs = remember(context) {
         context.getSharedPreferences(WoodlandExpedition.saveName, Context.MODE_PRIVATE)
     }
-    val expeditionProgress = WoodlandExpedition.restoreStep(
-        expeditionPrefs.getInt("step", 0)
+    // Read the original GH-V13 save; the versioned campaign registry adds
+    // world/chapter metadata but never rewrites or migrates the old progress.
+    val campaignState = GridHuntCampaign.registry.state(
+        WoodlandExpedition.chapter.id,
+        GridHuntCampaign.snapshotForExistingExpedition(
+            expeditionPrefs.getInt("step", 0)
+        )
     )
+    val expeditionProgress = requireNotNull(campaignState).completedObjectives
 
     when (screen) {
         "home" -> ExplorerDeskHome(
