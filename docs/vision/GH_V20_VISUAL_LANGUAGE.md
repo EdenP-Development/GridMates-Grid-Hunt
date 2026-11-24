@@ -23,3 +23,6 @@ Introduce map tools in context before independent field practice; demonstrate me
 5. Audit visual consistency, accessibility, saves and emulator/owner phone QA.
 
 No artwork registry or new tutorial mechanic is implemented by this design note alone. QA238 is the last confirmed fully verified baseline at authoring; newer map-first commits pending verification.
+
+## Owner refinement: balance reading and discovery
+Players vary: some enjoy instructions, some skim and experiment, others already know the skill. Teach through a brief demonstration and immediate interaction rather than front-loading paragraphs. Default to one concise instruction and a clear action, with optional expandable explanations and replayable illustrated help. Keep important clue wording and coordinate values readable; never hide essential information merely to reduce word count. Allow ordinary play without Academy completion. Incorrect practice attempts should give constructive feedback without penalties; do not reveal graduation answers automatically. Introduce tools contextually, use safe exploration and consistent visual affordances, and avoid repetitive tutorial popups. Validate comprehension with novice phone playtesting, not word count alone. This is owner-approved direction, not an implemented tutorial change.
