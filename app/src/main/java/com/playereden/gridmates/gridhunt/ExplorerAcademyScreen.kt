@@ -46,6 +46,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
     var inGraduation by rememberSaveable { mutableStateOf(fieldEarned.isNotEmpty()) }
     val practiceDone = ExplorerAcademy.practiceComplete(earned)
     val graduated = ExplorerAcademy.graduated(earned, fieldEarned)
+    var showOverview by rememberSaveable { mutableStateOf(true) }
     val active = if (inGraduation && practiceDone)
         ExplorerAcademy.graduationCurrent(earned, fieldEarned) else ExplorerAcademy.current(earned)
     var feedback by rememberSaveable(active?.id) { mutableStateOf("") }
@@ -73,6 +74,13 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
         Text(if (inGraduation && practiceDone) "Graduation expedition · ${fieldEarned.size} of ${ExplorerAcademy.graduation.size}"
             else "Beginner practice · ${earned.size} of ${ExplorerAcademy.exercises.size}",
             color = Forest, modifier = Modifier.testTag("academyProgress"))
+        if (showOverview) {
+            AcademySchoolOverview(earned, fieldEarned, qualifications,
+                onContinue = { showOverview = false })
+        } else {
+        TextButton(onClick = { showOverview = true }, modifier = Modifier.testTag("academyOverview")) {
+            Text("School overview")
+        }
         if (success.isNotBlank()) Text(success, color = Forest,
             modifier = Modifier.testTag("academySuccess"))
         if (active != null) {
@@ -165,6 +173,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
             }, modifier = Modifier.fillMaxWidth().testTag("academyReplay")) {
                 Text("Practice again")
             }
+        }
         }
         Text("Learn at your own pace. No timer or penalties.", color = Muted)
     }
@@ -271,4 +280,46 @@ private fun AcademyWoodlandMap(
         }
     }
     if (guide) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { guide = false })
+}
+
+@Composable
+private fun AcademySchoolOverview(
+    earned: Set<String>, fieldEarned: Set<String>, qualifications: Set<String>,
+    onContinue: () -> Unit
+) {
+    val complete = ExplorerAcademy.graduated(earned, fieldEarned)
+    val practiceDone = ExplorerAcademy.practiceComplete(earned)
+    Surface(color = Color(0xFFFFF0CF), shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().testTag("academySchoolOverview")) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("School of Exploration", color = Ink, fontSize = 23.sp, fontWeight = FontWeight.Bold)
+            Text("Your first steps from map reader to explorer.", color = Forest)
+            Text("Field training", color = Ink, fontWeight = FontWeight.Bold)
+            ExplorerAcademy.exercises.groupBy { it.lesson }.forEach { (lesson, exercises) ->
+                val count = exercises.count { it.id in earned }
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(if (count == exercises.size) "✓" else "○", color = Forest,
+                        modifier = Modifier.width(24.dp))
+                    Text(lesson, color = Ink, modifier = Modifier.weight(1f))
+                    Text("$count / ${exercises.size}", color = Muted, fontSize = 12.sp)
+                }
+            }
+            HorizontalDivider(color = Forest.copy(alpha = 0.25f))
+            Text("The Explorer's First Journey", color = Ink, fontWeight = FontWeight.Bold)
+            Text(if (practiceDone) "${fieldEarned.size} / ${ExplorerAcademy.graduation.size} checkpoints"
+                else "Complete field training to unlock graduation.", color = Forest)
+            if (ExplorerAcademy.qualificationId in qualifications) {
+                Text("★ Junior Explorer · Qualification earned", color = Forest, fontWeight = FontWeight.Bold)
+            }
+            Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                .testTag("academyContinueSchool")) {
+                Text(when {
+                    complete -> "View graduation"
+                    practiceDone -> "Continue to graduation"
+                    earned.isEmpty() -> "Begin field training"
+                    else -> "Continue field training"
+                })
+            }
+        }
+    }
 }
