@@ -80,7 +80,7 @@ class VisualCaptureTest {
 
     private fun prepare() {
         listOf("gridhunt_first_bearings_v1", "gridhunt_reverse_v1",
-            "gridhunt_treasure_checklist_v1").forEach { name ->
+            "gridhunt_treasure_checklist_v1", "gridhunt_identify_v1").forEach { name ->
             check(target.getSharedPreferences(name, Context.MODE_PRIVATE)
                 .edit().clear().commit()) { "Could not reset test-only $name" }
         }
@@ -134,6 +134,20 @@ class VisualCaptureTest {
         }
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         capture("10_woodland_checklist_finish.png")
+    }
+
+    @Test fun captureIdentifyByGridOpeningAndFourCorrectAnswers() {
+        prepare()
+        compose.onNodeWithTag("openIdentify").performScrollTo().performClick()
+        compose.onNodeWithTag("identifyReference").assertExists()
+        capture("12_identify_woodland.png")
+        listOf("mushroom-nook", "buttercup-glade", "acorn-nook", "old-waystone")
+            .forEach { id ->
+                compose.onNodeWithTag("identifyOption_$id").performClick()
+                compose.onNodeWithTag("identifyCheck").performClick()
+            }
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        capture("13_identify_finish.png")
     }
 
     @Test fun captureLandscapePuzzleLayouts() {
