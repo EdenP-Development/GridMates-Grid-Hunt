@@ -27,10 +27,13 @@ jobs:
           set -euo pipefail
           chmod +x gradlew
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.0'
+          export GITHUB_RUN_NUMBER=302
           ./gradlew :core:test :app:assembleBeta --no-daemon --max-workers=2 --console=plain
           mkdir -p unsigned
           cp app/build/outputs/apk/beta/app-beta-unsigned.apk unsigned/beta.apk
           sha256sum unsigned/beta.apk > unsigned/SHA256.txt
+          badging=$("$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging unsigned/beta.apk)
+          printf '%s\n' "$badging" | sed -n '1p'
       - uses: actions/upload-artifact@v4
         with:
           name: unsigned-gridhunt-proof
@@ -69,17 +72,21 @@ jobs:
           [[ -n "$KEYSTORE_BASE64" && -n "$KEYSTORE_PASSWORD" ]]
           printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$d/key.p12"
           actual=$(keytool -exportcert -storetype PKCS12 -keystore "$d/key.p12" -storepass:env KEYSTORE_PASSWORD -alias gridhunt-beta | sha256sum | awk '{print $1}')
-          [[ "$actual" == "$EXPECTED_CERT" ]]
+          [[ "$actual" == "$EXPECTED_CERT" ]] || { echo "Pinned certificate mismatch"; exit 1; }
+          echo "Keystore certificate verified"
           "$tools/zipalign" -P 16 -f 4 unsigned/beta.apk "$d/aligned.apk"
           "$tools/apksigner" sign --ks "$d/key.p12" --ks-type PKCS12 --ks-key-alias gridhunt-beta --ks-pass env:KEYSTORE_PASSWORD --key-pass env:KEYSTORE_PASSWORD --out "$d/signed.apk" "$d/aligned.apk"
+          echo "APK signing command completed"
           "$tools/apksigner" verify --print-certs "$d/signed.apk" > "$d/signer.txt"
           signer=$(awk '/Signer #1 certificate SHA-256 digest:/ {print $NF}' "$d/signer.txt")
-          [[ "$signer" == "$EXPECTED_CERT" ]]
+          [[ "$signer" == "$EXPECTED_CERT" ]] || { echo "APK certificate mismatch"; exit 1; }
+          echo "APK certificate verified"
           badging=$("$tools/aapt" dump badging "$d/signed.apk")
           line=$(printf '%s\n' "$badging" | sed -n '1p')
+          printf "Inspected APK: %s\n" "$line"
           [[ "$line" == *"name='com.playereden.gridmates.gridhunt.beta'"* ]]
-          [[ "$line" == *"versionCode='10302'"* ]]
-          [[ "$line" == *"versionName='0.3.0-gh02c-beta.302'"* ]]
+          [[ "$line" == *"versionCode='10302'"* ]] || { echo "Version code mismatch"; exit 1; }
+          [[ "$line" == *"versionName='0.3.0-gh02c-beta.302'"* ]] || { echo "Version name mismatch"; exit 1; }
           "$tools/zipalign" -c -P 16 4 "$d/signed.apk"
           hash=$(sha256sum "$d/signed.apk" | awk '{print $1}')
           echo "PASS: signed beta APK package, version and certificate verified; sha256=$hash"
