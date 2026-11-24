@@ -105,7 +105,8 @@ internal fun WoodlandMixedExpeditionScreen(
     }
     var showGuide by rememberSaveable(mission.chapter.id) { mutableStateOf(false) }
     var feedback by rememberSaveable(mission.chapter.id) {
-        mutableStateOf(if (chapterTwo)
+        mutableStateOf(mission.chapter.objectives.getOrNull(step - 1)?.discovery
+            ?.takeIf { it.isNotBlank() } ?: if (chapterTwo)
             "Follow the journal notes to trace the missing supplies."
             else "Follow the next clue to recover the missing field notes.")
     }
@@ -194,7 +195,7 @@ internal fun WoodlandMixedExpeditionScreen(
                 selectedCell = null
                 enteredCode = ""
                 chosenLandmark = null
-                feedback = if (mission.finished(step)) {
+                feedback = current.discovery.takeIf { it.isNotBlank() } ?: if (mission.finished(step)) {
                     if (chapterTwo) "The last stop has been found! The supplies trail is complete."
                     else "Every missing page recovered. Your woodland chapter is complete!"
                 } else if (chapterTwo) "A new trail note found! Follow the next clue."
