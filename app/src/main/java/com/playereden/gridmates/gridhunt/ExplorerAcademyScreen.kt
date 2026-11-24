@@ -96,23 +96,40 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
             Surface(color = Color(0xFFFFF0CF), shape = RoundedCornerShape(16.dp)) {
                 Column(Modifier.fillMaxWidth().padding(if (mapLesson) 8.dp else 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (mapLesson) {
-                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            Text(active.lesson, color = Ink, fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                                modifier = Modifier.weight(1f))
-                            TextButton(onClick = { showLessonHelp = !showLessonHelp },
-                                contentPadding = PaddingValues(horizontal = 4.dp),
-                                modifier = Modifier.testTag("academyLessonHelp")) {
-                                Text("Help", color = Forest)
-                            }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(active.lesson, color = Ink, fontSize = if (mapLesson) 16.sp else 20.sp,
+                            fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                        TextButton(onClick = { showLessonHelp = true },
+                            contentPadding = PaddingValues(horizontal = 4.dp),
+                            modifier = Modifier.testTag("academyLessonHelp").semantics { contentDescription = "Lesson help" }) {
+                            Text("?", color = Forest, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         }
-                        if (showLessonHelp) AlertDialog(onDismissRequest = { showLessonHelp = false },
-                            title = { Text(active.lesson) }, text = { Text(active.teaching) },
-                            confirmButton = { TextButton(onClick = { showLessonHelp = false }) { Text("Got it") } })
-                    } else {
-                        Text(active.lesson, color = Ink, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                        Text(active.teaching, color = Ink)
                     }
+                    if (showLessonHelp) AlertDialog(onDismissRequest = { showLessonHelp = false },
+                        title = { Text(active.lesson) }, text = {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text(active.teaching)
+                                if (active.id == "woodland-field") {
+                                    listOf(ExplorerTool.ZOOM_IN, ExplorerTool.ZOOM_OUT, ExplorerTool.FIT, ExplorerTool.GUIDE).forEach { tool ->
+                                        Row(verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            ExplorerToolIcon(tool)
+                                            Text(tool.label)
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        confirmButton = { TextButton(onClick = { showLessonHelp = false }) { Text("Got it") } })
+                    val tip = when(active.id) {
+                        "north" -> "North is up. East is right."
+                        "south" -> "North and south are opposites."
+                        "grid-order" -> "Read across, then up."
+                        "grid-practice", "grid-field" -> "Use the left and bottom grid lines."
+                        "woodland-field" -> "Tap a square. Drag or pinch to explore."
+                        else -> null
+                    }
+                    tip?.let { Text(it, color = Forest, fontSize = 13.sp) }
                     if (active.id == "north" || active.id == "south") {
                         AcademyCompass()
                     }
