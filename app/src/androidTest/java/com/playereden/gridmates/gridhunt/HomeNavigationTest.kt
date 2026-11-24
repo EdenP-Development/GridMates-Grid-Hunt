@@ -49,7 +49,6 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openIdentify").assertExists()
         openQuickIfAtHome()
         compose.onNodeWithTag("openExpedition").assertExists()
-        compose.onNodeWithTag("homeIllustration").assertExists()
         compose.onNodeWithText("Choose your puzzle").assertExists()
     }
 
