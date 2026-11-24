@@ -173,7 +173,7 @@ private fun GridHuntScreen() {
             onCustom = { screen = "custom" },
             onAcademy = { screen = "academy" }
         )
-        "academy" -> ExplorerAcademyScreen(onHome = { screen = "home" })
+        "academy" -> ExplorerAcademyScreen(onHome = { screen = "home" }, mapLook = mapLook, onLook = { lookName = it.name })
         "adventure" -> WoodlandAdventureJourney(
             progress = expeditionProgress,
             secondStatus = supplyState.status,
