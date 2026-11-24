@@ -52,6 +52,8 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
     var feedback by rememberSaveable(active?.id) { mutableStateOf("") }
     var selected by rememberSaveable(active?.id) { mutableStateOf<String?>(active?.route?.start?.reference) }
     var success by rememberSaveable { mutableStateOf("") }
+    var successDetail by rememberSaveable { mutableStateOf("") }
+    var showSuccessDetail by rememberSaveable { mutableStateOf(false) }
     var showLessonHelp by rememberSaveable(active?.id) { mutableStateOf(false) }
     val mapLesson = !showOverview && active?.woodlandField == true
     val scroll = rememberScrollState()
@@ -90,8 +92,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
         if (!mapLesson) TextButton(onClick = { showOverview = true }, modifier = Modifier.testTag("academyOverview")) {
             Text("School overview")
         }
-        if (success.isNotBlank() && active?.woodlandField != true) Text(success, color = Forest,
-            fontSize = 12.sp, modifier = Modifier.testTag("academySuccess"))
+
         if (active != null) {
             Surface(color = Color(0xFFFFF0CF), shape = RoundedCornerShape(16.dp)) {
                 Column(Modifier.fillMaxWidth().padding(if (mapLesson) 8.dp else 16.dp),
@@ -150,7 +151,9 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                                     .putStringSet("qualifications", awards).apply()
                                 fieldEarned = next
                                 qualifications = awards
-                                success = "✓ " + active.explanation
+                                success = "✓ Correct!"
+                                successDetail = active.explanation
+                                showSuccessDetail = false
                             } else {
                                 success = ""
                                 feedback = "Not quite. Review the clue and Map Guide, then try again."
@@ -159,11 +162,13 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                         val next = ExplorerAcademy.accept(earned, active.id, choice)
                         if (next != earned) {
                             prefs.edit().putStringSet("earned", next).apply()
-                            success = "✓ " + active.explanation
+                            success = "✓ Correct!"
+                            successDetail = active.explanation
+                            showSuccessDetail = false
                             earned = next
                         } else {
                             success = ""
-                            feedback = active.explanation + " Try again."
+                            feedback = "Try again. Use ? for a little help."
                         }
                         }
                     }
@@ -199,8 +204,16 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                             }
                         }
                     }
-                    if (active.woodlandField && success.isNotBlank()) Text(success, color = Forest,
-                        fontSize = 12.sp, modifier = Modifier.testTag("academySuccess"))
+                    if (success.isNotBlank()) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(success, color = Forest, fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f).testTag("academySuccess"))
+                        TextButton(onClick = { showSuccessDetail = true }) { Text("Why?", fontSize = 12.sp) }
+                    }
+                    if (showSuccessDetail && success.isNotBlank()) AlertDialog(
+                        onDismissRequest = { showSuccessDetail = false }, title = { Text("Nice exploring!") },
+                        text = { Text(successDetail) }, confirmButton = {
+                            TextButton(onClick = { showSuccessDetail = false }) { Text("Got it") }
+                        })
                     if (feedback.isNotBlank()) Text(feedback, color = Forest,
                         modifier = Modifier.testTag("academyFeedback"))
                 }
@@ -228,7 +241,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
             }
         }
         }
-        Text("Learn at your own pace. No timer or penalties.", color = Muted, fontSize = 12.sp)
+        if (showOverview) Text("Learn at your own pace. No timer or penalties.", color = Muted, fontSize = 12.sp)
         }
     }
 }
