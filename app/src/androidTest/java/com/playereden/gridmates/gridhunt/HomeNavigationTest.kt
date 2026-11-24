@@ -33,6 +33,7 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openReverse").assertExists()
         compose.onNodeWithTag("openTreasure").assertExists()
         compose.onNodeWithTag("openIdentify").assertExists()
+        compose.onNodeWithTag("openExpedition").assertExists()
         compose.onNodeWithTag("homeIllustration").assertExists()
         compose.onNodeWithText("Choose your next puzzle").assertExists()
     }
@@ -268,6 +269,73 @@ class HomeNavigationTest {
         compose.onNodeWithTag("finishContinue").performClick()
         compose.onNodeWithText("0 of 4 identified").assertExists()
         compose.onNodeWithText("2538").assertExists()
+    }
+
+    private fun playFirstMixedSquare() {
+        repeat(2) {
+            compose.onNodeWithContentDescription("Expedition move west").performClick()
+        }
+        repeat(3) {
+            compose.onNodeWithContentDescription("Expedition move south").performClick()
+        }
+        compose.onNodeWithText("2437").assertExists()
+        compose.onNodeWithTag("mixedCheck").performClick()
+    }
+
+    @Test fun mixedChapterValidatesEachVerbAndPreservesProgressAfterReopen() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
+            .edit().clear().commit()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
+        compose.onNodeWithText("0 of 4 pages found").assertExists()
+
+        // Stage 1 needs a MAP square selection, not an object tile.
+        playFirstMixedSquare()
+        compose.onNodeWithText("1 of 4 pages found").assertExists()
+
+        // Stage 2 reads the actual golden dot; wrong guesses do not advance.
+        compose.onNodeWithTag("mixedCodeInput").performTextInput("2538")
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithText("1 of 4 pages found").assertExists()
+        compose.onNodeWithTag("mixedCodeInput").performTextReplacement("2440")
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithText("2 of 4 pages found").assertExists()
+
+        compose.onNodeWithTag("mixedHome").performClick()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
+        compose.onNodeWithText("2 of 4 pages found").assertExists()
+
+        // Stage 3 uses the actual Mushroom Nook artwork and its square.
+        compose.onNodeWithTag("mixedCodeInput").performTextInput("2538")
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithText("3 of 4 pages found").assertExists()
+
+        // Stage 4 asks WHAT lives at 2941. Code entry is no longer valid.
+        compose.onNodeWithTag("mixedOption_mushroom-nook").performClick()
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithText("3 of 4 pages found").assertExists()
+        compose.onNodeWithTag("mixedOption_old-waystone").performClick()
+        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithText("4 of 4 pages found").assertExists()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+    }
+
+    @Test fun mixedChapterFinishRemainsUntilExplicitReplay() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
+            .edit().putInt("step", 4).commit()
+        compose.activityRule.scenario.recreate()
+
+        compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithTag("mixedHome").performClick()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithTag("openExpedition").performScrollTo().performClick()
+        compose.onNodeWithTag("puzzleFinishCard").assertExists()
+        compose.onNodeWithTag("finishContinue").performClick()
+        compose.onNodeWithText("0 of 4 pages found").assertExists()
     }
 
     @Test fun visualMapChoiceIsReachable() {
