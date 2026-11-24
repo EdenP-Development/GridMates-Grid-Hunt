@@ -90,26 +90,27 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
         if (!playing) {
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 WoodlandPostcard(Modifier.fillMaxWidth().height(96.dp))
-                Text("Little Woodland", fontWeight = FontWeight.Bold, color = Ink, fontSize = 18.sp)
+                Text("Choose your puzzle", fontWeight = FontWeight.Bold, color = Ink, fontSize = 16.sp)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf("grid" to "Trail Treasures", "gold" to "Golden Spots").forEach { (id,label) ->
                         FilterChip(selected = nextMode == id, onClick = { nextMode = id },
-                            label = { Text(label) }, modifier = Modifier.weight(1f).testTag("customMode_$id"))
+                            label = { Text(label, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 13.sp) }, colors = customChipColors(), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("customMode_$id"))
                     }
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf("identify" to "What's at This Grid?", "checklist" to "Treasure Checklist").forEach { (id,label) ->
                         FilterChip(selected = nextMode == id, onClick = { nextMode = id; count = 3 },
-                            label = { Text(label) }, modifier = Modifier.weight(1f).testTag("customMode_$id"))
+                            label = { Text(label, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 13.sp) }, colors = customChipColors(), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("customMode_$id"))
                     }
                 }
                 FilterChip(selected = nextMode == "mixed", onClick = { nextMode = "mixed"; if (count !in CustomHuntGenerator.mixedLengths) count = 6 },
-                    label = { Text("Mixed Expedition") }, modifier = Modifier.fillMaxWidth().testTag("customMode_mixed"))
+                    label = { Text("Mixed Expedition", modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center) }, colors = customChipColors(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("customMode_mixed"))
                 Text("Discoveries", color = Ink, fontWeight = FontWeight.SemiBold)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     (when(nextMode) { "mixed" -> CustomHuntGenerator.mixedLengths; "identify", "checklist" -> CustomHuntGenerator.landmarkLengths; else -> CustomHuntGenerator.lengths }).forEach { n ->
-                        FilterChip(selected = count == n, onClick = { count = n },
-                            label = { Text(n.toString()) }, modifier = Modifier.weight(1f).testTag("customLength_$n"))
+                        if (nextMode in listOf("identify", "checklist")) Text("3 discoveries", color = Forest, modifier = Modifier.testTag("customLength_$n"))
+                        else FilterChip(selected = count == n, onClick = { count = n },
+                            label = { Text(n.toString(), modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center) }, colors = customChipColors(), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("customLength_$n"))
                     }
                 }
                 if (targets.isNotEmpty() && step < targets.size) {
@@ -229,3 +230,9 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
         }
     }
 }
+
+@Composable
+private fun customChipColors() = FilterChipDefaults.filterChipColors(
+    containerColor = androidx.compose.ui.graphics.Color(0xFFFFFAEC), labelColor = Ink,
+    selectedContainerColor = Forest, selectedLabelColor = androidx.compose.ui.graphics.Color.White
+)
