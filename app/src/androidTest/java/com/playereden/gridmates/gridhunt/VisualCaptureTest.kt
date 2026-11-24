@@ -138,6 +138,9 @@ class VisualCaptureTest {
         compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
         compose.onNodeWithTag("customNotReady").assertExists()
         capture("18_custom_play_preview.png")
+        compose.onNodeWithTag("customOpenQuick").performClick()
+        compose.onNodeWithTag("openIdentify").assertExists()
+        capture("19_compact_quick_play.png")
     }
 
     @Test fun captureIntroTreasureChecklistAndEarnedFinish() {
