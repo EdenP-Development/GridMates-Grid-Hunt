@@ -48,77 +48,135 @@ internal fun ExplorerDeskHome(
         Modifier.fillMaxSize().background(Paper)
             .statusBarsPadding().navigationBarsPadding()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 18.dp, vertical = 12.dp),
+            .padding(horizontal = 17.dp, vertical = 11.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text("GRIDMATES  /  PUZZLE ADVENTURES", color = Forest,
             fontWeight = FontWeight.Bold, fontSize = 10.sp)
-        Text("Grid Hunt", color = Ink, fontWeight = FontWeight.ExtraBold, fontSize = 34.sp)
+        Text("Grid Hunt", color = Ink, fontWeight = FontWeight.ExtraBold,
+            fontSize = 34.sp)
         Text("Little maps. Big discoveries.", color = Muted, fontSize = 13.sp)
-        WoodlandPostcard(modifier = Modifier.fillMaxWidth().height(165.dp))
-        Text("Where shall we explore?", color = Ink, fontSize = 17.sp,
-            fontWeight = FontWeight.Bold)
 
-        ExplorerMenuCard(
-            title = "Adventure",
-            subtitle = when (expeditionProgress) {
-                0 -> "Follow the woodland trail and uncover the first story."
-                WoodlandExpedition.size -> "Your first chapter is complete. Revisit its discoveries."
-                else -> "The Missing Field Notes  ·  $expeditionProgress of 4 pages found"
-            },
-            accent = Color(0xFFDCE8CD),
-            primary = true,
-            tag = "openAdventure",
-            onClick = onAdventure
-        )
-        ExplorerMenuCard(
+        // One primary illustrated journey feature; don't repeat a big hero
+        // postcard above a second oversized Adventure information card.
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color(0xFFE0EBD4),
+            shape = RoundedCornerShape(22.dp),
+            shadowElevation = 3.dp
+        ) {
+            Column(
+                Modifier.fillMaxWidth().padding(11.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                WoodlandPostcard(Modifier.fillMaxWidth().height(142.dp))
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("ADVENTURE  ·  WORLD 1", color = Forest,
+                            fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                        Text("Little Woodland", color = Ink,
+                            fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                        Text(
+                            when (expeditionProgress) {
+                                0 -> "The Missing Field Notes awaits"
+                                WoodlandExpedition.size -> "Chapter 1 complete"
+                                else -> "$expeditionProgress of 4 pages recovered"
+                            },
+                            color = Muted, fontSize = 12.sp,
+                            modifier = Modifier.testTag("homeAdventureProgress")
+                        )
+                    }
+                    Text("✦", color = Gold, fontSize = 27.sp)
+                }
+                Button(
+                    onClick = onAdventure,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
+                        .testTag("openAdventure"),
+                    colors = ButtonDefaults.buttonColors(containerColor = Forest),
+                    shape = RoundedCornerShape(15.dp)
+                ) {
+                    Text(if (expeditionProgress > 0 &&
+                            expeditionProgress < WoodlandExpedition.size)
+                            "Continue your journey" else "Explore Adventure",
+                        fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+        Text("Or choose your own path", color = Ink, fontSize = 17.sp,
+            fontWeight = FontWeight.Bold)
+        HomeDestinationStrip(
+            icon = "◇",
             title = "Quick Play",
-            subtitle = "Choose a favorite puzzle and jump straight in.",
-            accent = Color(0xFFF6E7C5),
-            primary = false,
+            description = "Four puzzle styles. Jump straight in.",
+            actionLabel = "Choose",
+            color = Color(0xFFF5E8C9),
             tag = "openQuickPlay",
             onClick = onQuickPlay
         )
-        ExplorerMenuCard(
+        HomeDestinationStrip(
+            icon = "✎",
             title = "Custom Play",
-            subtitle = "Your own expedition settings  ·  In development",
-            accent = Color(0xFFE5E9E3),
-            primary = false,
+            description = "Build your own hunt  ·  Coming later",
+            actionLabel = "Preview",
+            color = Color(0xFFE5E9E3),
             tag = "openCustomPlay",
             onClick = onCustom
         )
-        Text("Your discoveries stay on this device. No account needed.",
+        Text("Offline adventures. Discoveries stay on your device.",
             color = Muted, fontSize = 11.sp)
     }
 }
 
 @Composable
-private fun ExplorerMenuCard(
-    title: String, subtitle: String, accent: Color,
-    primary: Boolean, tag: String, onClick: () -> Unit
+private fun HomeDestinationStrip(
+    icon: String,
+    title: String,
+    description: String,
+    actionLabel: String,
+    color: Color,
+    tag: String,
+    onClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(19.dp),
-        color = accent,
-        shadowElevation = if (primary) 3.dp else 1.dp
+        color = color,
+        shape = RoundedCornerShape(18.dp),
+        shadowElevation = 1.dp
     ) {
-        Column(Modifier.fillMaxWidth().padding(13.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(title, color = Ink, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
-            Text(subtitle, color = Muted, fontSize = 12.sp)
+        Row(
+            Modifier.fillMaxWidth().padding(11.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(9.dp)
+        ) {
+            Surface(
+                color = Color(0xFFFFFAED),
+                shape = RoundedCornerShape(13.dp)
+            ) {
+                Text(icon, modifier = Modifier.padding(10.dp),
+                    color = Forest, fontWeight = FontWeight.Bold,
+                    fontSize = 23.sp)
+            }
+            Column(Modifier.weight(1f)) {
+                Text(title, color = Ink, fontWeight = FontWeight.ExtraBold,
+                    fontSize = 17.sp)
+                Text(description, color = Muted, fontSize = 11.sp)
+            }
             Button(
                 onClick = onClick,
-                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag(tag),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (primary) Forest else Pine
-                )
+                modifier = Modifier.heightIn(min = 48.dp)
+                    .testTag(tag),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                    horizontal = 11.dp, vertical = 4.dp
+                ),
+                colors = ButtonDefaults.buttonColors(containerColor = Forest),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text(when (title) {
-                    "Adventure" -> "Open your journey"
-                    "Quick Play" -> "Choose a puzzle"
-                    else -> "See what is planned"
-                }, fontWeight = FontWeight.Bold)
+                Text(actionLabel, fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold)
             }
         }
     }
