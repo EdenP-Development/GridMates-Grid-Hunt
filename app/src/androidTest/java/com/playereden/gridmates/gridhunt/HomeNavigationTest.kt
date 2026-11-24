@@ -499,4 +499,50 @@ class HomeNavigationTest {
         org.junit.Assert.assertEquals(before, campaign.all.toMap())
     }
 
+    @Test fun customHuntCompletionAndReplacementProtection() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val custom = context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE)
+        val precision = context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE)
+        val oldPrecision = precision.getBoolean("precise_selection", false)
+        val authored = listOf("gridhunt_first_bearings_v1", "gridhunt_reverse_v1",
+            "gridhunt_mixed_woodland_v1", "gridhunt_woodland_supplies_v1",
+            "gridhunt_academy_exploration_v1").map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
+        val before = authored.map { it.all.toMap() }
+        check(custom.edit().clear().commit())
+        check(precision.edit().putBoolean("precise_selection", true).commit())
+        try {
+            compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
+            compose.onNodeWithTag("customLength_3").performScrollTo().performClick()
+            compose.onNodeWithTag("customStart").performScrollTo().performClick()
+            compose.onNodeWithTag("customMap").assertExists()
+            val codes = custom.getString("codes", "")!!.split(",")
+            org.junit.Assert.assertEquals(3, codes.size)
+            compose.onNodeWithTag("customBack").performClick()
+            compose.onNodeWithTag("customStart").performScrollTo().performClick()
+            compose.onNodeWithTag("customCancelReplace").performClick()
+            org.junit.Assert.assertEquals(codes.joinToString(","), custom.getString("codes", ""))
+            compose.onNodeWithTag("customResume").performScrollTo().performClick()
+            codes.forEachIndexed { index, code ->
+                val e = code.take(2).toInt()
+                val n = code.takeLast(2).toInt()
+                // Select via the optional precision controls, including the origin itself.
+                val startE = if (e == 26 && n == 40) 25 else 26
+                if (startE == 25) compose.onNodeWithContentDescription("Move selected square west").performClick()
+                repeat((startE-e).coerceAtLeast(0)) { compose.onNodeWithContentDescription("Move selected square west").performClick() }
+                repeat((e-startE).coerceAtLeast(0)) { compose.onNodeWithContentDescription("Move selected square east").performClick() }
+                repeat((40-n).coerceAtLeast(0)) { compose.onNodeWithContentDescription("Move selected square south").performClick() }
+                repeat((n-40).coerceAtLeast(0)) { compose.onNodeWithContentDescription("Move selected square north").performClick() }
+                compose.onNodeWithTag("checkChapter").performClick()
+                compose.waitForIdle()
+                org.junit.Assert.assertEquals(index+1, custom.getInt("step",0))
+            }
+            compose.onNodeWithTag("puzzleFinishCard").assertExists()
+            compose.onNodeWithTag("finishHome").performClick()
+            compose.onNodeWithTag("customResume").assertDoesNotExist()
+            org.junit.Assert.assertEquals(before, authored.map { it.all.toMap() })
+        } finally {
+            precision.edit().putBoolean("precise_selection", oldPrecision).commit()
+        }
+    }
+
 }
