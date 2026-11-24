@@ -251,8 +251,10 @@ internal fun WoodlandAdventureJourney(
                         )
                     }
                 }
-                Text("CHAPTER 1  ·  THE MISSING FIELD NOTES",
-                    color = Ink, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
+                Text("CHAPTER 1", color = Forest,
+                    fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text("The Missing Field Notes",
+                    color = Ink, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
                 Text("Four kinds of clues. Recover every missing page.",
                     color = Muted, fontSize = 12.sp)
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
