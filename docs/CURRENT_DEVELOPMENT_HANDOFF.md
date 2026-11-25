@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V41-A — staged two-world campaign and progression tests committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V41-B — exact scene binding and Adventure level standard committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V41-A
+## Authoritative current checkpoint — GH-V41-B
+- QA441 run 45690563506 at fc5f2c761e0c9ff0dd41c720e825f6b74d6395ad passed all three jobs. Coastal artwork review #21 run 45690563464 passed. QA441 is latest fully green baseline.
+- Owner requested eventually at least 10–12 levels per chapter. docs/ADVENTURE_CHAPTER_LEVEL_STANDARD.md records 12-level working target, stable puzzle identities, migration design gates and protection of earned unlocks (fc5f2c761e0c9ff0dd41c720e825f6b74d6395ad). No actual level expansion or save migration yet.
+- MapScene now carries exact ExplorationMap; publishedMapScene rejects unknown maps/revisions rather than silently rendering Woodland (d4c7dc38ac043690b488116218242b30791c59e2). HuntMapPanel validates requested map, scene and bounds, preserving original Woodland defaults (cff474c3e7d96933e2498b62323d53f03ea9bc3c). Added local unit test for exact match and mismatched ID/revision/bounds. Fresh CI pending; verify app unit test task is executed.
+- Next inspect rendered coastal artwork and resolve shoreline/anchor fit, then implement coastal scene with both looks. No live coastal publication, release, merge, signing or legacy save changes.
+
+## GH-V41-A
 - QA438 run 45684682594 at 0827922f15184ce6b70f17ee4a012c756461aa37 passed all three jobs; artwork review #18 run 45684682456 also passed. QA438 is latest fully green baseline.
 - WorldDestination now verifies exact chapter map identity/revision (1b2816ce307c67212003d5fd5816aeaa664e5b48). CoastalCampaignDraft stages existing Woodland and three coastal chapters in a separate registry and selection policy (4324927c91de419b6aef8f164be7bed7c78705c3). All Woodland chapters required for each coastal chapter, plus all earlier coastal chapters. No live registry or save changes.
 - CoastalCampaignDraftTest verifies unlocks, locked out-of-order progress, completion/revisit, distinct progress namespaces, publication isolation and wrong map revision rejection. Fresh CI pending.
