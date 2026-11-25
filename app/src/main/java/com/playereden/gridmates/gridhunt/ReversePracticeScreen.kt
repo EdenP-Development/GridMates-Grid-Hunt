@@ -111,12 +111,12 @@ internal fun ReversePracticeScreen(
     }
     val targets = ReverseTraining.markers
     var step by rememberSaveable {
-        mutableIntStateOf(prefs.getInt("step", 0).coerceIn(0, targets.size))
+        mutableIntStateOf(prefs.savedInt("step", 0).coerceIn(0, targets.size))
     }
     var answer by rememberSaveable {
-        mutableStateOf(prefs.getString("answer", "")?.take(4)?.filter { it in '0'..'9' } ?: "")
+        mutableStateOf(prefs.savedString("answer", "")?.take(4)?.filter { it in '0'..'9' } ?: "")
     }
-    var hint by rememberSaveable { mutableIntStateOf(prefs.getInt("hint", 0).coerceIn(0, 2)) }
+    var hint by rememberSaveable { mutableIntStateOf(prefs.savedInt("hint", 0).coerceIn(0, 2)) }
     var feedback by rememberSaveable {
         mutableStateOf("Find the golden dot! What four-digit square is it hiding in?")
     }
