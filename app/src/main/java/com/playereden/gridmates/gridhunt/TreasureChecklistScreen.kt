@@ -286,7 +286,8 @@ private fun TreasureChecklistTargets(
                         val active = target.id == activeId && !solved
                         OutlinedButton(
                             onClick = { onChoose(target) },
-                            modifier = Modifier.weight(1f).heightIn(min = 43.dp)
+                            shape = JournalActionShape,
+                            modifier = Modifier.weight(1f).heightIn(min = 48.dp)
                                 .testTag("treasureItem_${target.id}"),
                             contentPadding = PaddingValues(horizontal = 5.dp, vertical = 3.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
@@ -364,6 +365,7 @@ private fun TreasureChecklistAnswer(
             modifier = Modifier.weight(1f).testTag("treasureCodeInput")
         )
         Button(
+            shape = JournalActionShape,
             onClick = submitCode, enabled = answer.length == 4,
             modifier = Modifier.heightIn(min = 56.dp).testTag("checkTreasure"),
             colors = ButtonDefaults.buttonColors(containerColor = Forest)
