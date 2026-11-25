@@ -1,6 +1,11 @@
 name: Coastal artwork review
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'artwork/worlds/whispering-coast/**'
+      - 'scripts/verify_coastal_artwork.py'
+      - '.github/workflows/coastal-artwork-review.yml'
   push:
     paths:
       - 'artwork/worlds/whispering-coast/**'
