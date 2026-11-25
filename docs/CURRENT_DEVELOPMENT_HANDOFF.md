@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V39-F — isolated map-specific Android persistence and instrumentation tests committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V39-G — published-world selection policy and tests committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V39-F
+## Authoritative current checkpoint — GH-V39-G
+- QA408 run 45585084844 was still building/testing at inspection; no pass claimed for the new Android persistence tests. Later commits may supersede it.
+- WorldSelection.kt joins explicitly published CampaignWorld and ExplorationMap definitions, exposes read-only chapter progress/unlock/completion choices, rejects unknown or locked selections, and falls back to first unlocked published world (d46baf14e2fd45f21959fd258f47d4733984a2ca). PublishedWorlds currently contains only Little Woodland. No placeholder or new screen, no persistence writes.
+- WorldSelectionTest verifies original world selection and completion, unknown selection fallback, no invented destinations, mismatched map IDs and duplicate destinations (863dc676f131ce7ba1e96401bbcb5157ace69b80). Fresh CI required; cross-world prerequisite fixture and exact scene/map revision dispatch remain follow-up.
+- Next consolidate GH-V38/39 QA before additional implementation, verify all Android instrumentation including WorldHuntStore, inspect renderer captures and save upgrade. Then establish world 2 design brief and explicit publication requirements; current Home/Adventure routes remain unchanged until more than one actual playable world exists. No release, merge, package/signing or legacy preference changes.
+
+## GH-V39-F
 - QA405 run 45584022026 passed core/build/signing/packaging and real QA345 install-over upgrade; instrumentation still running at inspection. Later commits may supersede.
 - WorldHuntStore introduced map ID/revision scoped SharedPreferences namespace, validated complete session writes in one editor commit, and read-only Empty/Invalid/Ready results with strict typed schema fields (46b649a00453f16bf362dd97ef123a5de7cc333a). Historical gridhunt_custom_v1 untouched; adapter not yet wired into live screens. Explicit valid write can replace an invalid record; no automatic repair or migration.
 - WorldHuntStoreTest adds two Android instrumentation tests for distinct overlapping-coordinate maps/revisions, exact restoration, rejection of invalid writes, unchanged legacy store, and preservation of malformed records (0686a18d554389120cacfa994171106c8fbca8df). Test-only namespaces cleaned up. Fresh CI required.
