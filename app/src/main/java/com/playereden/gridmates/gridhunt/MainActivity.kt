@@ -381,8 +381,8 @@ private fun GridHuntHome(
                 Text("✦  YOUR LITTLE DISCOVERIES", color = Forest,
                     fontWeight = FontWeight.Bold, fontSize = 11.sp)
                 Spacer(Modifier.height(4.dp))
-                Text("$chapterCompleted of 9 squares found   •   $reverseCompleted of 5 golden spots",
-                    color = Ink, fontSize = 12.sp)
+                Text("$chapterCompleted of 9 squares found", color = Ink, fontSize = 12.sp)
+                Text("$reverseCompleted of 5 golden spots", color = Ink, fontSize = 12.sp)
             }
         }
         Text("Choose your puzzle", color = Ink, fontSize = 17.sp,
