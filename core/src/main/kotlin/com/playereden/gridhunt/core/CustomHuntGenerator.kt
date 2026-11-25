@@ -5,16 +5,17 @@ import kotlin.random.Random
 /** Version 1 woodland session contract. Stable grid references, independent of artwork. */
 object CustomHuntGenerator {
     val lengths = listOf(3, 6, 9)
-    private val cells = (24..29).flatMap { e -> (37..42).map { n -> GridCell(e, n) } }
+    private val map = ExplorationMaps.woodland
+    private val cells = map.cells
     private val byReference = cells.associateBy { it.reference }
 
     val landmarkLengths = listOf(3)
     fun generateLandmarks(random: Random = Random.Default): List<GridCell> =
-        WoodlandLandmarks.all.map { it.cell }.distinct().shuffled(random).take(3)
+        map.landmarks.map { it.cell }.distinct().shuffled(random).take(3)
 
     fun restoreLandmarks(encoded: String): List<GridCell> {
         val targets = restore(encoded)
-        val valid = WoodlandLandmarks.all.map { it.cell }.toSet()
+        val valid = map.landmarks.map { it.cell }.toSet()
         return targets.takeIf { it.size in landmarkLengths && it.all { cell -> cell in valid } } ?: emptyList()
     }
 
@@ -25,7 +26,7 @@ object CustomHuntGenerator {
     fun generateMixed(count: Int, random: Random = Random.Default): List<Objective> {
         require(count in mixedLengths)
         val types = (mixedTypes + List(count - mixedTypes.size) { if (it % 2 == 0) "grid" else "gold" }).shuffled(random)
-        val landmarks = WoodlandLandmarks.all.map { it.cell }.distinct().shuffled(random).take(2)
+        val landmarks = map.landmarks.map { it.cell }.distinct().shuffled(random).take(2)
         val ordinary = cells.filter { it !in landmarks }.shuffled(random).iterator()
         val landmarkIterator = landmarks.iterator()
         return types.map { type ->
@@ -38,7 +39,7 @@ object CustomHuntGenerator {
         val kinds = types.split(",")
         if (targets.size !in mixedLengths || kinds.size != targets.size || kinds.any { it !in mixedTypes } ||
             !kinds.containsAll(mixedTypes)) return emptyList()
-        val landmarks = WoodlandLandmarks.all.map { it.cell }.toSet()
+        val landmarks = map.landmarks.map { it.cell }.toSet()
         if (kinds.zip(targets).any { (kind, cell) -> kind in listOf("identify", "checklist") && cell !in landmarks }) return emptyList()
         return kinds.zip(targets).map { (kind, cell) -> Objective(kind, cell) }
     }
@@ -63,12 +64,12 @@ object CustomHuntGenerator {
     }
 
     fun generateFreshLandmarks(previous: Set<GridCell>, random: Random = Random.Default): List<GridCell> =
-        freshOrder(WoodlandLandmarks.all.map { it.cell }.distinct(), previous, random).take(3)
+        freshOrder(map.landmarks.map { it.cell }.distinct(), previous, random).take(3)
 
     fun generateFreshMixed(count: Int, previous: Set<GridCell>, random: Random = Random.Default): List<Objective> {
         require(count in mixedLengths)
         val types = (mixedTypes + List(count - mixedTypes.size) { if (it % 2 == 0) "grid" else "gold" }).shuffled(random)
-        val landmarks = freshOrder(WoodlandLandmarks.all.map { it.cell }.distinct(), previous, random).take(2)
+        val landmarks = freshOrder(map.landmarks.map { it.cell }.distinct(), previous, random).take(2)
         val ordinary = freshOrder(cells.filterNot { it in landmarks }, previous, random).iterator()
         val landmarkIterator = landmarks.iterator()
         return types.map { type ->
