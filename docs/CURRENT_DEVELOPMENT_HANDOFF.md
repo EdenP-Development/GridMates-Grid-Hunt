@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V40-F — coastal export pipeline and PR validation committed; rendered review pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V40-G — coastal draft geography and tests committed; QA429 and artwork review #9 passed.**
 
-## Authoritative current checkpoint — GH-V40-F
+## Authoritative current checkpoint — GH-V40-G
+- QA429 run 45669650921 at 405268f5bc6125946a3a894a200307268fd0340f passed all three jobs. APK artifact 15050075281, UI evidence 15049671819, upgrade evidence 15050320440. Coastal artwork review #9 run 45669650884 passed, artifact 15049710412 with 50 PNG exports, manifest and review sheet. Visual inspection still pending.
+- Prior artwork review failed small-size edge clearance; wave master scaled to 85% with padding (b1b0495d7925eb61e2e95b06905002eb841a9ce0), terrain and postcard copies synchronized. Validation requirements unchanged.
+- WhisperingCoastDraft.kt encodes unpublished 36-cell map and six candidate landmarks using existing validated ExplorationMap (e858d5068107ed59d8ace164f7388ce6ba32ef84). Tests cover grid references, publication isolation, 100 seeded disjoint landmark pairs and mixed round trips across 100 seeds. Tests committed, fresh CI pending. No registry addition or live UI.
+- Next review actual rendered artwork, refine shoreline and precise sprite anchors, then author coastal campaign and exact scene dispatch. No release, merge, legacy saves, signing or approved Woodland changes.
+
+## GH-V40-F
 - QA423 run 45592007302, source 3bbd5d768540aac4f9f1a38bb7edbc5580a1cf9a, all three jobs passed. APK artifact 15010757962; UI evidence 15011423979; upgrade evidence 15011538169. Latest explicitly verified baseline. QA425 run 45667925055 passed core/build at inspection, Android and upgrade pending; subsequent commits may supersede it.
 - GH-V40-E added scripts/verify_coastal_artwork.py (843fdcbe18352527bdcf607c06b752030a711ad2) to render ten SVG masters at 24/32/48/128/256px, validate alpha bounds, repeat-render equality and record SHA-256 plus review sheet. Dedicated workflow .github/workflows/coastal-artwork-review.yml (fac196c0c4b820e568e3ea3faba9397c48a64270), updated to trigger on relevant pull requests (55dbc875132089ee15514c840f83689ced74abe4). Connector commit-run lookup only returns PR-triggered workflows, so push-only result was not accessible. No successful artwork render claimed yet.
 - Next inspect PR artwork workflow results and actual review PNG, fix any failing asset/validation issue without weakening requirements, compare against Woodland style and verify coordinate/anchor fit. Export remains outside Android runtime. No publication, merge, signing, existing artwork or save changes.
