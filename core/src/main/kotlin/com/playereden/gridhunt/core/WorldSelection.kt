@@ -5,7 +5,10 @@ data class WorldDestination(
     val world: CampaignWorld,
     val map: ExplorationMap
 ) {
-    init { require(world.mapId == map.id) }
+    init {
+        require(world.mapId == map.id)
+        require(world.chapters.all { it.chapter.map == map }) { "Chapter map identity or revision mismatch" }
+    }
 }
 
 data class WorldChoice(
