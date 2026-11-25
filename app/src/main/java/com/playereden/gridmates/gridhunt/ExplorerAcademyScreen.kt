@@ -181,7 +181,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                     if (active.woodlandField) {
                         AcademyWoodlandMap(mapLook, onLook, selected) { selected = it }
                         active.route?.let { route ->
-                            OutlinedButton(onClick = { selected = route.start.reference },
+                            OutlinedButton(shape = JournalActionShape, onClick = { selected = route.start.reference },
                                 modifier = Modifier.fillMaxWidth().testTag("academyRouteReset")) {
                                 Text("Return to start · " + route.start.reference)
                             }
@@ -192,7 +192,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("Selected: " + (selected ?: "Tap a square"), color = Forest,
                             modifier = Modifier.weight(1f), fontSize = 12.sp)
-                        Button(onClick = { selected?.let(submit) },
+                        Button(shape = JournalActionShape, onClick = { selected?.let(submit) },
                             enabled = selected != null,
                             modifier = Modifier.weight(1f).heightIn(min = 48.dp)
                                 .testTag("academyCheckSquare"), contentPadding = PaddingValues(horizontal = 6.dp)) { Text("Check square") }
@@ -200,7 +200,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                     } else active.choices.chunked(2).forEachIndexed { rowIndex, choices ->
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             choices.forEachIndexed { columnIndex, choice ->
-                                OutlinedButton(onClick = { submit(choice) },
+                                OutlinedButton(shape = JournalActionShape, onClick = { submit(choice) },
                                     modifier = Modifier.weight(1f).heightIn(min = 48.dp)
                                         .testTag("academyChoice_${rowIndex * 2 + columnIndex}")) { Text(choice) }
                             }
@@ -228,17 +228,17 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                     fontWeight = FontWeight.Bold, modifier = Modifier.testTag("academyPracticeComplete"))
                 Text("Your field assignment awaits. Apply your skills in four woodland challenges.", color = Ink)
             }
-            if (!graduated) Button(onClick = { inGraduation = true; success = "" },
-                modifier = Modifier.fillMaxWidth().testTag("academyStartGraduation")) {
+            if (!graduated) Button(shape = JournalActionShape, onClick = { inGraduation = true; success = "" },
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("academyStartGraduation")) {
                 Text("Begin graduation expedition")
             }
-            Button(onClick = {
+            Button(shape = JournalActionShape, onClick = {
                 prefs.edit().remove("earned").remove("graduation").apply()
                 earned = emptySet()
                 fieldEarned = emptySet()
                 inGraduation = false
                 success = ""
-            }, modifier = Modifier.fillMaxWidth().testTag("academyReplay")) {
+            }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("academyReplay")) {
                 Text("Practice again")
             }
         }
@@ -416,7 +416,7 @@ private fun AcademySchoolOverview(
                     }
                 }
             }
-            Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+            Button(shape = JournalActionShape, onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                 .testTag("academyContinueSchool")) {
                 Text(when {
                     complete -> "View graduation"
