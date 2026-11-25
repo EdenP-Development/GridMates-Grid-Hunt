@@ -367,6 +367,7 @@ private fun ReverseControls(
         ReverseToolButton(ExplorerTool.FIT, Modifier.weight(1f), onFit)
     }
     Button(
+        shape = JournalActionShape,
         onClick = { if (finished) onCheck() else submitCode() }, enabled = finished || answer.length == 4,
         modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("checkReverse"),
         colors = ButtonDefaults.buttonColors(containerColor = Forest)
