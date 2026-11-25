@@ -65,17 +65,26 @@ internal fun GridHuntSettings(
             }
         }
         OutlinedButton(onClick = { guide = true },
+            shape = JournalActionShape,
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("settingsGuide")) {
             Text("Map guide")
         }
         Surface(shape = RoundedCornerShape(18.dp), color = Color(0xFFE4EDDA),
             border = JournalPanelBorder) {
             Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text("GridMates: Grid Hunt", color = Ink, fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    androidx.compose.foundation.Image(androidx.compose.ui.res.painterResource(R.drawable.gh_tool_notebook),
+                        contentDescription = null, modifier = Modifier.size(40.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("GridMates: Grid Hunt", color = Ink, fontWeight = FontWeight.Bold)
+                        Text("A game by Spudacus", color = Muted, fontSize = 11.sp)
+                    }
+                }
                 Text("Little maps. Big discoveries.", color = Muted, fontSize = 13.sp)
                 Text("Play offline. Puzzle progress stays on your device.", color = Muted, fontSize = 12.sp)
             }
         }
+        WoodlandPostcard(Modifier.fillMaxWidth().height(96.dp), showLabel = false)
     }
     if (guide) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { guide = false })
 }
