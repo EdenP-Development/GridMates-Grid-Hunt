@@ -8,6 +8,7 @@ import subprocess
 import sys
 import xml.etree.ElementTree as ET
 import zipfile
+from PIL import Image, ImageDraw
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PNG = b"\x89PNG\r\n\x1a\n"
@@ -27,6 +28,26 @@ def source_check():
         width, height, depth, color_type = struct.unpack(">IIBB", data[16:26])
         require((width, height, depth, color_type) == (item["width"], item["height"], 8, item["png_color_type"]), (item["path"], "PNG header"))
         print("PASS source:", item["path"], item["sha256"])
+    colors = ET.parse(ROOT / "app/src/main/res/values/gh_launcher_colors.xml").getroot()
+    require(colors.find("color[@name='gh_launcher_background']").text.upper() == "#214F3F",
+            "GridMates v1.0 canonical surround")
+    foreground = Image.open(ROOT / "app/src/main/res/drawable-nodpi/gh_launcher_foreground.png").convert("RGBA")
+    box = foreground.getchannel("A").getbbox()
+    require(foreground.size == (432, 432), "adaptive canvas")
+    require(box is not None and box[0] >= 100 and box[1] >= 100 and box[2] <= 332 and box[3] <= 332,
+            ("artwork outside nominal footprint", box))
+    print("PASS GridMates v1.0 foreground alpha bounds:", box)
+    output = ROOT / "launcher-review"
+    output.mkdir(exist_ok=True)
+    base = Image.new("RGBA", (432, 432), "#214F3F")
+    base.alpha_composite(foreground)
+    visible = base.crop((84, 84, 348, 348))
+    for name, radius in (("circle", 132), ("rounded-square", 45), ("squircle-approx", 78)):
+        mask = Image.new("L", visible.size, 0)
+        ImageDraw.Draw(mask).rounded_rectangle((0, 0, 263, 263), radius=radius, fill=255)
+        preview = visible.copy()
+        preview.putalpha(mask)
+        preview.save(output / (name + ".png"))
     app = ET.parse(ROOT / "app/src/main/AndroidManifest.xml").getroot().find("application")
     require(app is not None, "no application element")
     for attr in ("icon", "roundIcon"):
