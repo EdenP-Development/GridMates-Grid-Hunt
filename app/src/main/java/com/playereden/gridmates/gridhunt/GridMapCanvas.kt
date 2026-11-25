@@ -377,6 +377,33 @@ private fun TrainingMapCanvas(
                 organicPatch(28700.0, 41900.0, 1150.0, 650.0, 12, Color(0x167FAD78))
                 organicPatch(28000.0, 37800.0, 1480.0, 600.0, 13, Color(0x1F9FB37C))
             }
+            // GH-V36-I: layered, subdued paper terrain. These are washes, not
+            // contour lines, named features, or clues. Keep the survey view intact.
+            if (!surveyStyle) {
+                organicPatch(25300.0, 41350.0, 1450.0, 1050.0, 21, Color(0x197BA36D))
+                organicPatch(28500.0, 42300.0, 1400.0, 820.0, 22, Color(0x227BA36D))
+                organicPatch(24700.0, 39300.0, 930.0, 1050.0, 23, Color(0x1C9EAF77))
+                organicPatch(28200.0, 38050.0, 1700.0, 1000.0, 24, Color(0x217BA36D))
+                organicPatch(26800.0, 40200.0, 1150.0, 760.0, 25, Color(0x25F7DDA3))
+                // Sparse grass strokes are subordinate to every playable symbol.
+                // World-space positions remain stable as the camera moves.
+                for (i in 0 until 84) {
+                    val e = 24200.0 + ((i * 977 + 131) % 5600)
+                    val n = 37200.0 + ((i * 643 + 307) % 5600)
+                    if (WoodlandLandmarks.all.any {
+                        kotlin.math.abs(it.point.easting - e) < 450.0 &&
+                            kotlin.math.abs(it.point.northing - n) < 450.0
+                    }) continue
+                    val center = p(e, n)
+                    val tuft = (65.0 * cam.pixelsPerMeter).toFloat().coerceAtMost(4.dp.toPx())
+                    if (tuft < 1.dp.toPx()) continue
+                    val ink = Color(0x3B71885A)
+                    drawLine(ink, center, center + Offset(-tuft * .65f, -tuft),
+                        strokeWidth = .65.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round)
+                    drawLine(ink, center, center + Offset(tuft * .55f, -tuft * .85f),
+                        strokeWidth = .65.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round)
+                }
+            }
             // Fixed flecks suggest grasses and paper grain. No random frame jitter.
             for (i in 0 until 46) {
                 val e = 24120.0 + ((i * 977 + 103) % 5700)
@@ -428,6 +455,11 @@ private fun TrainingMapCanvas(
                 val radius = base * (0.9f + (i % 4) * 0.07f)
                 val treeSprite = if (i % 3 == 0) pineSprite else oakSprite
                 if (treeSprite != null) {
+                    // A subtle ground shadow helps the existing illustrated trees
+                    // sit on the terrain rather than appear as floating stickers.
+                    drawOval(Color(0x2862774E),
+                        topLeft = center + Offset(-radius * .86f, radius * .40f),
+                        size = Size(radius * 1.72f, radius * .48f))
                     drawWoodlandSprite(treeSprite, center, radius * 2.65f, alpha = 0.78f)
                     return@forEachIndexed
                 }
