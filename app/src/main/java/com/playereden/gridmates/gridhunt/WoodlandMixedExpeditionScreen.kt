@@ -2,6 +2,9 @@ package com.playereden.gridmates.gridhunt
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -513,16 +516,15 @@ private fun MixedExpeditionFinish(
                 "You traced the supplies to their last known stop."
                 else "Every lost page has been recovered. Your field journal is whole.",
             discoveries = if (chapterTwo) "4 OF 4 CLUES SOLVED" else "4 OF 4 PAGES RECOVERED",
-            primaryLabel = "Explore again",
-            onPrimary = onReplay,
-            onHome = onHome
+            primaryLabel = if (!chapterTwo && onNextChapter != null) "Continue · The Lost Supplies" else "Explore again",
+            onPrimary = if (!chapterTwo && onNextChapter != null) onNextChapter else onReplay,
+            onHome = onHome,
+            primaryTag = if (!chapterTwo && onNextChapter != null) "nextExpedition" else "finishContinue"
         )
         if (!chapterTwo && onNextChapter != null) {
-            Button(onClick = onNextChapter,
-                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-                    .testTag("nextExpedition"),
-                colors = ButtonDefaults.buttonColors(containerColor = Forest)) {
-                Text("Continue · The Lost Supplies", fontWeight = FontWeight.Bold)
+            TextButton(onClick = onReplay,
+                modifier = Modifier.fillMaxWidth().testTag("finishReplay")) {
+                Text("Explore again", color = Forest)
             }
         }
         TextButton(onClick = onJournal,
@@ -551,23 +553,54 @@ private fun ExpeditionJournalDialog(
                 Modifier.fillMaxWidth().journalScroll(),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Text(mission.chapter.name, color = Ink, fontWeight = FontWeight.Bold)
+                Surface(color = Color(0xFFE6D6AD), border = JournalPanelBorder,
+                    shape = RoundedCornerShape(12.dp)) {
+                    Row(Modifier.fillMaxWidth().padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                        Image(painterResource(R.drawable.gh_tool_notebook), contentDescription = null,
+                            modifier = Modifier.size(52.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text("LITTLE WOODLAND · CHAPTER " + if (chapterTwo) "2" else "1",
+                                color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text(mission.chapter.name, color = Ink, fontWeight = FontWeight.ExtraBold,
+                                fontSize = 15.sp)
+                        }
+                    }
+                }
                 Text(mission.chapter.story, color = Ink, fontSize = 13.sp)
                 Text(if (chapterTwo) "${earned.size} of ${mission.size} clues solved"
                     else "${earned.size} of ${mission.size} pages found",
                     color = Forest, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag("journalProgress"))
+                Row(Modifier.fillMaxWidth().testTag("journalPageCollection"),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    repeat(mission.size) { index ->
+                        val recovered = index < earned.size
+                        Surface(modifier = Modifier.weight(1f).heightIn(min = 40.dp)
+                            .semantics { contentDescription = "$unit ${index + 1}, " +
+                                if (recovered) "recovered" else "not yet recovered" },
+                            shape = RoundedCornerShape(7.dp), border = JournalPanelBorder,
+                            color = if (recovered) Color(0xFFDDE9CD) else Color(0xFFF9EBCB)) {
+                            Column(Modifier.padding(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(if (recovered) "✓" else "◇", color = Forest, fontWeight = FontWeight.Bold)
+                                Text((index + 1).toString(), color = Muted, fontSize = 10.sp)
+                            }
+                        }
+                    }
+                }
                 if (earned.isEmpty()) {
                     Text("Your discoveries will appear here as you explore.",
                         color = Muted, modifier = Modifier.testTag("journalEmpty"))
                 }
                 earned.forEachIndexed { index, objective ->
                     Surface(
-                        color = Color(0xFFFFFBF2), shape = RoundedCornerShape(10.dp),
+                        color = Color(0xFFFFFBF2), shape = RoundedCornerShape(10.dp), border = JournalPanelBorder,
                         modifier = Modifier.fillMaxWidth().testTag("journalEntry_${objective.id}")
                     ) {
                         Column(Modifier.padding(10.dp)) {
-                            Text("$unit ${index + 1} · ${objective.title}", color = Forest,
+                            Text("RECOVERED · $unit ${index + 1}", color = Forest, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                            Text(objective.title, color = Ink,
                                 fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             Text(objective.discovery.ifBlank { "Discovery recorded." },
                                 color = Ink, fontSize = 13.sp)
@@ -575,7 +608,7 @@ private fun ExpeditionJournalDialog(
                     }
                 }
                 if (active != null) {
-                    Surface(color = Color(0xFFF8DCA0), shape = RoundedCornerShape(10.dp),
+                    Surface(color = Color(0xFFF8DCA0), shape = RoundedCornerShape(10.dp), border = JournalPanelBorder,
                         modifier = Modifier.fillMaxWidth().testTag("journalCurrent")) {
                         Column(Modifier.padding(10.dp)) {
                             Text("CURRENT OBJECTIVE", color = Forest,

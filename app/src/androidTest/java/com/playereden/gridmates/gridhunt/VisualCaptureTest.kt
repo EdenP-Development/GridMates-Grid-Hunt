@@ -204,6 +204,7 @@ class VisualCaptureTest {
         capture("14_mixed_expedition.png")
         compose.onNodeWithTag("mixedJournal").performClick()
         compose.onNodeWithTag("journalEmpty").assertExists()
+        compose.onNodeWithTag("journalPageCollection").assertExists()
         compose.onNodeWithTag("journalCurrent").assertExists()
         compose.onNodeWithTag("closeJournal").performClick()
         repeat(2) {
@@ -237,6 +238,7 @@ class VisualCaptureTest {
         compose.onNodeWithTag("quickBack").performClick()
         compose.onNodeWithTag("openAdventure").performClick()
         compose.onNodeWithTag("openAdventureChapter").performClick()
+        compose.onNodeWithTag("finishReplay").assertExists()
         compose.onNodeWithTag("nextExpedition").performClick()
         compose.onNodeWithText("The Lost Supplies").assertExists()
         compose.onNodeWithTag("mixedProgress").assertExists()

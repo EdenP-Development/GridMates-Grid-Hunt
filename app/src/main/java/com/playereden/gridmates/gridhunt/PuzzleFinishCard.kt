@@ -42,7 +42,8 @@ internal fun PuzzleFinishCard(
     discoveries: String,
     primaryLabel: String,
     onPrimary: () -> Unit,
-    onHome: () -> Unit
+    onHome: () -> Unit,
+    primaryTag: String = "finishContinue"
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth().testTag("puzzleFinishCard"),
@@ -68,7 +69,7 @@ internal fun PuzzleFinishCard(
                 Button(
                     onClick = onPrimary,
                     modifier = Modifier.weight(1f).heightIn(min = 48.dp)
-                        .testTag("finishContinue"),
+                        .testTag(primaryTag),
                     colors = ButtonDefaults.buttonColors(containerColor = Forest),
                     contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
