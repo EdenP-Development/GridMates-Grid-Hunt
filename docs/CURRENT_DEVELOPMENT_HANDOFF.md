@@ -1,8 +1,13 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V39-G — published-world selection policy and tests committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V40-B — coastal landmark studies committed; QA412 verified baseline.**
 
-## Authoritative current checkpoint — GH-V39-G
+## Authoritative current checkpoint — GH-V40-B
+- QA412 run 45586701603, source 872b350f18afcbdd2903950789abb0d8753c8595, all three jobs passed after retry of infrastructure failure. Android 50/50 tests, 0 skipped/failed. Actual signed QA345 install-over preserved 11 exact preference maps before and after cold launch. APK artifact 15008384490; Android UI evidence 15010510013. QA412 is verified automated baseline; physical visual comparison remains pending.
+- GH-V40 proposed Whispering Coast (docs/GH-V40_WHISPERING_COAST_DESIGN.md, commit 872b350f18afcbdd2903950789abb0d8753c8595); coordinate composition v0.1 SVG (adba554a267d0a7d6d35e8f91a7111e525ff25d3) and six original hand-authored landmark vector silhouette studies (4eaa2fafbb2c3abcd943832e394f127d297aaceb), asset specification/anchors (8ef53817c14db43bd32d91518d10305e28c09a18). Located under artwork/worlds/whispering-coast/. Draft design only, not runtime sprites or approved world. No map registry changes.
+- Next review silhouette legibility at 24/32/48px on both map looks; individual transparent masters and deterministic exports, then environmental asset collection and postcard. Refine shoreline/anchor geography before freezing data; exact scene binding and live save/navigation integration remain required before publication. No new release, merge, package/signing, legacy preferences or approved art changes.
+
+## GH-V39-G
 - QA408 run 45585084844 was still building/testing at inspection; no pass claimed for the new Android persistence tests. Later commits may supersede it.
 - WorldSelection.kt joins explicitly published CampaignWorld and ExplorationMap definitions, exposes read-only chapter progress/unlock/completion choices, rejects unknown or locked selections, and falls back to first unlocked published world (d46baf14e2fd45f21959fd258f47d4733984a2ca). PublishedWorlds currently contains only Little Woodland. No placeholder or new screen, no persistence writes.
 - WorldSelectionTest verifies original world selection and completion, unknown selection fallback, no invented destinations, mismatched map IDs and duplicate destinations (863dc676f131ce7ba1e96401bbcb5157ace69b80). Fresh CI required; cross-world prerequisite fixture and exact scene/map revision dispatch remain follow-up.
