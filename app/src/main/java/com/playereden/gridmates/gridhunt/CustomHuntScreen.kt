@@ -91,7 +91,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 modifier = Modifier.testTag("customBack")) { Text(if (playing) "Setup" else "Home") }
         }
         if (!playing) {
-            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(Modifier.weight(1f).journalScroll(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 WoodlandPostcard(Modifier.fillMaxWidth().height(96.dp))
                 Text("Choose your puzzle", fontWeight = FontWeight.Bold, color = Ink, fontSize = 16.sp)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -249,7 +249,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     Row(Modifier.fillMaxSize().testTag("customWideLayout"),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         mapPanel(Modifier.weight(1.25f).fillMaxHeight())
-                        Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()),
+                        Column(Modifier.weight(1f).fillMaxHeight().journalScroll(),
                             verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             prompt()
                             controls()
@@ -260,7 +260,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     // and allow the control area to scroll rather than collapsing it.
                     val short = maxHeight < 420.dp
                     if (short) {
-                        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).testTag("customShortLayout"),
+                        Column(Modifier.fillMaxSize().journalScroll().testTag("customShortLayout"),
                             verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             prompt()
                             mapPanel(Modifier.fillMaxWidth().height(240.dp))

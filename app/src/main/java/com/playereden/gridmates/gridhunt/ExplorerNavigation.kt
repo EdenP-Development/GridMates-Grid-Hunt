@@ -56,7 +56,7 @@ internal fun ExplorerDeskHome(
     Column(
         Modifier.fillMaxSize().journalPaper()
             .statusBarsPadding().navigationBarsPadding()
-            .verticalScroll(rememberScrollState())
+            .journalScroll()
             .padding(horizontal = 17.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
@@ -240,7 +240,7 @@ internal fun WoodlandAdventureJourney(
     Column(
         Modifier.fillMaxSize().journalPaper()
             .statusBarsPadding().navigationBarsPadding()
-            .verticalScroll(rememberScrollState())
+            .journalScroll()
             .padding(horizontal = 17.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -440,7 +440,7 @@ internal fun WoodlandCustomPlayPreview(
     Column(
         Modifier.fillMaxSize().journalPaper()
             .statusBarsPadding().navigationBarsPadding()
-            .verticalScroll(rememberScrollState())
+            .journalScroll()
             .padding(19.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {

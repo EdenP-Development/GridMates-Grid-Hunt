@@ -85,7 +85,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
                 color = Forest, modifier = Modifier.weight(1f).testTag("academyProgress"))
             if (mapLesson) TextButton(onClick = { showOverview = true }, modifier = Modifier.testTag("academyOverview")) { Text("Overview") }
         }
-        Column(Modifier.weight(1f).verticalScroll(scroll),
+        Column(Modifier.weight(1f).journalScroll(scroll),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (showOverview) {
             AcademySchoolOverview(earned, fieldEarned, qualifications,

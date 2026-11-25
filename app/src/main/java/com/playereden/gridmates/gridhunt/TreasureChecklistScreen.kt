@@ -204,7 +204,7 @@ internal fun TreasureChecklistScreen(
                 )
                 Column(
                     Modifier.width(sidePanelWidth)
-                        .fillMaxHeight().verticalScroll(rememberScrollState()),
+                        .fillMaxHeight().journalScroll(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     TreasureChecklistHeader(completed.size, mission.targets.size,

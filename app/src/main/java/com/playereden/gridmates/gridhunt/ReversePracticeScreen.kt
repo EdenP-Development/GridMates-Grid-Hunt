@@ -215,7 +215,7 @@ internal fun ReversePracticeScreen(
                     onLook = onLook
                 )
                 Column(
-                    Modifier.width(controlsWidth).fillMaxHeight().verticalScroll(rememberScrollState()),
+                    Modifier.width(controlsWidth).fillMaxHeight().journalScroll(),
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     ReverseHeader(onBack)

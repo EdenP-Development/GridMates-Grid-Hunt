@@ -1,8 +1,9 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V28-C — Map Guide accuracy implemented; CI pending; active alpha.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V28-D — scroll indicators implemented; CI pending; active alpha.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V28-C
+## Authoritative current checkpoint — GH-V28-D
+- GH-V28-D adds reusable passive journalScroll rail, only when content overflows, thumb follows scroll position and trailing padding avoids covering text. Applied to menus, Academy, Map Guide, Journal and existing scrollable puzzle control panels. No new gestures or changed answers/saves. QA317 in progress at inspection; QA316/315 cancelled by superseding commits; QA313 latest confirmed full pass. Verify combined CI and physical scroll reachability, then align Quick Play cards.
 - GH-V28-C corrects Map Guide landmark descriptions for actual illustrated symbols, retains style-specific legacy descriptions, adds six shared scenery drawable previews and distinguishes scenery from named discovery targets. No coordinates or answers exposed. QA316 keyboard build was running at inspection; QA315 cancelled; latest confirmed complete pass QA313. Next scroll affordances and menu alignment; new CI and physical review pending.
 - GH-V28-B numeric fields now explicitly request keyboard Done and use the same four-digit submission validation as on-screen Check in both campaign chapters, Golden Spots, Treasure Checklist and Custom numeric modes. Clear input focus on valid-length submission to dismiss keyboard; no auto-submit on typing. Existing mixed expedition regression now exercises IME submission. Physical keyboard layout/visibility still requires device verification; next Map Guide accuracy and scroll affordances. QA315 style retirement was running at implementation.
 - GH-V28-A retires player-facing Cool Sketch toggle in maps and Quick Play; legacy style preference normalized to FIELD_GUIDE, haptics and progression untouched, underlying renderer retained. Updated regression assertions and required screenshot name; fresh CI pending. Next keyboard submission and Map Guide accuracy. Owner has not approved public beta.

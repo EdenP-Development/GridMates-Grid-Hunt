@@ -46,7 +46,7 @@ internal fun WoodlandMapGuideDialog(mapLook: MapLook, onDismiss: () -> Unit) {
         },
         text = {
             Column(
-                Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()),
+                Modifier.heightIn(max = 480.dp).journalScroll(),
                 verticalArrangement = Arrangement.spacedBy(9.dp)
             ) {
                 Text(

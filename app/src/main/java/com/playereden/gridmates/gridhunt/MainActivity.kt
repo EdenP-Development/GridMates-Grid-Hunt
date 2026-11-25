@@ -342,7 +342,7 @@ private fun GridHuntHome(
     Column(
         modifier = Modifier.fillMaxSize().journalPaper()
             .statusBarsPadding().navigationBarsPadding()
-            .verticalScroll(rememberScrollState())
+            .journalScroll()
             .padding(horizontal = 18.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(7.dp)
     ) {
@@ -648,7 +648,7 @@ private fun FirstBearingsScreen(
                     modifier = Modifier
                         .width(sidePanelWidth)
                         .fillMaxHeight()
-                        .verticalScroll(rememberScrollState()),
+                        .journalScroll(),
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     HuntHeader(

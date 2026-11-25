@@ -188,7 +188,7 @@ internal fun WoodlandIdentifyScreen(
                 )
                 Column(
                     Modifier.width(sideWidth).fillMaxHeight()
-                        .verticalScroll(rememberScrollState()),
+                        .journalScroll(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     IdentifyHeader(step, mission.questions.size,

@@ -266,7 +266,7 @@ internal fun WoodlandMixedExpeditionScreen(
                 )
                 Column(
                     Modifier.width(sideWidth).fillMaxHeight()
-                        .verticalScroll(rememberScrollState()),
+                        .journalScroll(),
                     verticalArrangement = Arrangement.spacedBy(7.dp)
                 ) {
                     MixedExpeditionHeader(mission.chapter.name, chapterTwo, step, mission.size,
@@ -548,7 +548,7 @@ private fun ExpeditionJournalDialog(
         title = { Text("Explorer's Journal", color = Ink, fontWeight = FontWeight.Bold) },
         text = {
             Column(
-                Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                Modifier.fillMaxWidth().journalScroll(),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(mission.chapter.name, color = Ink, fontWeight = FontWeight.Bold)
