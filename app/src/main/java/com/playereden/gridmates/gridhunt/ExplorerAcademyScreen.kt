@@ -39,12 +39,12 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
         context.getSharedPreferences(ExplorerAcademy.saveName, Context.MODE_PRIVATE)
     }
     var earned by remember { mutableStateOf(ExplorerAcademy.restore(
-        prefs.getStringSet("earned", emptySet())?.toSet() ?: emptySet()
+        prefs.savedStringSet("earned", emptySet())?.toSet() ?: emptySet()
     )) }
     var fieldEarned by remember { mutableStateOf(ExplorerAcademy.restoreGraduation(
-        prefs.getStringSet("graduation", emptySet())?.toSet() ?: emptySet())) }
+        prefs.savedStringSet("graduation", emptySet())?.toSet() ?: emptySet())) }
     var qualifications by remember { mutableStateOf(
-        prefs.getStringSet("qualifications", emptySet())?.toSet() ?: emptySet()) }
+        prefs.savedStringSet("qualifications", emptySet())?.toSet() ?: emptySet()) }
     var inGraduation by rememberSaveable { mutableStateOf(fieldEarned.isNotEmpty()) }
     val practiceDone = ExplorerAcademy.practiceComplete(earned)
     val graduated = ExplorerAcademy.graduated(earned, fieldEarned)
@@ -307,7 +307,7 @@ private fun AcademyWoodlandMap(
     var guide by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val controls = remember(context) { context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE) }
-    var precise by remember { mutableStateOf(controls.getBoolean("precise_selection", false)) }
+    var precise by remember { mutableStateOf(controls.savedBoolean("precise_selection", false)) }
     var toolOptions by rememberSaveable { mutableStateOf(false) }
     fun fit() {
         if (viewport.width > 80 && viewport.height > 80)
