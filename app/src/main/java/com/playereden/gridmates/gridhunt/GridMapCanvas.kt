@@ -579,6 +579,17 @@ private fun TrainingMapCanvas(
                 drawCircle(Color(0xFF244236), radius = 7f, center = center)
             }
         }
+        // Double rule stays on the existing world edge; it does not inset
+        // the grid, alter the camera viewport or reserve touchable map space.
+        if (!surveyStyle) {
+            drawRect(Color(0xFFD5C092), topLeft = Offset(left, top),
+                size = Size(right - left, bottom - top), style = Stroke(3.dp.toPx()))
+        }
+        drawRect(
+            color = if (surveyStyle) Color(0xFF67785F) else Color(0xFF786849),
+            topLeft = Offset(left, top),
+            size = Size(right - left, bottom - top), style = Stroke(1.dp.toPx())
+        )
         // Separate axis rails prevent the 24/37 overlap seen at the SW corner.
         // When zoomed, anchor labels near the viewport edge instead of leaving
         // the only useful ticks far offscreen with the map's original boundary.
@@ -613,31 +624,26 @@ private fun TrainingMapCanvas(
             for (easting in 24000..29000 step 1000) {
                 val x = p(easting.toDouble(), bounds.south).x
                 val labelX = x + inset
-                if (x >= 0f && labelX + labelWidth <= size.width - inset &&
-                    !(labelX < northingColumn + labelWidth + inset &&
-                        bottom >= size.height - labelHeight - 2 * inset)) {
+                if (x >= 0f && labelX + labelWidth <= size.width - inset) {
                     gridLabel((easting / 1000).toString(), labelX, eastingBaseline)
                 }
             }
             for (northing in 37000..42000 step 1000) {
                 val y = p(bounds.west, northing.toDouble()).y
-                val baseline = y - (paint.fontMetrics.ascent + paint.fontMetrics.descent) / 2f
-                if (baseline + paint.fontMetrics.ascent >= inset &&
+                val centered = y - (paint.fontMetrics.ascent + paint.fontMetrics.descent) / 2f
+                // Keep the southwest northing above the easting row instead
+                // of suppressing the first easting (24) when the rails meet.
+                val baseline = if (centered + paint.fontMetrics.descent >
+                    eastingBaseline + paint.fontMetrics.ascent - inset &&
+                    y >= size.height - labelHeight - 2 * inset)
+                    eastingBaseline + paint.fontMetrics.ascent - paint.fontMetrics.descent - inset
+                else centered
+                if (y in 0f..size.height && baseline + paint.fontMetrics.ascent >= inset &&
                     baseline + paint.fontMetrics.descent <= size.height - inset) {
                     gridLabel((northing / 1000).toString(), northingColumn, baseline)
                 }
             }
         }
-        // Double rule stays on the existing world edge; it does not inset
-        // the grid, alter the camera viewport or reserve touchable map space.
-        if (!surveyStyle) {
-            drawRect(Color(0xFFD5C092), topLeft = Offset(left, top),
-                size = Size(right - left, bottom - top), style = Stroke(3.dp.toPx()))
-        }
-        drawRect(
-            color = if (surveyStyle) Color(0xFF67785F) else Color(0xFF786849),
-            topLeft = Offset(left, top),
-            size = Size(right - left, bottom - top), style = Stroke(1.dp.toPx())
-        )
+
     }
 }
