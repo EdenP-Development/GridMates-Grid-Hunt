@@ -86,17 +86,17 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openChapter").assertExists()
     }
 
-    @Test fun mapLookSwitchKeepsBothPuzzlesOpen() {
+    @Test fun retiredMapToggleDoesNotObstructPuzzles() {
         openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performClick()
         dismissGuideIfShown()
-        compose.onNodeWithTag("mapLookToggle").assertExists().performClick()
+        compose.onNodeWithTag("mapLookToggle").assertDoesNotExist()
         compose.onNodeWithText("Trail Treasures").assertExists()
         compose.onNodeWithTag("chapterHome").performClick()
 
         openQuickIfAtHome()
         compose.onNodeWithTag("openReverse").performScrollTo().performClick()
-        compose.onNodeWithTag("mapLookToggle").assertExists().performClick()
+        compose.onNodeWithTag("mapLookToggle").assertDoesNotExist()
         compose.onNodeWithText("Golden Spots").assertExists()
     }
 
@@ -465,11 +465,12 @@ class HomeNavigationTest {
         compose.onNodeWithText("0 of 4 pages found").assertExists()
     }
 
-    @Test fun visualMapChoiceIsReachable() {
+    @Test fun legacyMapChoiceIsRetiredButPlayOptionsRemain() {
         openQuickIfAtHome()
         compose.onNodeWithTag("appearanceToggle").performScrollTo().performClick()
-        compose.onNodeWithTag("style_SURVEY_TABLE").performScrollTo().performClick()
-        compose.onNodeWithTag("style_FIELD_GUIDE").assertExists()
+        compose.onNodeWithTag("style_SURVEY_TABLE").assertDoesNotExist()
+        compose.onNodeWithTag("style_FIELD_GUIDE").assertDoesNotExist()
+        compose.onNodeWithText("Play options").assertExists()
         openQuickIfAtHome()
         compose.onNodeWithTag("openChapter").performScrollTo().performClick()
         dismissGuideIfShown()

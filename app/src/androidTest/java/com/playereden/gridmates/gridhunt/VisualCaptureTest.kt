@@ -279,8 +279,8 @@ class VisualCaptureTest {
         dismissGuide()
         compose.onNodeWithTag("checkChapter").assertExists()
         capture("02_trail_treasures.png")
-        compose.onNodeWithTag("mapLookToggle").performClick()
-        capture("03_trail_other_map_style.png")
+        compose.onNodeWithTag("mapLookToggle").assertDoesNotExist()
+        capture("03_trail_unobstructed_map.png")
 
         compose.onNodeWithTag("chapterHome").performClick()
         openQuickIfAtHome()

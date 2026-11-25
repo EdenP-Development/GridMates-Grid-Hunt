@@ -141,17 +141,7 @@ internal fun HuntMapPanel(
                     maxLines = 2)
             }
         }
-        if (onLook != null) {
-            // Appearance belongs beside the compass, not in the story caption.
-            // Keep the grid and camera untouched when switching looks.
-            Surface(
-                modifier = Modifier.align(Alignment.TopStart).padding(8.dp),
-                color = Color(0xEFFFF9EA),
-                shape = RoundedCornerShape(9.dp)
-            ) {
-                QuickMapLookButton(mapLook = mapLook, onLook = onLook)
-            }
-        }
+        // World appearance is fixed during alpha; no overlay covers the grid.
         // The north cue belongs to the map, not the crowded game header.
         // Keep it compact and translucent so a marker near the edge stays visible.
         Text(

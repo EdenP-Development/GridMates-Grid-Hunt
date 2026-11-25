@@ -152,7 +152,7 @@ jobs:
             # The runner executes each script line separately: use standalone commands.
             test -s vision-screenshots/01_home.png
             test -s vision-screenshots/02_trail_treasures.png
-            test -s vision-screenshots/03_trail_other_map_style.png
+            test -s vision-screenshots/03_trail_unobstructed_map.png
             test -s vision-screenshots/04_golden_spots.png
             test -s vision-screenshots/05_treasure_finish.png
             test -s vision-screenshots/06_golden_finish.png

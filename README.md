@@ -1,6 +1,6 @@
 # GridMates: Grid Hunt
 
-**Current development checkpoint:** [GH-V25-C / QA307 and next steps](docs/CURRENT_DEVELOPMENT_HANDOFF.md). This handoff supersedes older status notes below.
+**Current development checkpoint:** [GH-V28 active alpha and next steps](docs/CURRENT_DEVELOPMENT_HANDOFF.md). QA313 passed; public beta deferred after physical playtest.
 
 **Organization:** [EdenP-Development/GridMates-Grid-Hunt](https://github.com/EdenP-Development/GridMates-Grid-Hunt). Original repository transferred intact; continue the existing draft PR and preserve the established QA identity. See the [shared standards](https://github.com/EdenP-Development/Eden-Development-Standards).
 

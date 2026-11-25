@@ -131,15 +131,13 @@ private fun GridHuntScreen() {
         context.getSharedPreferences("gridhunt_visual_lab_v1", Context.MODE_PRIVATE)
     }
     var screen by rememberSaveable { mutableStateOf("home") }
-    var lookName by rememberSaveable {
-        mutableStateOf(MapLook.restore(prefs.getString("map_look", null)).name)
-    }
     var hapticsEnabled by rememberSaveable {
         mutableStateOf(prefs.getBoolean("haptics", true))
     }
-    val mapLook = MapLook.restore(lookName)
-    LaunchedEffect(lookName, hapticsEnabled) {
-        prefs.edit().putString("map_look", lookName)
+    // Alpha: one illustrated map per world.
+    val mapLook = MapLook.FIELD_GUIDE
+    LaunchedEffect(hapticsEnabled) {
+        prefs.edit().putString("map_look", mapLook.name)
             .putBoolean("haptics", hapticsEnabled).apply()
     }
     // Preserve the originating hub when returning from a puzzle.
@@ -179,7 +177,7 @@ private fun GridHuntScreen() {
             onCustom = { screen = "custom" },
             onAcademy = { screen = "academy" }
         )
-        "academy" -> ExplorerAcademyScreen(onHome = { screen = "home" }, mapLook = mapLook, onLook = { lookName = it.name })
+        "academy" -> ExplorerAcademyScreen(onHome = { screen = "home" }, mapLook = mapLook, onLook = { _ -> })
         "adventure" -> WoodlandAdventureJourney(
             progress = expeditionProgress,
             secondStatus = supplyState.status,
@@ -196,35 +194,35 @@ private fun GridHuntScreen() {
             },
             onBack = { screen = "home" }
         )
-        "custom" -> CustomHuntScreen(mapLook = mapLook, onLook = { lookName = it.name }, onHome = { screen = "home" })
+        "custom" -> CustomHuntScreen(mapLook = mapLook, onLook = { _ -> }, onHome = { screen = "home" })
         "chapter" -> FirstBearingsScreen(
             onHome = { screen = returnHub },
             mapLook = mapLook,
-            onLook = { lookName = it.name },
+            onLook = { _ -> },
             hapticsEnabled = hapticsEnabled
         )
         "reverse" -> ReversePracticeScreen(
             onBack = { screen = returnHub },
             mapLook = mapLook,
-            onLook = { lookName = it.name },
+            onLook = { _ -> },
             hapticsEnabled = hapticsEnabled
         )
         "treasure" -> TreasureChecklistScreen(
             onHome = { screen = returnHub },
             mapLook = mapLook,
-            onLook = { lookName = it.name },
+            onLook = { _ -> },
             hapticsEnabled = hapticsEnabled
         )
         "identify" -> WoodlandIdentifyScreen(
             onHome = { screen = returnHub },
             mapLook = mapLook,
-            onLook = { lookName = it.name },
+            onLook = { _ -> },
             hapticsEnabled = hapticsEnabled
         )
         "expedition" -> WoodlandMixedExpeditionScreen(
             onHome = { screen = returnHub },
             mapLook = mapLook,
-            onLook = { lookName = it.name },
+            onLook = { _ -> },
             hapticsEnabled = hapticsEnabled,
             onNextChapter = if (returnHub == "adventure") ({
                 // Read current persisted progress, not the snapshot from before the final clue.
@@ -257,14 +255,14 @@ private fun GridHuntScreen() {
             } else WoodlandMixedExpeditionScreen(
                 onHome = { screen = "adventure" },
                 mapLook = mapLook,
-                onLook = { lookName = it.name },
+                onLook = { _ -> },
                 hapticsEnabled = hapticsEnabled,
                 chapterTwo = true
             )
         }
         "quick" -> GridHuntHome(
             mapLook = mapLook,
-            onLook = { lookName = it.name },
+            onLook = { _ -> },
             hapticsEnabled = hapticsEnabled,
             onHaptics = { hapticsEnabled = it },
             onChapter = {
@@ -425,35 +423,14 @@ private fun GridHuntHome(
             onClick = { showAppearance = !showAppearance },
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("appearanceToggle")
         ) {
-            Text(if (showAppearance) "Hide map styles & options  ↑"
-                else "Make it yours: maps & options  ↓")
+            Text(if (showAppearance) "Hide play options  ↑"
+                else "Play options  ↓")
         }
         if (showAppearance) {
             Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFF0E8D5), border = JournalPanelBorder) {
                 Column(Modifier.fillMaxWidth().padding(13.dp),
                     verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                    Text("Pick your map's look", color = Ink, fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp)
-                    Row(Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                        MapLook.entries.forEach { look ->
-                            val chosen = mapLook == look
-                            OutlinedButton(
-                                onClick = { onLook(look) },
-                                modifier = Modifier.weight(1f).heightIn(min = 54.dp)
-                                    .testTag("style_" + look.name),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    containerColor = if (chosen) Color(0xFFD2E1C5)
-                                        else Color(0xFFFFFAEC)
-                                ),
-                                contentPadding = PaddingValues(4.dp)
-                            ) {
-                                Text((if (chosen) "✓ " else "") + look.label,
-                                    fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
-                                    maxLines = 2)
-                            }
-                        }
-                    }
+                    Text("Play options", color = Ink, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     OutlinedButton(
                         onClick = { onHaptics(!hapticsEnabled) },
                         modifier = Modifier.fillMaxWidth().heightIn(min = 45.dp)

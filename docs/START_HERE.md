@@ -1,6 +1,6 @@
 # START HERE — GridMates: Grid Hunt
 
-**Current checkpoint: GH-V25-C / QA307.** Start with [CURRENT_DEVELOPMENT_HANDOFF.md](CURRENT_DEVELOPMENT_HANDOFF.md), the authoritative record of the current build, art, migration, signing and next steps. Continue [draft PR #12](https://github.com/EdenP-Development/GridMates-Grid-Hunt/pull/12). Next GH-V26 decorative woodland environment expansion; launcher icon deferred. [Central standards](https://github.com/EdenP-Development/Eden-Development-Standards).
+**Current checkpoint: GH-V28-A — active alpha.** Start with [CURRENT_DEVELOPMENT_HANDOFF.md](CURRENT_DEVELOPMENT_HANDOFF.md) and [physical playtest roadmap](vision/GH_V28_PHYSICAL_PLAYTEST_AND_ALPHA_ROADMAP.md). QA313 passed; owner explicitly deferred public beta. Continue [draft PR #12](https://github.com/EdenP-Development/GridMates-Grid-Hunt/pull/12). Cool Sketch retirement implemented pending CI; next keyboard, guide and scroll fixes. [Central standards](https://github.com/EdenP-Development/Eden-Development-Standards).
 
 ## Product in one sentence
 
