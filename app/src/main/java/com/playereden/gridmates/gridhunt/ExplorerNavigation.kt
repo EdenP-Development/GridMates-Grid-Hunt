@@ -411,58 +411,62 @@ internal fun WoodlandAdventureJourney(
                             y = (maxHeight * .14f - nodeSize / 2).coerceAtLeast(0.dp)).size(nodeSize)
                     )
                 }
-                Text("CHAPTER 1", color = Forest,
-                    fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                Text("The Missing Field Notes",
-                    color = Ink, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
-                Text("Four kinds of clues. Recover every missing page.",
-                    color = Muted, fontSize = 12.sp)
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("$progress of 4 pages recovered",
-                        color = Forest, fontSize = 12.sp,
-                        modifier = Modifier.testTag("adventureProgress"))
-                    if (progress == WoodlandExpedition.size) {
-                        Text("✓ Complete", color = Forest,
-                            fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
             }
         }
-        Surface(shape = RoundedCornerShape(18.dp), color = Color(0xFFF3E9D2)) {
-            Column(Modifier.fillMaxWidth().padding(13.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("CHAPTER 2  ·  THE LOST SUPPLIES", color = Forest,
-                    fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
-                Text("Four new clues across Little Woodland.", color = Ink, fontSize = 13.sp)
-                Text(when (secondStatus) {
-                    CampaignChapterStatus.LOCKED ->
-                        "Locked — finish Chapter 1 to follow the supply trail"
-                    CampaignChapterStatus.READY -> "Ready for a new adventure"
-                    CampaignChapterStatus.IN_PROGRESS ->
-                        "$secondProgress of 4 clues solved"
-                    CampaignChapterStatus.COMPLETE -> "4 of 4 clues solved · Complete"
-                }, color = Muted, fontSize = 12.sp,
-                    modifier = Modifier.testTag("secondChapterStatus"))
-
-            }
-        }
-        Surface(shape = RoundedCornerShape(18.dp), color = Color(0xFFF3E9D2)) {
-            Column(Modifier.fillMaxWidth().padding(13.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("CHAPTER 3 · THE RETURN TRAIL", color = Forest,
-                    fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
-                Text("Make a final circuit and return to the trailhead.", color = Ink, fontSize = 13.sp)
-                Text(when (thirdStatus) {
-                    CampaignChapterStatus.LOCKED -> "Locked — finish Chapters 1 and 2"
-                    CampaignChapterStatus.READY -> "Ready for a new adventure"
-                    CampaignChapterStatus.IN_PROGRESS -> "$thirdProgress of 4 clues solved"
-                    CampaignChapterStatus.COMPLETE -> "4 of 4 clues solved · Complete"
-                }, color = Muted, fontSize = 12.sp, modifier = Modifier.testTag("thirdChapterStatus"))
-            }
-        }
-        Text("Choose a numbered destination to explore.",
+        AdventureChapterCard(1, "The Missing Field Notes", "Four kinds of clues. Recover every missing page.",
+            if (progress == WoodlandExpedition.size) CampaignChapterStatus.COMPLETE
+            else if (progress > 0) CampaignChapterStatus.IN_PROGRESS else CampaignChapterStatus.READY,
+            "$progress of 4 pages recovered", "adventureProgress", onChapter)
+        AdventureChapterCard(2, "The Lost Supplies", "Four new clues across Little Woodland.",
+            secondStatus, when (secondStatus) {
+                CampaignChapterStatus.LOCKED -> "Locked — finish Chapter 1 to follow the supply trail"
+                CampaignChapterStatus.READY -> "Ready for a new adventure"
+                CampaignChapterStatus.IN_PROGRESS -> "$secondProgress of 4 clues solved"
+                CampaignChapterStatus.COMPLETE -> "4 of 4 clues solved · Complete"
+            }, "secondChapterStatus", onSecondChapter)
+        AdventureChapterCard(3, "The Return Trail", "Make a final circuit and return to the trailhead.",
+            thirdStatus, when (thirdStatus) {
+                CampaignChapterStatus.LOCKED -> "Locked — finish Chapters 1 and 2"
+                CampaignChapterStatus.READY -> "Ready for a new adventure"
+                CampaignChapterStatus.IN_PROGRESS -> "$thirdProgress of 4 clues solved"
+                CampaignChapterStatus.COMPLETE -> "4 of 4 clues solved · Complete"
+            }, "thirdChapterStatus", onThirdChapter)
+        Text("Choose a chapter or a numbered destination to explore.",
             color = Muted, fontSize = 12.sp)
+    }
+}
+
+@Composable
+private fun AdventureChapterCard(
+    number: Int, title: String, description: String, status: CampaignChapterStatus,
+    progress: String, progressTag: String, onOpen: () -> Unit
+) {
+    val locked = status == CampaignChapterStatus.LOCKED
+    Surface(shape = RoundedCornerShape(18.dp), border = JournalPanelBorder,
+        color = when (status) {
+            CampaignChapterStatus.COMPLETE -> Color(0xFFE4EDDA)
+            CampaignChapterStatus.LOCKED -> Color(0xFFF3E9D2)
+            else -> Color(0xFFFFF0CF)
+        }, shadowElevation = if (locked) 0.dp else 2.dp) {
+        Column(Modifier.fillMaxWidth().padding(13.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text("CHAPTER $number", color = Forest, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            Text(title, color = Ink, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+            Text(description, color = Muted, fontSize = 12.sp)
+            Text(progress, color = Forest, fontSize = 12.sp, modifier = Modifier.testTag(progressTag))
+            if (number == 1 && status == CampaignChapterStatus.COMPLETE) Text("✓ Complete", color = Forest, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Button(onClick = onOpen, enabled = !locked,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("chapterCardAction_$number"),
+                shape = RoundedCornerShape(13.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Forest)) {
+                Text(when (status) {
+                    CampaignChapterStatus.LOCKED -> "Locked"
+                    CampaignChapterStatus.READY -> "Start chapter"
+                    CampaignChapterStatus.IN_PROGRESS -> "Continue chapter"
+                    CampaignChapterStatus.COMPLETE -> "Revisit chapter"
+                }, fontWeight = FontWeight.Bold)
+            }
+        }
     }
 }
 
