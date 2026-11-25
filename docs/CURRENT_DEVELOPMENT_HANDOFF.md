@@ -1,8 +1,9 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V26-B — QA309 import passed; scenery integration pending CI.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V26-C — QA309 import passed; warm gameplay scenery pending CI.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V26-B
+## Authoritative current checkpoint — GH-V26-C
+- GH-V26-C warm gameplay map now uses five decorative placements of rocks, ferns, log and pond. World anchored, size limited, canonical landmark exclusion, beneath route/grid/objectives; survey unchanged. No new core answers or saves. Verify fresh CI and screenshots; QA310 menu-scene CI was in progress at implementation. Next interface texture/readability polish, then final launcher icon.
 - GH-V26-A four original transparent 256x256 decorative environment PNGs (rocks, ferns, log, pond) imported byte-for-byte at dc40a8ca7a5b08d6c7bff7498bb6cb6f0c30a6f0; QA309 full CI passed https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45520056258. Manifest docs/vision/WOODLAND_ENVIRONMENT_ASSET_MANIFEST.json. Sixteen total original illustrations. GH-V26-B adds these sprites to Home/Custom postcard and Adventure journey; CI and physical visual acceptance pending. Next verify screenshots, then cautiously integrate decorative scenery into warm gameplay only, preserving grid lines, canonical landmarks and survey style. Launcher icon still deferred.
 - QA307 evidence and signing proof below remain valid historical checkpoints.
 - Latest verified gameplay source: 312701abdcc2086d9771fb80d024ef804bc11a88; QA307 https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45510779210 passed both jobs, 32 executed Android emulator tests, core tests, QA signature and update preflight, unsigned beta identity and screenshot checks. QA APK 10307 / 0.3.0-gh02c-qa.307; SHA256 ac883ff575130ca1d9cdaf388bce5426f953c040c89d0f7c554b05ca7dadb8fb. APK https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45510779210/artifacts/14975920482 ; visual evidence https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45510779210/artifacts/14974759699 ; expire Dec 8, 2026. Physical phone acceptance and comprehensive save upgrade rehearsal outstanding.

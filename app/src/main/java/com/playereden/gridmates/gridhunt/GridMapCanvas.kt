@@ -194,6 +194,10 @@ private fun TrainingMapCanvas(
     )
     val oakSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_wood_oak_sm)
     val pineSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_wood_pine_sm)
+    val rocksSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_env_rocks)
+    val fernsSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_env_ferns)
+    val logSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_env_log)
+    val pondSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_env_pond)
     val mapBackdrop = if (surveyStyle) Color(0xFFB1C7C6) else Color(0xFFD1DFCF)
     val mapPaper = if (surveyStyle) Color(0xFFDCEBE7) else Color(0xFFEDE4CB)
     val treeDark = if (surveyStyle) Color(0xFF68938F) else Color(0xFF88AA84)
@@ -359,6 +363,30 @@ private fun TrainingMapCanvas(
                     center + Offset(radius * 0.32f, -radius * 0.22f))
                 drawCircle(canopyHighlight, radius * 0.38f,
                     center + Offset(-radius * 0.23f, -radius * 0.3f))
+            }
+            // GH-V26-C: quiet decorative accents anchored in world meters.
+            // Keep them smaller and softer than answer-bearing landmarks. Never
+            // use these positions for objectives, clues, selection or persistence.
+            // The stream, trail, canonical symbols and grid are drawn afterward.
+            if (!surveyStyle) {
+                fun scenery(bitmap: ImageBitmap?, e: Double, n: Double, meters: Double) {
+                    if (bitmap == null) return
+                    val half = meters / 2.0
+                    if (!bounds.contains(WorldPoint(e-half,n-half)) ||
+                        !bounds.contains(WorldPoint(e+half,n+half))) return
+                    // Reserve a generous exclusion zone around canonical symbols.
+                    if (WoodlandLandmarks.all.any { landmark ->
+                            kotlin.math.abs(landmark.point.easting-e) < half+700.0 &&
+                            kotlin.math.abs(landmark.point.northing-n) < half+700.0
+                        }) return
+                    val side = (meters * cam.pixelsPerMeter).toFloat().coerceAtMost(64.dp.toPx())
+                    if (side >= 8.dp.toPx()) drawWoodlandSprite(bitmap, p(e,n), side, alpha = .70f)
+                }
+                scenery(rocksSprite, 24650.0, 40800.0, 420.0)
+                scenery(fernsSprite, 27480.0, 41250.0, 360.0)
+                scenery(logSprite, 28900.0, 38800.0, 480.0)
+                scenery(pondSprite, 24600.0, 37800.0, 620.0)
+                scenery(fernsSprite, 28150.0, 37450.0, 360.0)
             }
             val stream = Path().apply {
                 val a = p(24900.0, 43000.0)

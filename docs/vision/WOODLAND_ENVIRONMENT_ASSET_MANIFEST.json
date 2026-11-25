@@ -23,11 +23,13 @@
       "git_blob_sha": "76f2b10f3c24c652ce7c26ed8b1625144c6e570c"
     }
   ],
-  "status": "byte-verified import; QA309 import passed; Home/Custom postcard and Adventure integration pending CI and visual acceptance",
+  "status": "GH-V26-C integrated; QA309 import passed; latest visual acceptance pending",
   "usage": "decorative only; preserve playable map geometry and answer-bearing landmarks",
   "reuse": [
     "Home postcard",
     "Custom Play postcard",
-    "Adventure journey"
-  ]
+    "Adventure journey",
+    "warm gameplay map decorative layer"
+  ],
+  "map_policy": "World-anchored, low opacity, bounded size, excluded near canonical landmarks, underneath creek/trail/grid/objectives; survey unchanged"
 }
