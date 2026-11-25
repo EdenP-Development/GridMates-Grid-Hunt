@@ -537,16 +537,38 @@ class HomeNavigationTest {
         compose.onNodeWithText("0 of 4 pages found").assertExists()
     }
 
-    @Test fun legacyMapChoiceIsRetiredButPlayOptionsRemain() {
-        openQuickIfAtHome()
-        compose.onNodeWithTag("appearanceToggle").performScrollTo().performClick()
-        compose.onNodeWithTag("style_SURVEY_TABLE").assertDoesNotExist()
-        compose.onNodeWithTag("style_FIELD_GUIDE").assertDoesNotExist()
-        compose.onNodeWithText("Play options").assertExists()
-        openQuickIfAtHome()
-        compose.onNodeWithTag("openChapter").performScrollTo().performClick()
-        dismissGuideIfShown()
-        compose.onNodeWithText("Trail Treasures").assertExists()
+    @Test fun globalSettingsPreserveExistingPreferencesAndRetireMapChoice() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val play = context.getSharedPreferences("gridhunt_visual_lab_v1", Context.MODE_PRIVATE)
+        val ui = context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE)
+        val oldHaptics = play.getBoolean("haptics", true)
+        val oldPrecise = ui.getBoolean("precise_selection", false)
+        try {
+            compose.onNodeWithTag("openSettings").performClick()
+            compose.onNodeWithTag("style_SURVEY_TABLE").assertDoesNotExist()
+            compose.onNodeWithTag("style_FIELD_GUIDE").assertDoesNotExist()
+            compose.onNodeWithTag("settingsHaptics").performClick()
+            compose.onNodeWithTag("settingsPrecise").performClick()
+            compose.waitForIdle()
+            org.junit.Assert.assertEquals(!oldHaptics, play.getBoolean("haptics", true))
+            org.junit.Assert.assertEquals(!oldPrecise, ui.getBoolean("precise_selection", false))
+            compose.activityRule.scenario.recreate()
+            compose.onNodeWithTag("settingsHaptics").assertExists()
+            compose.onNodeWithTag("settingsPrecise").assertExists()
+            compose.onNodeWithTag("settingsHaptics").performClick()
+            compose.onNodeWithTag("settingsPrecise").performClick()
+            compose.waitForIdle()
+            org.junit.Assert.assertEquals(oldHaptics, play.getBoolean("haptics", true))
+            org.junit.Assert.assertEquals(oldPrecise, ui.getBoolean("precise_selection", false))
+            compose.onNodeWithTag("settingsBack").performClick()
+            openQuickIfAtHome()
+            compose.onNodeWithTag("quickSettings").performScrollTo().performClick()
+            compose.onNodeWithTag("settingsGuide").assertExists()
+            compose.onNodeWithTag("settingsBack").performClick()
+        } finally {
+            play.edit().putBoolean("haptics", oldHaptics).commit()
+            ui.edit().putBoolean("precise_selection", oldPrecise).commit()
+        }
     }
     @Test fun customHuntGeneratesUniqueTargetsAndResumesWithoutChangingCampaign() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext

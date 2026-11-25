@@ -55,7 +55,8 @@ internal fun ExplorerDeskHome(
     onAdventure: () -> Unit,
     onQuickPlay: () -> Unit,
     onCustom: () -> Unit,
-    onAcademy: () -> Unit
+    onAcademy: () -> Unit,
+    onSettings: () -> Unit
 ) {
     Column(
         Modifier.fillMaxSize().journalPaper()
@@ -64,8 +65,13 @@ internal fun ExplorerDeskHome(
             .padding(horizontal = 17.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Text("GRIDMATES  /  PUZZLE ADVENTURES", color = Forest,
-            fontWeight = FontWeight.Bold, fontSize = 10.sp)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("GRIDMATES  /  PUZZLE ADVENTURES", color = Forest,
+                fontWeight = FontWeight.Bold, fontSize = 10.sp, modifier = Modifier.weight(1f))
+            TextButton(onClick = onSettings, modifier = Modifier.testTag("openSettings")) {
+                Text("Settings", color = Forest)
+            }
+        }
         Text("Grid Hunt", color = Ink, fontWeight = FontWeight.ExtraBold,
             fontSize = 30.sp)
         Text("Little maps. Big discoveries.", color = Muted, fontSize = 13.sp)

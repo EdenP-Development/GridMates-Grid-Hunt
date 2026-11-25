@@ -1,6 +1,6 @@
 # START HERE — GridMates: Grid Hunt
 
-**Current checkpoint: GH-V31-A — active alpha.** Read [CURRENT_DEVELOPMENT_HANDOFF.md](CURRENT_DEVELOPMENT_HANDOFF.md) first. QA324 last confirmed full pass; latest Adventure marker/Home/compass changes awaiting combined CI. Chapter 3 candidate authored but not player-accessible yet. Owner wants one consolidated physical playtest after content, consistency and save checks; no public beta or merge without approval. Continue [draft PR #12](https://github.com/EdenP-Development/GridMates-Grid-Hunt/pull/12). [Central standards](https://github.com/EdenP-Development/Eden-Development-Standards).
+**Current checkpoint: GH-V32-A — active alpha.** Read [CURRENT_DEVELOPMENT_HANDOFF.md](CURRENT_DEVELOPMENT_HANDOFF.md) first. QA324 last confirmed full pass; Chapter 3 and central Settings integrated pending combined CI. Owner wants one consolidated physical playtest after interface, icon and save checks. No merge/public beta without approval. Continue [draft PR #12](https://github.com/EdenP-Development/GridMates-Grid-Hunt/pull/12).
 
 ## Product in one sentence
 

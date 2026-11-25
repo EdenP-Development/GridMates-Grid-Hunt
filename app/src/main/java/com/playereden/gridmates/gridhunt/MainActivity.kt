@@ -146,7 +146,7 @@ private fun GridHuntScreen() {
     var returnHub by rememberSaveable { mutableStateOf("quick") }
     val goBack = {
         screen = when (screen) {
-            "quick", "adventure", "custom", "academy" -> "home"
+            "quick", "adventure", "custom", "academy", "settings" -> "home"
             else -> returnHub
         }
     }
@@ -183,8 +183,11 @@ private fun GridHuntScreen() {
             onAdventure = { screen = "adventure" },
             onQuickPlay = { screen = "quick" },
             onCustom = { screen = "custom" },
-            onAcademy = { screen = "academy" }
+            onAcademy = { screen = "academy" },
+            onSettings = { screen = "settings" }
         )
+        "settings" -> GridHuntSettings(hapticsEnabled, { hapticsEnabled = it }, mapLook,
+            onBack = { screen = "home" })
         "academy" -> ExplorerAcademyScreen(onHome = { screen = "home" }, mapLook = mapLook, onLook = { _ -> })
         "adventure" -> WoodlandAdventureJourney(
             progress = expeditionProgress,
@@ -278,8 +281,7 @@ private fun GridHuntScreen() {
         "quick" -> GridHuntHome(
             mapLook = mapLook,
             onLook = { _ -> },
-            hapticsEnabled = hapticsEnabled,
-            onHaptics = { hapticsEnabled = it },
+            onSettings = { screen = "settings" },
             onChapter = {
                 returnHub = "quick"
                 screen = "chapter"
@@ -310,8 +312,7 @@ private fun GridHuntScreen() {
 private fun GridHuntHome(
     mapLook: MapLook,
     onLook: (MapLook) -> Unit,
-    hapticsEnabled: Boolean,
-    onHaptics: (Boolean) -> Unit,
+    onSettings: () -> Unit,
     onChapter: () -> Unit,
     onReverse: () -> Unit,
     onTreasure: () -> Unit,
@@ -352,7 +353,6 @@ private fun GridHuntHome(
     val allTrailsFinished = chapterState.huntIndex == FirstBearingsChapter.hunts.lastIndex &&
         chapterState.objectiveIndex == FirstBearingsChapter.hunts.last().objectives.size
     val allGoldenSpotsFinished = reverseCompleted == ReverseTraining.markers.size
-    var showAppearance by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize().journalPaper()
@@ -434,26 +434,9 @@ private fun GridHuntHome(
                 }
             }
         }
-        OutlinedButton(
-            onClick = { showAppearance = !showAppearance },
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("appearanceToggle")
-        ) {
-            Text(if (showAppearance) "Hide play options  ↑"
-                else "Play options  ↓")
-        }
-        if (showAppearance) {
-            Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFF0E8D5), border = JournalPanelBorder) {
-                Column(Modifier.fillMaxWidth().padding(13.dp),
-                    verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                    Text("Play options", color = Ink, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    OutlinedButton(
-                        onClick = { onHaptics(!hapticsEnabled) },
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 45.dp)
-                    ) {
-                        Text("Little victory buzz: " + if (hapticsEnabled) "On" else "Off")
-                    }
-                }
-            }
+        OutlinedButton(onClick = onSettings,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("quickSettings")) {
+            Text("Settings")
         }
         Text("Play offline. Your puzzle progress stays on this device.",
             fontSize = 11.sp, color = Muted)
