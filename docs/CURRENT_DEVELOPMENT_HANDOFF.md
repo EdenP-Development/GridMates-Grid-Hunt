@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V39-E — injectable scene provider committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V39-F — isolated map-specific Android persistence and instrumentation tests committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V39-E
+## Authoritative current checkpoint — GH-V39-F
+- QA405 run 45584022026 passed core/build/signing/packaging and real QA345 install-over upgrade; instrumentation still running at inspection. Later commits may supersede.
+- WorldHuntStore introduced map ID/revision scoped SharedPreferences namespace, validated complete session writes in one editor commit, and read-only Empty/Invalid/Ready results with strict typed schema fields (46b649a00453f16bf362dd97ef123a5de7cc333a). Historical gridhunt_custom_v1 untouched; adapter not yet wired into live screens. Explicit valid write can replace an invalid record; no automatic repair or migration.
+- WorldHuntStoreTest adds two Android instrumentation tests for distinct overlapping-coordinate maps/revisions, exact restoration, rejection of invalid writes, unchanged legacy store, and preservation of malformed records (0686a18d554389120cacfa994171106c8fbca8df). Test-only namespaces cleaned up. Fresh CI required.
+- Next GH-V39-G audit world selection and scene identity contracts, preserve existing home/Adventure/Custom Play navigation, and avoid publishing placeholder worlds. Before new world publication, integrate adapter off UI thread and use explicit user-approved replacement, validate scene-to-map matching, run full combined QA and owner visual comparison. No new playable worlds, save migration, package/signing change, merge or release.
+
+## GH-V39-E
 - QA403 run 45582634566 passed JVM/build/signing/packaging and QA345 install-over upgrade; Android instrumentation running at inspection. New commits may supersede that run.
 - MapScene.kt encapsulates Woodland bitmap loading, terrain palette and draw callback (523b44293437d0bc85b94deee0fb98bbf856f135). HuntMapPanel accepts optional MapScene, defaults to original Woodland provider; shared canvas consumes injected backdrop, paper, grid ink and terrain callback (9679724860ed1b3f60cebb36b40ca4d5232805f2). Shared frame, compass, label and selection styling remain unchanged. No new published world or selectable scene; future caller must supply matching bounds and scene. Fresh CI and visual comparison required.
 - Next GH-V39-F explicit world/map identity persistence design and isolated store adapter, with existing Woodland preference keys untouched. Consider injectable scene identity validation and renderer regression before exposing new worlds. No save migration, package/signing change, merge or release.
