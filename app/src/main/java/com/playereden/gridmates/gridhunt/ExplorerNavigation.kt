@@ -3,6 +3,10 @@ package com.playereden.gridmates.gridhunt
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -79,7 +83,7 @@ internal fun ExplorerDeskHome(
                 Modifier.fillMaxWidth().padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                WoodlandPostcard(Modifier.fillMaxWidth().height(104.dp))
+                WoodlandPostcard(Modifier.fillMaxWidth().height(116.dp), showLabel = false)
                 Row(
                     Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -265,7 +269,7 @@ internal fun WoodlandAdventureJourney(
                         modifier = Modifier.weight(1f))
                     Text("2 chapters", color = Muted, fontSize = 11.sp)
                 }
-                androidx.compose.foundation.layout.Box(
+                BoxWithConstraints(
                     modifier = Modifier.fillMaxWidth().height(210.dp)
                         .testTag("adventureRouteMap")
                         .clip(RoundedCornerShape(14.dp))
@@ -327,12 +331,10 @@ internal fun WoodlandAdventureJourney(
                             drawCircle(Color(0x12695335),.55.dp.toPx(),
                                 Offset(w*((i*43+7)%101)/101f,h*((i*67+13)%103)/103f))
                         }
-                        // Trail starts at a compass-style dot and leads to one
-                        // *actual* playable destination; no fake chapter nodes.
+                        // The two real chapter buttons sit on the painted route.
                         drawCircle(Forest, 13f, Offset(w*0.12f,h*0.86f))
                         drawCircle(Color(0xFFFFF6E2), 7f, Offset(w*0.12f,h*0.86f))
-                        drawCircle(Gold, 20f, Offset(w*0.85f,h*0.13f))
-                        drawCircle(Color(0xFFFFF6E2), 11f, Offset(w*0.85f,h*0.13f))
+
                     }
                     Text(
                         "START",
@@ -340,55 +342,36 @@ internal fun WoodlandAdventureJourney(
                             .padding(start = 11.dp, bottom = 9.dp),
                         color = Forest, fontWeight = FontWeight.Bold, fontSize = 10.sp
                     )
-                    // Two real chapters now share the trail. Distinct accessible
-                    // buttons are the interactive nodes; Canvas remains scenery.
-                    Button(
-                        onClick = onChapter,
-                        modifier = Modifier.align(Alignment.BottomStart)
-                            .padding(start = 12.dp, bottom = 35.dp)
-                            .heightIn(min = 50.dp)
-                            .testTag("openAdventureChapter"),
-                        colors = ButtonDefaults.buttonColors(containerColor = Forest),
-                        shape = RoundedCornerShape(14.dp),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                            horizontal = 12.dp, vertical = 5.dp
-                        )
-                    ) {
-                        Text(
-                            when {
-                                progress == WoodlandExpedition.size -> "✓  1 · Field Notes"
-                                progress > 0 -> "▶  1 · Field Notes"
-                                else -> "1 · Field Notes"
-                            },
-                            fontSize = 12.sp, fontWeight = FontWeight.Bold
-                        )
+                    // Align compact real buttons with the actual painted route nodes.
+                    // Chapter information lives below the scene, not on top of it.
+                    val nodeSize = 48.dp
+                    val firstLabel = when {
+                        progress == WoodlandExpedition.size -> "Chapter 1, The Missing Field Notes, complete"
+                        progress > 0 -> "Chapter 1, The Missing Field Notes, in progress"
+                        else -> "Chapter 1, The Missing Field Notes, ready"
                     }
-                    Button(
-                        onClick = onSecondChapter,
+                    val secondLabel = "Chapter 2, The Lost Supplies, " + when (secondStatus) {
+                        CampaignChapterStatus.LOCKED -> "locked"
+                        CampaignChapterStatus.COMPLETE -> "complete"
+                        CampaignChapterStatus.IN_PROGRESS -> "in progress"
+                        CampaignChapterStatus.READY -> "ready"
+                    }
+                    AdventureRouteNode(
+                        number = 1, label = firstLabel,
+                        complete = progress == WoodlandExpedition.size,
+                        enabled = true, tag = "openAdventureChapter", onClick = onChapter,
+                        modifier = Modifier.offset(x = (maxWidth * .47f - nodeSize / 2).coerceAtLeast(0.dp),
+                            y = maxHeight * .49f - nodeSize / 2).size(nodeSize)
+                    )
+                    AdventureRouteNode(
+                        number = 2, label = secondLabel,
+                        complete = secondStatus == CampaignChapterStatus.COMPLETE,
                         enabled = secondStatus != CampaignChapterStatus.LOCKED,
-                        modifier = Modifier.align(Alignment.TopEnd)
-                            .padding(end = 10.dp, top = 39.dp)
-                            .heightIn(min = 50.dp)
-                            .testTag("openSecondChapter"),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Forest,
-                            disabledContainerColor = Color(0xFFEFE5D2),
-                            disabledContentColor = Color(0xFF53685E)
-                        ),
-                        shape = RoundedCornerShape(14.dp),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                            horizontal = 10.dp, vertical = 5.dp
-                        )
-                    ) {
-                        Text(
-                            when (secondStatus) {
-                                CampaignChapterStatus.LOCKED -> "🔒  2 · Supplies"
-                                CampaignChapterStatus.COMPLETE -> "✓  2 · Supplies"
-                                else -> "2 · Supplies"
-                            },
-                            fontSize = 12.sp, fontWeight = FontWeight.Bold
-                        )
-                    }
+                        tag = "openSecondChapter", onClick = onSecondChapter,
+                        modifier = Modifier.offset(x = (maxWidth * .85f - nodeSize / 2)
+                            .coerceIn(0.dp, (maxWidth - nodeSize).coerceAtLeast(0.dp)),
+                            y = (maxHeight * .13f - nodeSize / 2).coerceAtLeast(0.dp)).size(nodeSize)
+                    )
                 }
                 Text("CHAPTER 1", color = Forest,
                     fontSize = 10.sp, fontWeight = FontWeight.Bold)
@@ -426,8 +409,29 @@ internal fun WoodlandAdventureJourney(
 
             }
         }
-        Text("More woodland destinations will follow as we build new puzzles.",
+        Text("Choose a numbered destination to explore.",
             color = Muted, fontSize = 12.sp)
+    }
+}
+
+/** Compact accessible route marker with a full 48dp target. */
+@Composable
+private fun AdventureRouteNode(
+    number: Int, label: String, complete: Boolean, enabled: Boolean,
+    tag: String, onClick: () -> Unit, modifier: Modifier
+) {
+    Button(
+        onClick = onClick, enabled = enabled,
+        modifier = modifier.testTag(tag).semantics { contentDescription = label },
+        shape = RoundedCornerShape(24.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Forest,
+            disabledContainerColor = Color(0xFFEFE5D2),
+            disabledContentColor = Color(0xFF53685E)),
+        border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFFD5B575))
+    ) {
+        Text(if (complete) "✓" else number.toString(),
+            fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
     }
 }
 

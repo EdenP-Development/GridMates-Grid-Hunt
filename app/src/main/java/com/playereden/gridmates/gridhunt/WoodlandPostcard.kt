@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
  * The real puzzle map and all its world coordinates remain in GridMapCanvas.
  */
 @Composable
-internal fun WoodlandPostcard(modifier: Modifier = Modifier) {
+internal fun WoodlandPostcard(modifier: Modifier = Modifier, showLabel: Boolean = true) {
     val oakArt = ImageBitmap.imageResource(R.drawable.gh_wood_oak_sm)
     val pineArt = ImageBitmap.imageResource(R.drawable.gh_wood_pine_sm)
     val rocksArt = ImageBitmap.imageResource(R.drawable.gh_env_rocks)
@@ -133,7 +133,7 @@ internal fun WoodlandPostcard(modifier: Modifier = Modifier) {
             drawLine(Color.White, treasure + Offset(7f, -7f),
                 treasure + Offset(-7f, 7f), strokeWidth = 3f)
         }
-        Surface(
+        if (showLabel) Surface(
             modifier = Modifier.align(Alignment.BottomStart).padding(6.dp),
             color = Color(0xFFFDF8EA),
             shape = RoundedCornerShape(8.dp),
