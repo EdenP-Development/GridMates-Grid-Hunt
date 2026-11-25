@@ -565,6 +565,12 @@ class HomeNavigationTest {
             compose.onNodeWithTag("quickSettings").performScrollTo().performClick()
             compose.onNodeWithTag("settingsGuide").assertExists()
             compose.onNodeWithTag("settingsBack").performClick()
+            compose.onNodeWithTag("quickBack").assertExists()
+            compose.onNodeWithTag("quickSettings").performScrollTo().performClick()
+            compose.activityRule.scenario.recreate()
+            compose.onNodeWithTag("settingsGuide").assertExists()
+            androidx.test.espresso.Espresso.pressBack()
+            compose.onNodeWithTag("quickBack").assertExists()
         } finally {
             play.edit().putBoolean("haptics", oldHaptics).commit()
             ui.edit().putBoolean("precise_selection", oldPrecise).commit()
