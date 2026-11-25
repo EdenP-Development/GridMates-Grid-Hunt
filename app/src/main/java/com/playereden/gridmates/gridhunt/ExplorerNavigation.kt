@@ -46,18 +46,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.WoodlandExpedition
 import com.playereden.gridhunt.core.CampaignChapterStatus
+import com.playereden.gridhunt.core.CampaignChapterProgress
+import com.playereden.gridhunt.core.GridHuntCampaign
 import com.playereden.gridhunt.core.WoodlandSupplyExpedition
 
 /** GH-V14 Explorer Desk navigation shell. No new modes, art pack or saved-game keys. */
 @Composable
 internal fun ExplorerDeskHome(
-    expeditionProgress: Int,
+    worldProgress: List<CampaignChapterProgress>,
     onAdventure: () -> Unit,
     onQuickPlay: () -> Unit,
     onCustom: () -> Unit,
     onAcademy: () -> Unit,
     onSettings: () -> Unit
 ) {
+    val completedChapters = worldProgress.count { it.status == CampaignChapterStatus.COMPLETE }
+    val nextChapter = worldProgress.firstOrNull {
+        it.status == CampaignChapterStatus.READY || it.status == CampaignChapterStatus.IN_PROGRESS
+    }
+    val nextName = nextChapter?.let { GridHuntCampaign.registry.findChapter(it.chapterId)?.chapter?.name }
+    val worldComplete = worldProgress.isNotEmpty() && completedChapters == worldProgress.size
     Column(
         Modifier.fillMaxSize().journalPaper()
             .statusBarsPadding().navigationBarsPadding()
@@ -101,14 +109,22 @@ internal fun ExplorerDeskHome(
                         Text("Little Woodland", color = Ink,
                             fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
                         Text(
-                            when (expeditionProgress) {
-                                0 -> "The Missing Field Notes awaits"
-                                WoodlandExpedition.size -> "Chapter 1 complete"
-                                else -> "$expeditionProgress of 4 pages recovered"
+                            when {
+                                worldComplete -> "Little Woodland complete!"
+                                nextName != null -> nextName
+                                else -> "Explore Little Woodland"
                             },
                             color = Muted, fontSize = 12.sp,
                             modifier = Modifier.testTag("homeAdventureProgress")
                         )
+                        Text("$completedChapters of ${worldProgress.size} chapters complete",
+                            color = Forest, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                            modifier = Modifier.testTag("homeWorldProgress"))
+                        if (nextChapter?.status == CampaignChapterStatus.IN_PROGRESS) {
+                            Text("${nextChapter.completedObjectives} of ${nextChapter.totalObjectives} objectives solved",
+                                color = Muted, fontSize = 11.sp,
+                                modifier = Modifier.testTag("homeChapterProgress"))
+                        }
                     }
                     Text("✦", color = Gold, fontSize = 27.sp)
                 }
@@ -119,9 +135,11 @@ internal fun ExplorerDeskHome(
                     colors = ButtonDefaults.buttonColors(containerColor = Forest),
                     shape = RoundedCornerShape(15.dp)
                 ) {
-                    Text(if (expeditionProgress > 0 &&
-                            expeditionProgress < WoodlandExpedition.size)
-                            "Continue your journey" else "Explore Adventure",
+                    Text(when {
+                        worldComplete -> "Revisit Adventure"
+                        completedChapters > 0 || nextChapter?.status == CampaignChapterStatus.IN_PROGRESS -> "Continue your journey"
+                        else -> "Explore Adventure"
+                    },
                         fontWeight = FontWeight.Bold)
                 }
             }
