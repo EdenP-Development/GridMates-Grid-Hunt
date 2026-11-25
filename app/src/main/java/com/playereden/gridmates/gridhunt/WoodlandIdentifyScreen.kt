@@ -71,10 +71,10 @@ internal fun WoodlandIdentifyScreen(
     }
     val mission = WoodlandIdentifyMission
     var step by rememberSaveable {
-        mutableStateOf(mission.restoreStep(prefs.getInt("step", 0)))
+        mutableStateOf(mission.restoreStep(prefs.savedInt("step", 0)))
     }
     var chosenId by rememberSaveable {
-        mutableStateOf(prefs.getString("chosen_id", null)?.takeIf { id ->
+        mutableStateOf(prefs.savedString("chosen_id", null)?.takeIf { id ->
             mission.choices.any { it.id == id }
         })
     }
