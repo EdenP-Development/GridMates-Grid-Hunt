@@ -94,6 +94,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
             Column(Modifier.weight(1f).journalScroll(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 WoodlandPostcard(Modifier.fillMaxWidth().height(96.dp))
                 Text("Choose your puzzle", fontWeight = FontWeight.Bold, color = Ink, fontSize = 16.sp)
+                Text("Make a fresh woodland adventure at your own pace.", color = Muted, fontSize = 12.sp)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf("grid" to "Trail Treasures", "gold" to "Golden Spots").forEach { (id,label) ->
                         FilterChip(selected = nextMode == id, onClick = { nextMode = id },
@@ -117,13 +118,14 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     }
                 }
                 if (targets.isNotEmpty() && step < targets.size) {
-                    OutlinedButton(onClick = { playing = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("customResume")) {
+                    OutlinedButton(onClick = { playing = true }, shape = JournalActionShape, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("customResume")) {
                         Text("Resume · " + (when(mode) { "gold" -> "Golden Spots"; "identify" -> "Landmark Identification"; "checklist" -> "Treasure Checklist"; "mixed" -> "Mixed Expedition"; else -> "Trail Treasures" }) + " · $step/${targets.size}")
                     }
                 }
-                Button(onClick = { if (targets.isNotEmpty() && step < targets.size) replaceHunt = true else start() }, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("customStart")) {
+                Button(onClick = { if (targets.isNotEmpty() && step < targets.size) replaceHunt = true else start() }, shape = JournalActionShape, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("customStart")) {
                     Text("New hunt")
                 }
+                Text("Each new hunt chooses a fresh set of discoveries. Existing Adventure and Quick Play progress stays separate.", color = Muted, fontSize = 11.sp)
             }
         } else if (targets.isEmpty()) {
             Text("This hunt could not be restored.", color = Forest)
