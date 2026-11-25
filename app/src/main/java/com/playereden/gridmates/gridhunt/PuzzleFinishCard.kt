@@ -68,6 +68,7 @@ internal fun PuzzleFinishCard(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = onPrimary,
+                    shape = JournalActionShape,
                     modifier = Modifier.weight(1f).heightIn(min = 48.dp)
                         .testTag(primaryTag),
                     colors = ButtonDefaults.buttonColors(containerColor = Forest),
@@ -78,6 +79,7 @@ internal fun PuzzleFinishCard(
                 }
                 OutlinedButton(
                     onClick = onHome,
+                    shape = JournalActionShape,
                     modifier = Modifier.weight(0.54f).heightIn(min = 48.dp)
                         .testTag("finishHome"),
                     contentPadding = PaddingValues(horizontal = 7.dp)
