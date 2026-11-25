@@ -1,8 +1,13 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V40-D — coastal masters, terrain and postcard studies committed; QA412 verified runtime baseline.**
+Updated 2026-11-25. **Current checkpoint: GH-V40-F — coastal export pipeline and PR validation committed; rendered review pending.**
 
-## Authoritative current checkpoint — GH-V40-D
+## Authoritative current checkpoint — GH-V40-F
+- QA423 run 45592007302, source 3bbd5d768540aac4f9f1a38bb7edbc5580a1cf9a, all three jobs passed. APK artifact 15010757962; UI evidence 15011423979; upgrade evidence 15011538169. Latest explicitly verified baseline. QA425 run 45667925055 passed core/build at inspection, Android and upgrade pending; subsequent commits may supersede it.
+- GH-V40-E added scripts/verify_coastal_artwork.py (843fdcbe18352527bdcf607c06b752030a711ad2) to render ten SVG masters at 24/32/48/128/256px, validate alpha bounds, repeat-render equality and record SHA-256 plus review sheet. Dedicated workflow .github/workflows/coastal-artwork-review.yml (fac196c0c4b820e568e3ea3faba9397c48a64270), updated to trigger on relevant pull requests (55dbc875132089ee15514c840f83689ced74abe4). Connector commit-run lookup only returns PR-triggered workflows, so push-only result was not accessible. No successful artwork render claimed yet.
+- Next inspect PR artwork workflow results and actual review PNG, fix any failing asset/validation issue without weakening requirements, compare against Woodland style and verify coordinate/anchor fit. Export remains outside Android runtime. No publication, merge, signing, existing artwork or save changes.
+
+## GH-V40-D
 - QA412 remains the last explicitly verified all-green runtime baseline: run 45586701603, 50/50 Android tests, 11 exact preference maps preserved through actual signed install-over and cold launch, APK artifact 15008384490. QA421 was pending at inspection; later artwork commits supersede it. No new runtime changes since QA412.
 - GH-V40-C committed ten standalone 128×128 label-free SVG masters (six landmarks, four scenery assets) under artwork/worlds/whispering-coast/masters/. All ten were individually fetched and checked for canvas and absence of text nodes at GH-V40-D; final wave master commit 18e0070efa65cfba276f5706e49d8ad3fac5071c. Batch commit unavailable because connector commit response lacks tree SHA; individual commits succeeded.
 - GH-V40-D created terrain-study-v0.1.svg (5f6bce32e010e6cb47f0a8384a4e37720a8b0009) and postcard-study-v0.1.svg (0c63f753f68567fcba636feea851467ddeb49fe2). Both reuse original masters, remain draft SVG sources outside runtime, and are not approved final art. Asset README reconciled. Terrain uses proposed coordinate centers; exact anchor offsets and shoreline fit remain unresolved. Embedded master copies must be regenerated/reconciled if masters change.
