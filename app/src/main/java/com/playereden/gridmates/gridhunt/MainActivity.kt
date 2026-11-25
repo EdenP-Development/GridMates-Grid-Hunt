@@ -147,9 +147,11 @@ private fun GridHuntScreen() {
     }
     // Preserve the originating hub when returning from a puzzle.
     var returnHub by rememberSaveable { mutableStateOf("quick") }
+    var settingsOrigin by rememberSaveable { mutableStateOf("home") }
     val goBack = {
         screen = when (screen) {
-            "quick", "adventure", "custom", "academy", "settings" -> "home"
+            "settings" -> settingsOrigin
+            "quick", "adventure", "custom", "academy" -> "home"
             else -> returnHub
         }
     }
@@ -187,10 +189,10 @@ private fun GridHuntScreen() {
             onQuickPlay = { screen = "quick" },
             onCustom = { screen = "custom" },
             onAcademy = { screen = "academy" },
-            onSettings = { screen = "settings" }
+            onSettings = { settingsOrigin = "home"; screen = "settings" }
         )
         "settings" -> GridHuntSettings(hapticsEnabled, { hapticsEnabled = it }, mapLook,
-            onBack = { screen = "home" })
+            onBack = { screen = settingsOrigin })
         "academy" -> ExplorerAcademyScreen(onHome = { screen = "home" }, mapLook = mapLook, onLook = { _ -> })
         "adventure" -> WoodlandAdventureJourney(
             progress = expeditionProgress,
@@ -284,7 +286,7 @@ private fun GridHuntScreen() {
         "quick" -> GridHuntHome(
             mapLook = mapLook,
             onLook = { _ -> },
-            onSettings = { screen = "settings" },
+            onSettings = { settingsOrigin = "quick"; screen = "settings" },
             onChapter = {
                 returnHub = "quick"
                 screen = "chapter"
