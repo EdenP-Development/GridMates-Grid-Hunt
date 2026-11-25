@@ -137,7 +137,7 @@ private fun GridHuntScreen() {
     }
     var screen by rememberSaveable { mutableStateOf("home") }
     var hapticsEnabled by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("haptics", true))
+        mutableStateOf(prefs.savedBoolean("haptics", true))
     }
     // Alpha: one illustrated map per world.
     val mapLook = MapLook.FIELD_GUIDE
@@ -168,7 +168,7 @@ private fun GridHuntScreen() {
         context.getSharedPreferences(WoodlandReturnExpedition.saveName, Context.MODE_PRIVATE)
     }
     fun currentCampaignSnapshot() = GridHuntCampaign.snapshot(
-        expeditionPrefs.getInt("step", 0), supplyPrefs.getInt("step", 0), returnPrefs.getInt("step", 0)
+        expeditionPrefs.savedInt("step", 0), supplyPrefs.savedInt("step", 0), returnPrefs.savedInt("step", 0)
     )
     val campaignSnapshot = currentCampaignSnapshot()
     val campaignState = requireNotNull(GridHuntCampaign.registry.state(
@@ -341,20 +341,20 @@ private fun GridHuntHome(
     val expeditionPrefs = remember(context) {
         context.getSharedPreferences(WoodlandExpedition.saveName, Context.MODE_PRIVATE)
     }
-    val expeditionCount = WoodlandExpedition.restoreStep(expeditionPrefs.getInt("step", 0))
+    val expeditionCount = WoodlandExpedition.restoreStep(expeditionPrefs.savedInt("step", 0))
     val identifyCount = WoodlandIdentifyMission.restoreStep(
-        identifyPrefs.getInt("step", 0)
+        identifyPrefs.savedInt("step", 0)
     )
     val treasureCount = TreasureChecklistMission.restoreCompleted(
-        (treasurePrefs.getString("completed_ids", "") ?: "")
+        (treasurePrefs.savedString("completed_ids", "") ?: "")
             .split(',').filter { it.isNotBlank() }.toSet()
     ).size
     val chapterState = FirstBearingsChapter.restore(
-        chapterPrefs.getInt("hunt_index", 0), chapterPrefs.getInt("objective_index", 0)
+        chapterPrefs.savedInt("hunt_index", 0), chapterPrefs.savedInt("objective_index", 0)
     )
     val chapterCompleted = FirstBearingsChapter.hunts.take(chapterState.huntIndex)
         .sumOf { it.objectives.size } + chapterState.objectiveIndex
-    val reverseCompleted = reversePrefs.getInt("step", 0).coerceIn(0, ReverseTraining.markers.size)
+    val reverseCompleted = reversePrefs.savedInt("step", 0).coerceIn(0, ReverseTraining.markers.size)
     val allTrailsFinished = chapterState.huntIndex == FirstBearingsChapter.hunts.lastIndex &&
         chapterState.objectiveIndex == FirstBearingsChapter.hunts.last().objectives.size
     val allGoldenSpotsFinished = reverseCompleted == ReverseTraining.markers.size
@@ -462,14 +462,14 @@ private fun FirstBearingsScreen(
     }
     val initial = remember(prefs) {
         FirstBearingsChapter.restore(
-            prefs.getInt("hunt_index", 0),
-            prefs.getInt("objective_index", 0)
+            prefs.savedInt("hunt_index", 0),
+            prefs.savedInt("objective_index", 0)
         )
     }
     var huntIndex by rememberSaveable { mutableIntStateOf(initial.huntIndex) }
     var step by rememberSaveable { mutableIntStateOf(initial.objectiveIndex) }
     var selected by rememberSaveable {
-        mutableStateOf(prefs.getString("selected", null)?.takeIf { ref ->
+        mutableStateOf(prefs.savedString("selected", null)?.takeIf { ref ->
             runCatching {
                 val cell = GridReference.parse(ref)
                 cell.digits == 4 && WoodlandTrainingMap.bounds.contains(
@@ -478,12 +478,12 @@ private fun FirstBearingsScreen(
             }.getOrDefault(false)
         })
     }
-    var hintStage by rememberSaveable { mutableIntStateOf(prefs.getInt("hint_stage", 0).coerceIn(0, 2)) }
+    var hintStage by rememberSaveable { mutableIntStateOf(prefs.savedInt("hint_stage", 0).coerceIn(0, 2)) }
     var feedback by rememberSaveable {
         mutableStateOf("Ready for your first clue? Pick a square, then check your guess.")
     }
     var showGuide by rememberSaveable {
-        mutableStateOf(!prefs.getBoolean("guide_seen", false))
+        mutableStateOf(!prefs.savedBoolean("guide_seen", false))
     }
     // A discovery is a brief celebration, not persisted reward currency.
     var discoveryMessage by remember { mutableStateOf<String?>(null) }
