@@ -69,14 +69,14 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
             Column(Modifier.weight(1f)) {
                 Text("Explorer's Academy", fontSize = 22.sp, color = Ink,
                     fontWeight = FontWeight.ExtraBold)
-                if (!mapLesson) Text("School of Exploration", color = Forest)
+                if (!mapLesson && !showOverview) Text("School of Exploration", color = Forest)
             }
             TextButton(onClick = onHome, modifier = Modifier.testTag("academyHome")) {
                 Text("Home")
             }
         }
         if (ExplorerAcademy.qualificationId in qualifications) {
-            Text("★ Junior Explorer · School of Exploration", color = Forest,
+            Text("★ Junior Explorer", color = Forest,
                 fontWeight = FontWeight.Bold, modifier = Modifier.testTag("academyQualification"))
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

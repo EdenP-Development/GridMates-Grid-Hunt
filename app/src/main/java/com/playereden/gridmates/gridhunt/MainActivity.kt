@@ -19,6 +19,7 @@ import androidx.compose.foundation.gestures.calculateCentroid
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -367,34 +368,34 @@ private fun GridHuntHome(
         }
         Text("Choose your puzzle", color = Ink, fontSize = 17.sp,
             fontWeight = FontWeight.Bold)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
             QuickPlayModeTile(
                 label = "Trail Treasures", glyph = "◇", instruction = "Find the square",
                 progress = "$chapterCompleted of 9 found",
                 tag = "openChapter", color = Color(0xFFE2EBD8),
-                onClick = onChapter, modifier = Modifier.weight(1f)
+                onClick = onChapter, modifier = Modifier.weight(1f).fillMaxHeight()
             )
             QuickPlayModeTile(
                 label = "Golden Spots", glyph = "✦", instruction = "Read the marker",
                 progress = "$reverseCompleted of 5 found",
                 tag = "openReverse", color = Color(0xFFF5E7C7),
-                onClick = onReverse, modifier = Modifier.weight(1f)
+                onClick = onReverse, modifier = Modifier.weight(1f).fillMaxHeight()
             )
         }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
             QuickPlayModeTile(
                 label = "Treasure Checklist", glyph = "☑",
                 instruction = "Locate the landmarks",
                 progress = "$treasureCount of 4 found",
                 tag = "openTreasure", color = Color(0xFFFFF4D8),
-                onClick = onTreasure, modifier = Modifier.weight(1f)
+                onClick = onTreasure, modifier = Modifier.weight(1f).fillMaxHeight()
             )
             QuickPlayModeTile(
                 label = "What's at This Grid?", glyph = "⌖",
                 instruction = "Identify the object",
                 progress = "$identifyCount of 4 identified",
                 tag = "openIdentify", color = Color(0xFFE1ECE7),
-                onClick = onIdentify, modifier = Modifier.weight(1f)
+                onClick = onIdentify, modifier = Modifier.weight(1f).fillMaxHeight()
             )
         }
         Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFE8CA), border = JournalPanelBorder) {

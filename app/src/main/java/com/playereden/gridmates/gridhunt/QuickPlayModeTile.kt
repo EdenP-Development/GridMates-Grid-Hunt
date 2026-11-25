@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * Compact native-game quick-play tiles. Full tile is ONE interactive action:
+ * Compact native-game quick-play tiles. Each tile has ONE interactive action:
  * there is no nested decorative button or tiny separate icon hit target.
  */
 @Composable
@@ -47,7 +49,7 @@ internal fun QuickPlayModeTile(
         shadowElevation = 2.dp
     ) {
         Column(
-            Modifier.fillMaxWidth().padding(8.dp),
+            Modifier.fillMaxWidth().fillMaxHeight().padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically,
@@ -59,6 +61,7 @@ internal fun QuickPlayModeTile(
             Text(instruction, fontSize = 11.sp, maxLines = 2, color = Muted)
             Text(progress, fontSize = 11.sp, maxLines = 1,
                 fontWeight = FontWeight.Bold, color = Forest)
+            Spacer(Modifier.weight(1f))
             Button(
                 onClick = onClick,
                 modifier = Modifier.fillMaxWidth()

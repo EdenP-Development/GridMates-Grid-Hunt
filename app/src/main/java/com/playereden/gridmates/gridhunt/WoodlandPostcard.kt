@@ -134,13 +134,13 @@ internal fun WoodlandPostcard(modifier: Modifier = Modifier) {
                 treasure + Offset(-7f, 7f), strokeWidth = 3f)
         }
         Surface(
-            modifier = Modifier.align(Alignment.BottomStart).padding(12.dp),
+            modifier = Modifier.align(Alignment.BottomStart).padding(6.dp),
             color = Color(0xFFFDF8EA),
-            shape = RoundedCornerShape(12.dp),
-            shadowElevation = 2.dp
+            shape = RoundedCornerShape(8.dp),
+            shadowElevation = 1.dp
         ) {
-            Text("THE LITTLE WOODLAND", color = Ink, fontWeight = FontWeight.Bold,
-                fontSize = 11.sp, modifier = Modifier.padding(horizontal = 11.dp, vertical = 7.dp))
+            Text("LITTLE WOODLAND", color = Ink, fontWeight = FontWeight.SemiBold,
+                fontSize = 9.sp, modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp))
         }
     }
 }
