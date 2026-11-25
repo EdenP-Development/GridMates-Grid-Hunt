@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V39-A — validated map registry foundation committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V39-B — map-scoped generator and compatibility tests committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V39-A
+## Authoritative current checkpoint — GH-V39-B
+- QA396 run 45579885971 passed core/build/signing/packaging and actual QA345 upgrade; Android instrumentation running at inspection. Later commits may supersede it.
+- Extracted MapHuntGenerator accepting ExplorationMap, with supported lengths filtered by map capacity and landmark availability, preserving existing algorithm and objective ordering (ff7383fe457d646b15f1c51acf94c349c707c978). CustomHuntGenerator remains the Woodland compatibility facade with identical caller methods and Objective type (0deacfdc021707ee1f8f93d0c2747d7ccea9690e). No Android save or UI changes.
+- MapHuntGeneratorTest covers independent nonpublished test map, 100 seeds, exact restoration, cross-map out-of-bounds rejection, unsupported capacity and Woodland compatibility (368360fc9ac4589815d729fb6e2aa094d76c02ba). New tests require CI. Coordinate overlap between distinct maps is still possible: explicit map ID/revision session identity is required before integrating new playable maps, not implied by coordinate validation.
+- Next GH-V39-C map-scoped session identity and validation; retain legacy Woodland saved sequences and reject unknown revisions without rewriting. Then renderer architecture audit. No new published maps, art, release or merge.
+
+## GH-V39-A
 - QA393 run 45579076301 passed JVM/build/signing/packaging including GH-V38 fresh-generation tests; emulator and upgrade were running at inspection, may be superseded by new commits. QA388 remains last confirmed all-green run.
 - Architecture audit: CampaignRegistry supports multiple worlds and explicit cross-world prerequisites already; Android rendering, selection, landmark UI and session storage still bind to woodland. GridMath camera/reference primitives are reusable.
 - New ExplorationMap and ExplorationMaps define stable map ID, revision, name, whole-kilometer bounds, canonical cells and landmark lookup; reject invalid bounds, duplicate IDs, out-of-bounds landmarks and ambiguous four-digit landmark cells (62297b68241f8661ad04abd0dd8154290fbc4cdd). Registry publishes only existing Woodland. Current landmark type retains historical WoodlandLandmark name; no new world or renderer is published.
