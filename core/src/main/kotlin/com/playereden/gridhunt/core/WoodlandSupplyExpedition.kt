@@ -35,7 +35,7 @@ class ExpeditionPlaythrough(
         val step = restoreStep(raw)
         val objective = objectiveAt(step) ?: return step
         if (objective.verb != ExpeditionVerb.IDENTIFY_LANDMARK ||
-            WoodlandLandmarks.byId(choiceId ?: "") == null) return step
+            chapter.map.landmark(choiceId ?: "") == null) return step
         return if (choiceId == objective.landmarkId) step + 1 else step
     }
 }
