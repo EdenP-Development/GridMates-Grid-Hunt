@@ -7,6 +7,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Typography
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 
 internal val Ink = Color(0xFF213D35)
 internal val Forest = Color(0xFF315C4D)
@@ -44,4 +48,17 @@ internal fun Modifier.journalPaper(): Modifier = drawBehind {
             drawCircle(Color(0x0B795C36), (.35f + (seed % 3) * .10f).dp.toPx(), Offset(x,y))
         }
     }
+}
+
+/** Shared action shape; circular map tools and route nodes remain distinct. */
+internal val JournalActionShape = RoundedCornerShape(13.dp)
+
+/** Explicit smaller text must not inherit the default 24sp body line height. */
+internal val JournalTypography = Typography().let { defaults ->
+    defaults.copy(
+        bodyLarge = defaults.bodyLarge.copy(lineHeight = TextUnit.Unspecified, letterSpacing = 0.sp),
+        bodyMedium = defaults.bodyMedium.copy(lineHeight = TextUnit.Unspecified, letterSpacing = 0.sp),
+        bodySmall = defaults.bodySmall.copy(lineHeight = TextUnit.Unspecified, letterSpacing = 0.sp),
+        labelLarge = defaults.labelLarge.copy(lineHeight = TextUnit.Unspecified, letterSpacing = 0.sp)
+    )
 }
