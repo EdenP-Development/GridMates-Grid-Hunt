@@ -617,18 +617,33 @@ class HomeNavigationTest {
         org.junit.Assert.assertEquals(before, authored.map { it.all.toMap() })
     }
 
-    @Test fun mixedCustomExpeditionResumesExactSequenceAndCompletes() {
+    @Test fun mixedCustomExpeditionResumesExactSequenceAndCompletes() = exerciseMixedExpedition(false)
+
+    @Test fun fixedMixedExpeditionResumesExactSequenceAndCompletes() = exerciseMixedExpedition(true)
+
+    private fun exerciseMixedExpedition(fixed: Boolean) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val custom = context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE)
         val precision = context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE)
         val oldPrecision = precision.getBoolean("precise_selection", false)
         check(custom.edit().clear().commit())
+        if (fixed) {
+            // Known valid distinct cells; all four verbs, center and edge grids.
+            check(custom.edit().putString("mode", "mixed").putInt("count", 6)
+                .putString("codes", "2640,2442,2538,2941,2937,2739")
+                .putString("kinds", "grid,gold,identify,checklist,grid,gold")
+                .putInt("step", 0).commit())
+        }
         check(precision.edit().putBoolean("precise_selection", true).commit())
         try {
             compose.onNodeWithTag("openCustomPlay").performScrollTo().performClick()
-            compose.onNodeWithTag("customMode_mixed").performScrollTo().performClick()
-            compose.onNodeWithTag("customLength_6").performScrollTo().performClick()
-            compose.onNodeWithTag("customStart").performScrollTo().performClick()
+            if (fixed) {
+                compose.onNodeWithTag("customResume").performScrollTo().performClick()
+            } else {
+                compose.onNodeWithTag("customMode_mixed").performScrollTo().performClick()
+                compose.onNodeWithTag("customLength_6").performScrollTo().performClick()
+                compose.onNodeWithTag("customStart").performScrollTo().performClick()
+            }
             val codes = custom.getString("codes", "")!!
             val kinds = custom.getString("kinds", "")!!
             val objectives = kinds.split(",").zip(codes.split(","))
@@ -636,6 +651,7 @@ class HomeNavigationTest {
             org.junit.Assert.assertEquals(setOf("grid", "gold", "identify", "checklist"), objectives.map { it.first }.toSet())
             val ids = mapOf("2538" to "mushroom-nook", "2840" to "buttercup-glade", "2641" to "acorn-nook", "2941" to "old-waystone")
             objectives.forEachIndexed { index, (kind, code) ->
+                android.util.Log.i("GridHuntRegression", "fixed=$fixed objective=${index+1} kind=$kind code=$code sequence=$kinds/$codes")
                 when (kind) {
                     "grid" -> {
                         val e = code.take(2).toInt()
@@ -651,7 +667,11 @@ class HomeNavigationTest {
                     "gold", "checklist" -> {
                         val prefix = if (kind == "gold") "customGold" else "customChecklist"
                         compose.onNodeWithTag(prefix + "Input").performTextReplacement(code)
-                        compose.onNodeWithTag(prefix + "Check").performClick()
+                        if (fixed && kind == "gold") {
+                            compose.onNodeWithTag(prefix + "Input").performImeAction()
+                        } else {
+                            compose.onNodeWithTag(prefix + "Check").performClick()
+                        }
                     }
                     "identify" -> {
                         compose.onNodeWithTag("customIdentify_${ids.getValue(code)}").performClick()
@@ -659,7 +679,7 @@ class HomeNavigationTest {
                     }
                 }
                 compose.waitForIdle()
-                org.junit.Assert.assertEquals(index+1, custom.getInt("step",0))
+                org.junit.Assert.assertEquals("fixed=$fixed objective=${index+1} kind=$kind code=$code sequence=$kinds/$codes", index+1, custom.getInt("step",0))
                 if (index == 2) {
                     compose.onNodeWithTag("customBack").performClick()
                     compose.onNodeWithTag("customBack").performClick()
