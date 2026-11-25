@@ -30,15 +30,15 @@ class CampaignRegistryTest {
         chapters = entries.toList()
     )
 
-    @Test fun liveRegistryExposesTwoRealAuthoredLittleWoodlandChapters() {
+    @Test fun liveRegistryExposesThreeRealAuthoredLittleWoodlandChapters() {
         val registry = GridHuntCampaign.registry
         assertEquals(1, registry.worlds.size)
-        assertEquals(2, registry.chapters.size)
+        assertEquals(3, registry.chapters.size)
         assertEquals(GridHuntCampaign.littleWoodlandId, registry.worlds.single().id)
         assertEquals(WoodlandLandmarks.mapId, registry.worlds.single().mapId)
-        assertEquals(listOf(WoodlandExpedition.chapter.id, WoodlandSupplyExpedition.chapter.id),
+        assertEquals(listOf(WoodlandExpedition.chapter.id, WoodlandSupplyExpedition.chapter.id, WoodlandReturnExpedition.chapter.id),
             registry.chapters.map { it.chapter.id })
-        assertEquals(listOf(WoodlandExpedition.saveName, WoodlandSupplyExpedition.saveName),
+        assertEquals(listOf(WoodlandExpedition.saveName, WoodlandSupplyExpedition.saveName, WoodlandReturnExpedition.saveName),
             registry.chapters.map { it.progressKey })
         assertTrue(registry.chapters.all { it.chapter.objectives.size == 4 })
         assertEquals(setOf(WoodlandExpedition.chapter.id),
@@ -62,6 +62,16 @@ class CampaignRegistryTest {
             registry.state(id, GridHuntCampaign.snapshot(4, 4))?.status)
         assertEquals(4, registry.state(WoodlandExpedition.chapter.id,
             GridHuntCampaign.snapshot(4, 0))?.completedObjectives)
+    }
+
+    @Test fun thirdChapterRequiresBothEarlierChaptersAndKeepsIndependentProgress() {
+        val id = WoodlandReturnExpedition.chapter.id
+        val registry = GridHuntCampaign.registry
+        assertEquals(CampaignChapterStatus.LOCKED, registry.state(id, GridHuntCampaign.snapshot(0, 4, 0))?.status)
+        assertEquals(CampaignChapterStatus.LOCKED, registry.state(id, GridHuntCampaign.snapshot(4, 3, 4))?.status)
+        assertEquals(CampaignChapterStatus.READY, registry.state(id, GridHuntCampaign.snapshot(4, 4))?.status)
+        assertEquals(CampaignChapterStatus.IN_PROGRESS, registry.state(id, GridHuntCampaign.snapshot(4, 4, 2))?.status)
+        assertEquals(CampaignChapterStatus.COMPLETE, registry.state(id, GridHuntCampaign.snapshot(4, 4, 4))?.status)
     }
 
     @Test fun olderIndependentSaveIsReadWithoutMigrationOrReset() {

@@ -62,6 +62,7 @@ import com.playereden.gridhunt.core.PixelPoint
 import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.WoodlandExpedition
 import com.playereden.gridhunt.core.WoodlandSupplyExpedition
+import com.playereden.gridhunt.core.WoodlandReturnExpedition
 import com.playereden.gridhunt.core.ExpeditionPlaythrough
 import com.playereden.gridhunt.core.WoodlandIdentifyMission
 import com.playereden.gridhunt.core.WoodlandLandmarks
@@ -83,14 +84,18 @@ internal fun WoodlandMixedExpeditionScreen(
     onLook: (MapLook) -> Unit,
     hapticsEnabled: Boolean,
     chapterTwo: Boolean = false,
-    onNextChapter: (() -> Unit)? = null
+    onNextChapter: (() -> Unit)? = null,
+    chapterThree: Boolean = false
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    val mission = remember(chapterTwo) {
-        if (chapterTwo) WoodlandSupplyExpedition.run
+    val mission = remember(chapterTwo, chapterThree) {
+        if (chapterThree) WoodlandReturnExpedition.run
+        else if (chapterTwo) WoodlandSupplyExpedition.run
         else ExpeditionPlaythrough(WoodlandExpedition.chapter, WoodlandExpedition.saveName)
     }
+    val clueChapter = chapterTwo || chapterThree
+    val chapterNumber = if (chapterThree) 3 else if (chapterTwo) 2 else 1
     val prefs = remember(context, mission.saveName) {
         context.getSharedPreferences(mission.saveName, Context.MODE_PRIVATE)
     }
@@ -116,7 +121,8 @@ internal fun WoodlandMixedExpeditionScreen(
     var discoveryEarned by rememberSaveable(mission.chapter.id) { mutableStateOf(false) }
     var feedback by rememberSaveable(mission.chapter.id) {
         mutableStateOf(mission.chapter.objectives.getOrNull(step - 1)?.discovery
-            ?.takeIf { it.isNotBlank() } ?: if (chapterTwo)
+            ?.takeIf { it.isNotBlank() } ?: if (chapterThree) "Record the route back to the trailhead."
+            else if (chapterTwo)
             "Follow the journal notes to trace the missing supplies."
             else "Follow the next clue to recover the missing field notes.")
     }
@@ -207,9 +213,10 @@ internal fun WoodlandMixedExpeditionScreen(
                 chosenLandmark = null
                 discoveryEarned = true
                 feedback = current.discovery.takeIf { it.isNotBlank() } ?: if (mission.finished(step)) {
-                    if (chapterTwo) "The last stop has been found! The supplies trail is complete."
+                    if (chapterThree) "Your woodland circuit is complete!"
+                    else if (chapterTwo) "The last stop has been found! The supplies trail is complete."
                     else "Every missing page recovered. Your woodland chapter is complete!"
-                } else if (chapterTwo) "A new trail note found! Follow the next clue."
+                } else if (clueChapter) "A new trail note found! Follow the next clue."
                 else "A page found! The next clue asks for something different."
             } else {
                 discoveryEarned = false
@@ -233,7 +240,8 @@ internal fun WoodlandMixedExpeditionScreen(
         selectedCell = null
         enteredCode = ""
         chosenLandmark = null
-        feedback = if (chapterTwo) "The supply clues are ready to trace again."
+        feedback = if (chapterThree) "The return trail is ready to explore again."
+            else if (chapterTwo) "The supply clues are ready to trace again."
             else "All four notes have been hidden again. Enjoy the hunt!"
         fit()
     }
@@ -272,12 +280,12 @@ internal fun WoodlandMixedExpeditionScreen(
                         .journalScroll(),
                     verticalArrangement = Arrangement.spacedBy(7.dp)
                 ) {
-                    MixedExpeditionHeader(mission.chapter.name, chapterTwo, step, mission.size,
+                    MixedExpeditionHeader(mission.chapter.name, clueChapter, step, mission.size,
                         onHome, onGuide = { showGuide = true }, onJournal = { showJournal = true })
-                    if (finished) MixedExpeditionFinish(chapterTwo, onHome, replay,
+                    if (finished) MixedExpeditionFinish(chapterNumber, mission.size, onHome, replay,
                         onJournal = { showJournal = true }, onNextChapter = onNextChapter)
                     else if (active != null) {
-                        MixedExpeditionPrompt(active, chapterTwo, step + 1, mission.size)
+                        MixedExpeditionPrompt(active, clueChapter, step + 1, mission.size)
                         MixedExpeditionControls(
                             active, mapLook, selectedCell, enteredCode, chosenLandmark,
                             feedback, discoveryEarned, onSelected = { selectedCell = it },
@@ -290,9 +298,9 @@ internal fun WoodlandMixedExpeditionScreen(
             }
         } else {
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                MixedExpeditionHeader(mission.chapter.name, chapterTwo, step, mission.size, onHome,
+                MixedExpeditionHeader(mission.chapter.name, clueChapter, step, mission.size, onHome,
                     onGuide = { showGuide = true }, onJournal = { showJournal = true })
-                if (active != null) MixedExpeditionPrompt(active, chapterTwo, step + 1, mission.size)
+                if (active != null) MixedExpeditionPrompt(active, clueChapter, step + 1, mission.size)
                 HuntMapPanel(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     bounds = bounds, camera = camera,
@@ -302,7 +310,7 @@ internal fun WoodlandMixedExpeditionScreen(
                     enableSelect = active?.verb == ExpeditionVerb.FIND_SQUARE,
                     mapLook = mapLook, onLook = onLook
                 )
-                if (finished) MixedExpeditionFinish(chapterTwo, onHome, replay,
+                if (finished) MixedExpeditionFinish(chapterNumber, mission.size, onHome, replay,
                         onJournal = { showJournal = true }, onNextChapter = onNextChapter)
                 else if (active != null) {
                     MixedExpeditionControls(
@@ -317,7 +325,7 @@ internal fun WoodlandMixedExpeditionScreen(
         }
     }
     if (showJournal) {
-        ExpeditionJournalDialog(mission, step, chapterTwo) { showJournal = false }
+        ExpeditionJournalDialog(mission, step, chapterNumber) { showJournal = false }
     }
     if (showGuide) {
         WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showGuide = false })
@@ -505,23 +513,30 @@ private fun MixedExpeditionControls(
 
 @Composable
 private fun MixedExpeditionFinish(
-    chapterTwo: Boolean, onHome: () -> Unit, onReplay: () -> Unit,
+    chapterNumber: Int, total: Int, onHome: () -> Unit, onReplay: () -> Unit,
     onJournal: () -> Unit, onNextChapter: (() -> Unit)?
 ) {
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         PuzzleFinishCard(
-            title = if (chapterTwo) "The supply trail is complete!"
-                else "The field notes are together!",
-            description = if (chapterTwo)
-                "You traced the supplies to their last known stop."
-                else "Every lost page has been recovered. Your field journal is whole.",
-            discoveries = if (chapterTwo) "4 OF 4 CLUES SOLVED" else "4 OF 4 PAGES RECOVERED",
-            primaryLabel = if (!chapterTwo && onNextChapter != null) "Continue · The Lost Supplies" else "Explore again",
-            onPrimary = if (!chapterTwo && onNextChapter != null) onNextChapter else onReplay,
+            title = when (chapterNumber) {
+                3 -> "Your woodland circuit is complete!"
+                2 -> "The supply trail is complete!"
+                else -> "The field notes are together!"
+            },
+            description = when (chapterNumber) {
+                3 -> "You recorded the return route and reached the trailhead."
+                2 -> "You traced the supplies to their last known stop."
+                else -> "Every lost page has been recovered. Your field journal is whole."
+            },
+            discoveries = if (chapterNumber > 1) "$total OF $total CLUES SOLVED" else "$total OF $total PAGES RECOVERED",
+            primaryLabel = if (onNextChapter != null) {
+                if (chapterNumber == 1) "Continue · The Lost Supplies" else "Continue · The Return Trail"
+            } else "Explore again",
+            onPrimary = onNextChapter ?: onReplay,
             onHome = onHome,
-            primaryTag = if (!chapterTwo && onNextChapter != null) "nextExpedition" else "finishContinue"
+            primaryTag = if (onNextChapter != null) "nextExpedition" else "finishContinue"
         )
-        if (!chapterTwo && onNextChapter != null) {
+        if (onNextChapter != null) {
             TextButton(onClick = onReplay,
                 modifier = Modifier.fillMaxWidth().testTag("finishReplay")) {
                 Text("Explore again", color = Forest)
@@ -537,12 +552,12 @@ private fun MixedExpeditionFinish(
 /** Only earned entries and the active prompt are rendered; no future answers. */
 @Composable
 private fun ExpeditionJournalDialog(
-    mission: ExpeditionPlaythrough, step: Int, chapterTwo: Boolean,
+    mission: ExpeditionPlaythrough, step: Int, chapterNumber: Int,
     onDismiss: () -> Unit
 ) {
     val earned = mission.discoveries(step)
     val active = mission.objectiveAt(step)
-    val unit = if (chapterTwo) "Clue" else "Page"
+    val unit = if (chapterNumber > 1) "Clue" else "Page"
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier.testTag("expeditionJournal"),
@@ -561,7 +576,7 @@ private fun ExpeditionJournalDialog(
                         Image(painterResource(R.drawable.gh_tool_notebook), contentDescription = null,
                             modifier = Modifier.size(52.dp))
                         Column(Modifier.weight(1f)) {
-                            Text("LITTLE WOODLAND · CHAPTER " + if (chapterTwo) "2" else "1",
+                            Text("LITTLE WOODLAND · CHAPTER $chapterNumber",
                                 color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                             Text(mission.chapter.name, color = Ink, fontWeight = FontWeight.ExtraBold,
                                 fontSize = 15.sp)
@@ -569,7 +584,7 @@ private fun ExpeditionJournalDialog(
                     }
                 }
                 Text(mission.chapter.story, color = Ink, fontSize = 13.sp)
-                Text(if (chapterTwo) "${earned.size} of ${mission.size} clues solved"
+                Text(if (chapterNumber > 1) "${earned.size} of ${mission.size} clues solved"
                     else "${earned.size} of ${mission.size} pages found",
                     color = Forest, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag("journalProgress"))

@@ -89,6 +89,7 @@ import com.playereden.gridhunt.core.WoodlandIdentifyMission
 import com.playereden.gridhunt.core.WoodlandExpedition
 import com.playereden.gridhunt.core.GridHuntCampaign
 import com.playereden.gridhunt.core.WoodlandSupplyExpedition
+import com.playereden.gridhunt.core.WoodlandReturnExpedition
 import com.playereden.gridhunt.core.CampaignChapterStatus
 import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.GridCell
@@ -158,15 +159,21 @@ private fun GridHuntScreen() {
     val supplyPrefs = remember(context) {
         context.getSharedPreferences(WoodlandSupplyExpedition.saveName, Context.MODE_PRIVATE)
     }
-    val campaignSnapshot = GridHuntCampaign.snapshot(
-        expeditionPrefs.getInt("step", 0),
-        supplyPrefs.getInt("step", 0)
+    val returnPrefs = remember(context) {
+        context.getSharedPreferences(WoodlandReturnExpedition.saveName, Context.MODE_PRIVATE)
+    }
+    fun currentCampaignSnapshot() = GridHuntCampaign.snapshot(
+        expeditionPrefs.getInt("step", 0), supplyPrefs.getInt("step", 0), returnPrefs.getInt("step", 0)
     )
+    val campaignSnapshot = currentCampaignSnapshot()
     val campaignState = requireNotNull(GridHuntCampaign.registry.state(
         WoodlandExpedition.chapter.id, campaignSnapshot
     ))
     val supplyState = requireNotNull(GridHuntCampaign.registry.state(
         WoodlandSupplyExpedition.chapter.id, campaignSnapshot
+    ))
+    val returnState = requireNotNull(GridHuntCampaign.registry.state(
+        WoodlandReturnExpedition.chapter.id, campaignSnapshot
     ))
     val expeditionProgress = campaignState.completedObjectives
 
@@ -183,6 +190,14 @@ private fun GridHuntScreen() {
             progress = expeditionProgress,
             secondStatus = supplyState.status,
             secondProgress = supplyState.completedObjectives,
+            thirdStatus = returnState.status,
+            thirdProgress = returnState.completedObjectives,
+            onThirdChapter = {
+                if (returnState.status != CampaignChapterStatus.LOCKED) {
+                    returnHub = "adventure"
+                    screen = "returnTrail"
+                }
+            },
             onSecondChapter = {
                 if (supplyState.status != CampaignChapterStatus.LOCKED) {
                     returnHub = "adventure"
@@ -227,9 +242,7 @@ private fun GridHuntScreen() {
             hapticsEnabled = hapticsEnabled,
             onNextChapter = if (returnHub == "adventure") ({
                 // Read current persisted progress, not the snapshot from before the final clue.
-                val snapshot = GridHuntCampaign.snapshot(
-                    expeditionPrefs.getInt("step", 0), supplyPrefs.getInt("step", 0)
-                )
+                val snapshot = currentCampaignSnapshot()
                 val next = GridHuntCampaign.registry.state(
                     WoodlandSupplyExpedition.chapter.id, snapshot
                 )
@@ -239,26 +252,27 @@ private fun GridHuntScreen() {
                 }
             }) else null
         )
-        "supplies" -> {
-            if (supplyState.status == CampaignChapterStatus.LOCKED) {
-                // Guard even against restored screen state from older versions.
-                WoodlandAdventureJourney(
-                    progress = expeditionProgress,
-                    secondStatus = supplyState.status,
-                    secondProgress = supplyState.completedObjectives,
-                    onChapter = {
-                        returnHub = "adventure"
-                        screen = "expedition"
-                    },
-                    onSecondChapter = {},
-                    onBack = { screen = "home" }
-                )
+        "supplies", "returnTrail" -> {
+            val isReturn = screen == "returnTrail"
+            val status = if (isReturn) returnState.status else supplyState.status
+            if (status == CampaignChapterStatus.LOCKED) {
+                LaunchedEffect(screen) { screen = "adventure" }
             } else WoodlandMixedExpeditionScreen(
                 onHome = { screen = "adventure" },
                 mapLook = mapLook,
                 onLook = { _ -> },
                 hapticsEnabled = hapticsEnabled,
-                chapterTwo = true
+                chapterTwo = !isReturn,
+                chapterThree = isReturn,
+                onNextChapter = if (!isReturn) ({
+                    val next = GridHuntCampaign.registry.state(
+                        WoodlandReturnExpedition.chapter.id, currentCampaignSnapshot()
+                    )
+                    if (next?.status != CampaignChapterStatus.LOCKED && next != null) {
+                        returnHub = "adventure"
+                        screen = "returnTrail"
+                    }
+                }) else null
             )
         }
         "quick" -> GridHuntHome(

@@ -13,7 +13,7 @@ class WoodlandReturnExpeditionTest {
         assertEquals(4, objectives.map { it.expectedCell }.distinct().size)
         assertNotEquals(WoodlandExpedition.saveName, mission.saveName)
         assertNotEquals(WoodlandSupplyExpedition.saveName, mission.saveName)
-        assertNull(GridHuntCampaign.registry.findChapter(mission.chapter.id))
+        assertEquals(mission.saveName, GridHuntCampaign.registry.findChapter(mission.chapter.id)?.progressKey)
     }
 
     @Test fun completeInOrderAndRejectWrongVerbOrAnswer() {

@@ -233,7 +233,10 @@ internal fun WoodlandAdventureJourney(
     onBack: () -> Unit,
     secondStatus: CampaignChapterStatus = CampaignChapterStatus.LOCKED,
     secondProgress: Int = 0,
-    onSecondChapter: () -> Unit = {}
+    onSecondChapter: () -> Unit = {},
+    thirdStatus: CampaignChapterStatus = CampaignChapterStatus.LOCKED,
+    thirdProgress: Int = 0,
+    onThirdChapter: () -> Unit = {}
 ) {
     val oakArt = ImageBitmap.imageResource(R.drawable.gh_wood_oak_sm)
     val pineArt = ImageBitmap.imageResource(R.drawable.gh_wood_pine_sm)
@@ -267,7 +270,7 @@ internal fun WoodlandAdventureJourney(
                     Text("WORLD 1  ·  LITTLE WOODLAND", color = Forest,
                         fontSize = 11.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f))
-                    Text("2 chapters", color = Muted, fontSize = 11.sp)
+                    Text("3 chapters", color = Muted, fontSize = 11.sp)
                 }
                 BoxWithConstraints(
                     modifier = Modifier.fillMaxWidth().height(210.dp)
@@ -301,6 +304,7 @@ internal fun WoodlandAdventureJourney(
                             cubicTo(w * 0.81f, h * 0.47f,
                                 w * 0.62f, h * 0.16f,
                                 w * 0.85f, h * 0.13f)
+                            cubicTo(w * .62f, h * .04f, w * .34f, h * .10f, w * .18f, h * .14f)
                         }
                         drawPath(route, Color(0xFFB99762), style = Stroke(width = 15f))
                         drawPath(route, Color(0xFFF8E5B6), style = Stroke(width = 9f))
@@ -372,6 +376,16 @@ internal fun WoodlandAdventureJourney(
                             .coerceIn(0.dp, (maxWidth - nodeSize).coerceAtLeast(0.dp)),
                             y = (maxHeight * .13f - nodeSize / 2).coerceAtLeast(0.dp)).size(nodeSize)
                     )
+                    AdventureRouteNode(
+                        number = 3, label = "Chapter 3, The Return Trail, " +
+                            thirdStatus.name.lowercase().replace('_', ' '),
+                        complete = thirdStatus == CampaignChapterStatus.COMPLETE,
+                        enabled = thirdStatus != CampaignChapterStatus.LOCKED,
+                        tag = "openThirdChapter", onClick = onThirdChapter,
+                        modifier = Modifier.offset(
+                            x = (maxWidth * .18f - nodeSize / 2).coerceAtLeast(0.dp),
+                            y = (maxHeight * .14f - nodeSize / 2).coerceAtLeast(0.dp)).size(nodeSize)
+                    )
                 }
                 Text("CHAPTER 1", color = Forest,
                     fontSize = 10.sp, fontWeight = FontWeight.Bold)
@@ -407,6 +421,20 @@ internal fun WoodlandAdventureJourney(
                 }, color = Muted, fontSize = 12.sp,
                     modifier = Modifier.testTag("secondChapterStatus"))
 
+            }
+        }
+        Surface(shape = RoundedCornerShape(18.dp), color = Color(0xFFF3E9D2)) {
+            Column(Modifier.fillMaxWidth().padding(13.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("CHAPTER 3 · THE RETURN TRAIL", color = Forest,
+                    fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
+                Text("Make a final circuit and return to the trailhead.", color = Ink, fontSize = 13.sp)
+                Text(when (thirdStatus) {
+                    CampaignChapterStatus.LOCKED -> "Locked — finish Chapters 1 and 2"
+                    CampaignChapterStatus.READY -> "Ready for a new adventure"
+                    CampaignChapterStatus.IN_PROGRESS -> "$thirdProgress of 4 clues solved"
+                    CampaignChapterStatus.COMPLETE -> "4 of 4 clues solved · Complete"
+                }, color = Muted, fontSize = 12.sp, modifier = Modifier.testTag("thirdChapterStatus"))
             }
         }
         Text("Choose a numbered destination to explore.",

@@ -1,8 +1,7 @@
 package com.playereden.gridhunt.core
 
 /**
- * Authored Chapter 3 candidate. Intentionally not published in CampaignRegistry
- * until navigation, isolated saves and Android completion coverage are ready.
+ * Authored Chapter 3, registered with independent progress and prerequisite locks.
  * All objectives reference the existing map; no decorative scenery is a target.
  */
 object WoodlandReturnExpedition {

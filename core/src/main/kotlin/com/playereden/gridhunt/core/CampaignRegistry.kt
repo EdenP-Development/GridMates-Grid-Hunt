@@ -146,6 +146,13 @@ object GridHuntCampaign {
                         order = 1,
                         prerequisiteChapterIds = setOf(WoodlandExpedition.chapter.id),
                         progressKey = WoodlandSupplyExpedition.saveName
+                    ),
+                    CampaignChapter(
+                        chapter = WoodlandReturnExpedition.chapter,
+                        worldId = littleWoodlandId,
+                        order = 2,
+                        prerequisiteChapterIds = setOf(WoodlandExpedition.chapter.id, WoodlandSupplyExpedition.chapter.id),
+                        progressKey = WoodlandReturnExpedition.saveName
                     )
                 )
             )
@@ -158,10 +165,11 @@ object GridHuntCampaign {
     )
 
     /** Two isolated save namespaces; Chapter 2 never alters Chapter 1. */
-    fun snapshot(rawFirst: Int, rawSecond: Int) = CampaignSnapshot(
+    fun snapshot(rawFirst: Int, rawSecond: Int, rawThird: Int = 0) = CampaignSnapshot(
         mapOf(
             WoodlandExpedition.chapter.id to WoodlandExpedition.restoreStep(rawFirst),
-            WoodlandSupplyExpedition.chapter.id to WoodlandSupplyExpedition.run.restoreStep(rawSecond)
+            WoodlandSupplyExpedition.chapter.id to WoodlandSupplyExpedition.run.restoreStep(rawSecond),
+            WoodlandReturnExpedition.chapter.id to WoodlandReturnExpedition.run.restoreStep(rawThird)
         )
     )
 }
