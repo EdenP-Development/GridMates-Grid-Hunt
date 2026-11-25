@@ -22,7 +22,9 @@ import android.graphics.BitmapFactory
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
-// Adapted from the owner-approved shared game startup v1.0 Sudoku pilot.
+// Adapted from shared startup v1.0; Grid Hunt phone review requests a longer local dwell.
+internal const val STARTUP_FADE_MS = 300
+internal const val STARTUP_HOLD_MS = 1500
 internal fun startupBrandingStages(seriesDrawable: Int? = null): List<Int> =
     listOfNotNull(R.drawable.spudacus_v1_full_transparent, seriesDrawable)
 
@@ -52,9 +54,9 @@ internal fun StartupBranding(
             return@LaunchedEffect
         }
         opacity.snapTo(0f)
-        opacity.animateTo(1f, tween(250, easing = androidx.compose.animation.core.LinearEasing))
-        delay(1000)
-        opacity.animateTo(0f, tween(250))
+        opacity.animateTo(1f, tween(STARTUP_FADE_MS, easing = androidx.compose.animation.core.LinearEasing))
+        delay(STARTUP_HOLD_MS.toLong())
+        opacity.animateTo(0f, tween(STARTUP_FADE_MS))
         stage++
     }
     Box(Modifier.fillMaxSize()) {
