@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V40-B — coastal landmark studies committed; QA412 verified baseline.**
+Updated 2026-11-25. **Current checkpoint: GH-V40-D — coastal masters, terrain and postcard studies committed; QA412 verified runtime baseline.**
 
-## Authoritative current checkpoint — GH-V40-B
+## Authoritative current checkpoint — GH-V40-D
+- QA412 remains the last explicitly verified all-green runtime baseline: run 45586701603, 50/50 Android tests, 11 exact preference maps preserved through actual signed install-over and cold launch, APK artifact 15008384490. QA421 was pending at inspection; later artwork commits supersede it. No new runtime changes since QA412.
+- GH-V40-C committed ten standalone 128×128 label-free SVG masters (six landmarks, four scenery assets) under artwork/worlds/whispering-coast/masters/. All ten were individually fetched and checked for canvas and absence of text nodes at GH-V40-D; final wave master commit 18e0070efa65cfba276f5706e49d8ad3fac5071c. Batch commit unavailable because connector commit response lacks tree SHA; individual commits succeeded.
+- GH-V40-D created terrain-study-v0.1.svg (5f6bce32e010e6cb47f0a8384a4e37720a8b0009) and postcard-study-v0.1.svg (0c63f753f68567fcba636feea851467ddeb49fe2). Both reuse original masters, remain draft SVG sources outside runtime, and are not approved final art. Asset README reconciled. Terrain uses proposed coordinate centers; exact anchor offsets and shoreline fit remain unresolved. Embedded master copies must be regenerated/reconciled if masters change.
+- Next GH-V40-E deterministic asset rendering/validation and small-size comparison, then final coordinate/anchor design review. No playable coast registry, Android resource export, live persistence/navigation integration, release, merge, package/signing or legacy save changes. Preserve QA412 and owner-approved Woodland visuals.
+
+## GH-V40-B
 - QA412 run 45586701603, source 872b350f18afcbdd2903950789abb0d8753c8595, all three jobs passed after retry of infrastructure failure. Android 50/50 tests, 0 skipped/failed. Actual signed QA345 install-over preserved 11 exact preference maps before and after cold launch. APK artifact 15008384490; Android UI evidence 15010510013. QA412 is verified automated baseline; physical visual comparison remains pending.
 - GH-V40 proposed Whispering Coast (docs/GH-V40_WHISPERING_COAST_DESIGN.md, commit 872b350f18afcbdd2903950789abb0d8753c8595); coordinate composition v0.1 SVG (adba554a267d0a7d6d35e8f91a7111e525ff25d3) and six original hand-authored landmark vector silhouette studies (4eaa2fafbb2c3abcd943832e394f127d297aaceb), asset specification/anchors (8ef53817c14db43bd32d91518d10305e28c09a18). Located under artwork/worlds/whispering-coast/. Draft design only, not runtime sprites or approved world. No map registry changes.
 - Next review silhouette legibility at 24/32/48px on both map looks; individual transparent masters and deterministic exports, then environmental asset collection and postcard. Refine shoreline/anchor geography before freezing data; exact scene binding and live save/navigation integration remain required before publication. No new release, merge, package/signing, legacy preferences or approved art changes.
