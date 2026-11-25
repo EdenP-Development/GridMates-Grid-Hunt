@@ -1,8 +1,12 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V36-J — woodland atmosphere and Journal refinement committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V37-A — gameplay action consistency pass committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V36-J
+## Authoritative current checkpoint — GH-V37-A
+- QA379 was cancelled by newer development commits; do not infer a combined pass. GH-V37-A applied JournalActionShape to primary/secondary gameplay actions in HuntUi, PuzzleFinishCard, ReversePracticeScreen, TreasureChecklistScreen, WoodlandIdentifyScreen, WoodlandMixedExpeditionScreen, ExplorerAcademyScreen and CustomHuntScreen. Increased selected checklist, expedition directional and Academy action minimum heights to 48dp. Existing test tags, callbacks, circular tools, rules, package/signing and save contracts preserved. Source head before handoff bdf1b6e041ea01cd3df546043d9ae7303d6b8623. One connector write sequence disconnected; recovered by re-reading branch files and completing remaining commits. No compiled/visual acceptance claimed.
+- Next do not add source changes until latest CI completes unless concrete defect warrants it. Verify build, all Android regressions and signed QA upgrade; review exact emulator artifacts and provide consolidated owner test build when qualified. Remaining physical checks: launcher surround, splash timing, fit/zoom labels, map detail/readability, typography, large text, landscape, all gameplay and save preservation. Production signing and public release remain separate, unapproved gates.
+
+## GH-V36-J
 - QA376 (https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45571119732) was pending at inspection; no fresh combined acceptance claimed.
 - GH-V36-I layers five muted world-anchored terrain washes, deterministic sparse grass strokes with canonical landmark exclusion, and soft tree grounding shadows in the illustrated renderer only (8357f6565e378e3a83c39bb39eb427efb9559ed5). Existing sprites reused; no new assets, geographic features, changes to creek/trail paths, landmark coordinates, puzzle answers, touch/camera geometry or saves. Survey rendering unchanged. Actual map readability, performance and visual acceptance pending.
 - GH-V36-J adds distinct current discovery state (gold and sparkle, accessibility description), tighter spacing and explicit 18sp line height for 13sp Journal prose (b76a1af4eeffce9e0f7c69f80fdd51fb3155e55a). Preserves derived chapter discoveries, objective IDs and test tags. No extra save keys.
