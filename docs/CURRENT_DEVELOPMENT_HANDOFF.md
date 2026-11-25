@@ -1,8 +1,11 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V33-A — Settings return navigation corrected, regression pending.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V33-B — Home campaign presentation corrected, regression pending.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V33-A
+## Authoritative current checkpoint — GH-V33-B
+- Home Adventure card now consumes existing registry worldProgress, shows actual next unlocked chapter name, completed chapter count, active objective progress and Continue/Revisit action. UI d4f6f11cf767dc45e94032da2f6d7d9ba3a0fc22, wiring 9977377da04f6bf9c1783b5a5169e6bebcbbb2b7, Android regression 58489a15fa6995aa1178e2203a51fa9fe78eb779 seeds/restores only the three existing step keys and checks fresh, partial, second, third and complete states. No save schema, geometry, artwork, signing or release changes. QA333 build passed but emulator cancelled by superseding work; no startup full pass claimed. Fresh combined CI pending. Next inspect CI and remaining interface consistency (especially small screen/large text), then launcher icon, save compatibility and consolidated owner APK. No intermediate APK requested.
+
+## GH-V33-A
 - Recovered draft PR #12, branch feature/gh-v02-in-puzzle-map-look. QA333 core/build/unsigned beta/exact startup artwork packaging/fixed QA signer/artifact upload passed; emulator still executing at inspection. GH-V33-A source 94a80d650f5b78dcaa2c28907f50405aa969059b remembers Settings entry hub across recreation; toolbar and system Back return to Home or Quick Play as appropriate. Regression b3db0221428e596a1902af34a9da4973ffab0582 extends existing settings test with Quick Play return, recreation and Android Back. Fresh combined CI pending. No save changes, icon changes, merge or release. Next: Home Adventure summary still only reflects Chapter 1; derive current chapter/world completion from registry while preserving existing Chapter 1 progress test. Then audit remaining UI, icon, save upgrade, consolidated owner APK.
 
 ## GH-V32-D
