@@ -111,8 +111,10 @@ internal fun HuntMapPanel(
     enableSelect: Boolean = true,
     mapLook: MapLook,
     discoveryMessage: String? = null,
-    onLook: ((MapLook) -> Unit)? = null
+    onLook: ((MapLook) -> Unit)? = null,
+    scene: MapScene? = null
 ) {
+    val activeScene = scene ?: woodlandMapScene(mapLook)
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
@@ -124,7 +126,7 @@ internal fun HuntMapPanel(
             completed = completed, viewport = viewport, onViewport = onViewport,
             onCamera = onCamera, onSelect = onSelect,
             markerPoint = markerPoint, enableSelect = enableSelect,
-            mapLook = mapLook
+            mapLook = mapLook, scene = activeScene
         )
         if (discoveryMessage != null) {
             Surface(
@@ -191,7 +193,8 @@ private fun TrainingMapCanvas(
     onSelect: (String) -> Unit,
     markerPoint: WorldPoint? = null,
     enableSelect: Boolean = true,
-    mapLook: MapLook
+    mapLook: MapLook,
+    scene: MapScene
 ) {
     // Stable pointer coroutine with fresh state. Capturing 'camera' directly in
     // a long-lived pointerInput(viewport) block can retain the initial null camera.
@@ -200,25 +203,6 @@ private fun TrainingMapCanvas(
     val liveOnSelect by rememberUpdatedState(onSelect)
     val liveEnableSelect by rememberUpdatedState(enableSelect)
     val surveyStyle = mapLook == MapLook.SURVEY_TABLE
-    val landmarkSprites = if (surveyStyle) emptyMap() else mapOf(
-        WoodlandLandmarks.mushrooms.id to woodlandLandmarkSprite(WoodlandLandmarks.mushrooms.id),
-        WoodlandLandmarks.flowers.id to woodlandLandmarkSprite(WoodlandLandmarks.flowers.id),
-        WoodlandLandmarks.acorn.id to woodlandLandmarkSprite(WoodlandLandmarks.acorn.id),
-        WoodlandLandmarks.waystone.id to woodlandLandmarkSprite(WoodlandLandmarks.waystone.id)
-    )
-    val oakSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_wood_oak_sm)
-    val pineSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_wood_pine_sm)
-    val rocksSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_env_rocks)
-    val fernsSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_env_ferns)
-    val logSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_env_log)
-    val pondSprite = if (surveyStyle) null else ImageBitmap.imageResource(R.drawable.gh_env_pond)
-    val mapBackdrop = if (surveyStyle) Color(0xFFB1C7C6) else Color(0xFFD1DFCF)
-    val mapPaper = if (surveyStyle) Color(0xFFDCEBE7) else Color(0xFFEDE4CB)
-    val treeDark = if (surveyStyle) Color(0xFF68938F) else Color(0xFF88AA84)
-    val treeLight = if (surveyStyle) Color(0xFF9CBFBA) else Color(0xFFAAC098)
-    val gridInk = if (surveyStyle) Color(0xB74C6F76) else Color(0x88778667)
-    val streamInk = if (surveyStyle) Color(0xFF4E8C9E) else Color(0xFF6F9FA9)
-    val trailInk = if (surveyStyle) Color(0xFF6D8090) else Color(0xFFA68858)
     Canvas(
         modifier = Modifier
             .fillMaxSize()
@@ -309,27 +293,24 @@ private fun TrainingMapCanvas(
 
         drawRect(
             brush = Brush.linearGradient(
-                if (surveyStyle) listOf(mapBackdrop, Color(0xFF8EADAE))
-                else listOf(Color(0xFFCFDBCB), Color(0xFFB4C9B3)),
+                scene.backdrop,
                 start = Offset(0f, 0f), end = Offset(size.width, size.height)
             )
         )
         drawRect(
-            color = mapPaper,
+            color = scene.paper,
             topLeft = Offset(left, top), size = Size(right - left, bottom - top)
         )
         clipRect(left, top, right, bottom) {
-            drawWoodlandTerrain(bounds, cam, surveyStyle, landmarkSprites,
-                oakSprite, pineSprite, rocksSprite, fernsSprite, logSprite, pondSprite,
-                treeDark, treeLight, streamInk, trailInk, ::p)
+            scene.drawTerrain(this, bounds, cam, ::p)
             // Labels belong to the kilometer GRID LINES, not cell centers.
             for (easting in bounds.west.toInt()..bounds.east.toInt() step 1000) {
                 val x = p(easting.toDouble(), bounds.south).x
-                drawLine(gridInk, Offset(x, top), Offset(x, bottom), strokeWidth = 1.5f)
+                drawLine(scene.gridInk, Offset(x, top), Offset(x, bottom), strokeWidth = 1.5f)
             }
             for (northing in bounds.south.toInt()..bounds.north.toInt() step 1000) {
                 val y = p(bounds.west, northing.toDouble()).y
-                drawLine(gridInk, Offset(left, y), Offset(right, y), strokeWidth = 1.5f)
+                drawLine(scene.gridInk, Offset(left, y), Offset(right, y), strokeWidth = 1.5f)
             }
             // Solved discoveries stay on the map as little gold stamps.
             // Only already-accepted answers appear here; future targets stay hidden.
