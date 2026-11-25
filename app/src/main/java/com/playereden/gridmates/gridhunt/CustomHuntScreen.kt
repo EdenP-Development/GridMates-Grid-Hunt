@@ -29,18 +29,18 @@ import com.playereden.gridhunt.core.*
 internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHome: () -> Unit) {
     val context = LocalContext.current
     val prefs = remember(context) { context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE) }
-    var count by rememberSaveable { mutableIntStateOf(prefs.getInt("count", 3).let { if (prefs.getString("mode", "grid") == "mixed" && it !in CustomHuntGenerator.mixedLengths) 6 else if (it in CustomHuntGenerator.lengths) it else 3 }) }
-    var mode by rememberSaveable { mutableStateOf(prefs.getString("mode", "grid")?.takeIf { it in listOf("grid", "gold", "identify", "checklist", "mixed") } ?: "grid") }
+    var count by rememberSaveable { mutableIntStateOf(prefs.savedInt("count", 3).let { if (prefs.savedString("mode", "grid") == "mixed" && it !in CustomHuntGenerator.mixedLengths) 6 else if (it in CustomHuntGenerator.lengths) it else 3 }) }
+    var mode by rememberSaveable { mutableStateOf(prefs.savedString("mode", "grid")?.takeIf { it in listOf("grid", "gold", "identify", "checklist", "mixed") } ?: "grid") }
     var nextMode by rememberSaveable { mutableStateOf(mode) }
     var answer by rememberSaveable { mutableStateOf("") }
-    var codes by rememberSaveable { mutableStateOf(prefs.getString("codes", "") ?: "") }
-    var kinds by rememberSaveable { mutableStateOf(prefs.getString("kinds", "") ?: "") }
+    var codes by rememberSaveable { mutableStateOf(prefs.savedString("codes", "") ?: "") }
+    var kinds by rememberSaveable { mutableStateOf(prefs.savedString("kinds", "") ?: "") }
     val mixed = remember(codes, kinds, mode) { if (mode == "mixed") CustomHuntGenerator.restoreMixed(codes, kinds) else emptyList() }
     val targets = remember(codes, mode, mixed) {
         if (mode == "mixed") mixed.map { it.cell }
         else if (mode in listOf("identify", "checklist")) CustomHuntGenerator.restoreLandmarks(codes) else CustomHuntGenerator.restore(codes)
     }
-    var step by rememberSaveable { mutableIntStateOf(prefs.getInt("step", 0).coerceIn(0, targets.size)) }
+    var step by rememberSaveable { mutableIntStateOf(prefs.savedInt("step", 0).coerceIn(0, targets.size)) }
     var playing by rememberSaveable { mutableStateOf(false) }
     var replaceHunt by rememberSaveable { mutableStateOf(false) }
     BackHandler(enabled = playing) { playing = false }
