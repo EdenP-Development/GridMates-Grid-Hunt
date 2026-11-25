@@ -1,8 +1,13 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V35-C — actual signed APK upgrade gate implemented; execution pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V35-D — expanded save coverage committed; combined CI pending.**
 
-## Authoritative current checkpoint — GH-V35-C
+## Authoritative current checkpoint — GH-V35-D
+- QA359 was pending at inspection; no successful upgrade result yet. Expanded PopulatedSaveTest.kt (aea5354fbd5faef91be79fe3ff6d3b372851ca14) with recovered Return Trail journal entry/current objective, real checklist IDs, Quick Play counters, actual precision and haptics switch states and eleventh namespace. Allows only known normalized transient third-chapter fields on entry, requires existing seeded progress and all other maps unchanged. Haptics fixture follows existing setting to avoid conflating rememberSaveable recreation with cold restart.
+- Expanded actual upgrade fixture (b1e0c5e2e6f21f438bee6ee63eeac8882044b72e) to include all nine real Academy practice IDs, four graduation IDs, qualification and two real landmark discoveries. Cold upgrade fixture explicitly sets haptics off. Still synthetic; no player device data accessed.
+- Next prioritize allowing latest three-job CI to finish; repeated commits supersede prior runs. Fix concrete failures if any, then verify exact signed candidate artifact and provide consolidated alpha for owner playtest. Do not claim full pass before all jobs complete. Baseline artifact expiration and physical acceptance remain open. No release/merge, artwork or signing changes.
+
+## GH-V35-C
 - QA356 (https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45565918758) JVM/build/packaging job passed, emulator was running at inspection. QA354 superseded/cancelled; do not claim combined pass.
 - Added scripts/verify_save_upgrade.py (7fa39f7f71117f66eb02b667a1ccc5cee6463696) and separate Android emulator CI job (25e8c0ab6af9bb54be48985f3ab213f6b0fba672). Uses exact QA345 artifact, run 45562420181 artifact 14997709544, confirmed unexpired at inspection, and same-run candidate. Verifies receipts, signer, baseline version 10345 and increasing candidate version. Fresh emulator only; seeds 11 preference XML maps under QA app UID, checks exact values before/after adb install -r, and checks actual cold-launched Home progress on both versions. Never clears or uninstalls app data. Uploads text evidence. No execution result yet.
 - Fixture is synthetic, not a real player's save; checklist discovery IDs and Academy lesson/graduation completeness still require expanded assertions. Baseline artifact has finite retention; establish a durable reproducible baseline or rotate with a recorded verification receipt before it expires. Check actual workflow/ADB behavior and UI accessibility dump; fix if needed. Do not claim device acceptance. Next verify combined jobs and expand remaining persistence coverage, then consolidate owner APK. No release, merge, signing or artwork changes.
