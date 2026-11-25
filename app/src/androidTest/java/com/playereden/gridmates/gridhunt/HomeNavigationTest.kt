@@ -448,6 +448,77 @@ class HomeNavigationTest {
         compose.onNodeWithTag("openSecondChapter").assertIsEnabled()
     }
 
+    @Test fun thirdChapterUnlocksCompletesAndResumesWithoutChangingEarlierSaves() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val first = context.getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
+        val second = context.getSharedPreferences("gridhunt_woodland_supplies_v1", Context.MODE_PRIVATE)
+        val third = context.getSharedPreferences("gridhunt_woodland_return_v1", Context.MODE_PRIVATE)
+        val before = listOf(first, second, third).map { it.all.toMap() }
+        try {
+            check(first.edit().clear().putInt("step", 4).commit())
+            check(second.edit().clear().putInt("step", 3).commit())
+            check(third.edit().clear().commit())
+            compose.activityRule.scenario.recreate()
+            compose.onNodeWithTag("openAdventure").performClick()
+            compose.onNodeWithTag("openThirdChapter").assertIsNotEnabled()
+            compose.onNodeWithTag("openSecondChapter").assertIsEnabled().performClick()
+            compose.onNodeWithTag("mixedCodeInput").performTextReplacement("2941")
+            compose.onNodeWithTag("mixedCheck").performClick()
+            compose.onNodeWithTag("nextExpedition").performClick()
+            compose.onNodeWithText("The Return Trail").assertExists()
+            compose.onNodeWithText("0 of 4 clues solved").assertExists()
+            val earlier = listOf(first, second).map { it.all.toMap() }
+
+            compose.onNodeWithTag("mixedOption_acorn-nook").performClick()
+            compose.onNodeWithTag("mixedCheck").performClick()
+            compose.onNodeWithText("0 of 4 clues solved").assertExists()
+            compose.onNodeWithTag("mixedOption_old-waystone").performClick()
+            compose.onNodeWithTag("mixedCheck").performClick()
+            compose.onNodeWithText("1 of 4 clues solved").assertExists()
+            compose.onNodeWithTag("mixedCodeInput").performTextReplacement("2440")
+            compose.onNodeWithTag("mixedCodeInput").performImeAction()
+            compose.onNodeWithText("2 of 4 clues solved").assertExists()
+            compose.onNodeWithTag("mixedHome").performClick()
+            compose.activityRule.scenario.recreate()
+            compose.onNodeWithTag("openThirdChapter").assertIsEnabled().performClick()
+            compose.onNodeWithText("2 of 4 clues solved").assertExists()
+            compose.onNodeWithTag("mixedCodeInput").performTextReplacement("2641")
+            compose.onNodeWithTag("mixedCheck").performClick()
+            compose.onNodeWithText("3 of 4 clues solved").assertExists()
+            playFirstMixedSquare()
+            compose.onNodeWithTag("puzzleFinishCard").assertExists()
+            compose.onNodeWithTag("finishJournal").performClick()
+            compose.onNodeWithTag("journalComplete").assertExists()
+            compose.onNodeWithTag("journalEntry_return-trailhead").assertExists()
+            compose.onNodeWithTag("closeJournal").performClick()
+            compose.onNodeWithTag("mixedHome").performClick()
+            compose.activityRule.scenario.recreate()
+            compose.onNodeWithTag("openThirdChapter").assertIsEnabled().performClick()
+            compose.onNodeWithTag("puzzleFinishCard").assertExists()
+            org.junit.Assert.assertEquals(4, third.getInt("step", -1))
+            org.junit.Assert.assertEquals(earlier, listOf(first, second).map { it.all.toMap() })
+            compose.onNodeWithTag("finishContinue").performClick()
+            compose.onNodeWithText("0 of 4 clues solved").assertExists()
+            org.junit.Assert.assertEquals(0, third.getInt("step", -1))
+            org.junit.Assert.assertEquals(earlier, listOf(first, second).map { it.all.toMap() })
+            compose.onNodeWithTag("mixedHome").performClick()
+        } finally {
+            listOf(first, second, third).zip(before).forEach { (prefs, snapshot) ->
+                val editor = prefs.edit().clear()
+                snapshot.forEach { (key, value) ->
+                    when (value) {
+                        is Int -> editor.putInt(key, value)
+                        is String -> editor.putString(key, value)
+                        is Boolean -> editor.putBoolean(key, value)
+                        is Long -> editor.putLong(key, value)
+                        is Float -> editor.putFloat(key, value)
+                    }
+                }
+                check(editor.commit())
+            }
+        }
+    }
+
     @Test fun mixedChapterFinishRemainsUntilExplicitReplay() {
         InstrumentationRegistry.getInstrumentation().targetContext
             .getSharedPreferences("gridhunt_mixed_woodland_v1", Context.MODE_PRIVATE)
