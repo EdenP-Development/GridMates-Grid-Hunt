@@ -106,6 +106,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme(
+                typography = JournalTypography,
                 colorScheme = lightColorScheme(
                     primary = Forest,
                     onPrimary = Color.White,
