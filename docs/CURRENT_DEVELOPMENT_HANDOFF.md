@@ -1,8 +1,11 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V34 — launcher icon design; GH-V33 combined CI verified.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V34-B — original launcher icon integrated, CI and physical mask review pending.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V34
+## Authoritative current checkpoint — GH-V34-B
+- Owner preferred second launcher concept (explorer fox, golden frame, map and compass marker). Original generation 362acdc2-330a-4c15-bb79-a2bc7628e969 retained unchanged outside runtime. All three original/derived Git blob hashes matched pre-transfer local bytes. Prepared 192px RGB legacy and 432px RGBA adaptive foreground, 232px centered art, #032C14 forest background; only edge-connected exterior near-black pixels removed. Simulated round mask locally reviewed at 54/58/62/66dp, selected 58dp to preserve frame. Actual Android launcher appearance still pending. Manifest icon and roundIcon use same mipmap, adaptive v26 layers and legacy xxxhdpi fallback. Provenance and expected SHA256 in artwork/launcher/v2/manifest.json; CI checks exact source bytes and compiled icon layers in both debug QA and unsigned beta. No additional saves, package IDs, signer, startup artwork, gameplay or release changes. Next verify combined workflow, comprehensive save upgrade, consolidated signed QA and owner phone review. No public release/merge.
+
+## GH-V34
 - QA343 exact branch source 45682dfe849453d0d96f37cee46f67ea73d868f3 https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45558381898 passed both jobs, including 43 executed Android emulator tests, core/build, unsigned beta identity, exact startup artwork packaging, fixed QA signer and artifact upload. Startup behavior, Settings navigation and Home campaign regressions now have combined automated evidence. Physical timing, large-text layouts, phone acceptance and comprehensive upgrade remain open.
 - GH-V34 begins original launcher icon design. Manifest currently has no explicit application icon. Read shared BRAND_IDENTITY.md and ARTWORK_PIPELINE.md and local GH_V21_ASSET_PRODUCTION_BIBLE.md. Design candidate: warm parchment illustrated grid map, woodland foliage, gold discovery marker and full-bleed forest-green surround; recognizable at launcher scale, no text, no corporate mark, no black outer surround. Preserve distinct game identity and all package/signing/save contracts. Candidate needs owner visual acceptance and verified binary import before final status. Next adaptive/legacy icon integration and CI, comprehensive save upgrade, consolidated owner APK. No release or merge.
 

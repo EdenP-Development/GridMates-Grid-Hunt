@@ -1,0 +1,41 @@
+{
+  "asset_id": "gridhunt-launcher-v2",
+  "version": 2,
+  "generation_id": "362acdc2-330a-4c15-bb79-a2bc7628e969",
+  "provenance": "Original generated artwork; owner preferred candidate ('That's better'). Final masked launcher appearance and physical acceptance pending.",
+  "original_design": "GridMates fox in explorer hat holding parchment grid map, golden compass marker, golden wooden frame and forest-green surround.",
+  "processing": "Original RGB retained unchanged. Find edge-connected exterior pixels whose maximum RGB channel is <=45 using 4-connected flood fill; set their alpha to zero. Legacy: composite over #032C14, Lanczos resize to 192x192 RGB. Adaptive: Lanczos resize transparent artwork to 232x232 RGBA and center at (100,100) on transparent 432x432 canvas (58dp of 108dp). No redrawing, recoloring of interior art, or baked text. Simulated round-mask preview checked locally; Android masks vary.",
+  "source_masters_outside_runtime": true,
+  "files": [
+    {
+      "role": "source",
+      "path": "artwork/launcher/v2/gridhunt-launcher-original.png",
+      "bytes": 2309543,
+      "width": 1254,
+      "height": 1254,
+      "png_color_type": 2,
+      "sha256": "3ae7b5176acb2dfcb3af149a5da1ad5ceb0660f9b5903cfc557d48c71081b865",
+      "git_blob": "d197d8662577732fe1aec940f0fc7247e7803a8b"
+    },
+    {
+      "role": "adaptive_foreground",
+      "path": "app/src/main/res/drawable-nodpi/gh_launcher_foreground.png",
+      "bytes": 127789,
+      "width": 432,
+      "height": 432,
+      "png_color_type": 6,
+      "sha256": "48f3cb7df4a1fdbbc96aeca4197cf40120dc53a61cdc8ecebb805a7d487096ef",
+      "git_blob": "3b6160061c801ef1bdc9d569e33da82a4972e7fb"
+    },
+    {
+      "role": "legacy",
+      "path": "app/src/main/res/mipmap-xxxhdpi/gh_launcher.png",
+      "bytes": 78311,
+      "width": 192,
+      "height": 192,
+      "png_color_type": 2,
+      "sha256": "609397700035f43ece8c12805259a23bed31aa52acf8f5c254a7a2ce469e18af",
+      "git_blob": "f202faa1477e8c4eef45477796f3a7faa68c4a45"
+    }
+  ]
+}
