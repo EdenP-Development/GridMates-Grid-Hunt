@@ -62,9 +62,10 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 PixelPoint(viewport.width/2.0,viewport.height/2.0),PixelPoint(0.0,0.0),scale)
     }
     fun start() {
-        val generated = if (nextMode == "mixed") CustomHuntGenerator.generateMixed(count) else emptyList()
+        val previous = targets.toSet()
+        val generated = if (nextMode == "mixed") CustomHuntGenerator.generateFreshMixed(count, previous) else emptyList()
         kinds = generated.joinToString(",") { it.type }
-        codes = CustomHuntGenerator.encode(if (generated.isNotEmpty()) generated.map { it.cell } else if (nextMode in listOf("identify", "checklist")) CustomHuntGenerator.generateLandmarks() else CustomHuntGenerator.generate(count))
+        codes = CustomHuntGenerator.encode(if (generated.isNotEmpty()) generated.map { it.cell } else if (nextMode in listOf("identify", "checklist")) CustomHuntGenerator.generateFreshLandmarks(previous) else CustomHuntGenerator.generateFresh(count, previous))
         mode = nextMode
         step = 0; selected = null; answer = ""; hint = 0; feedback = instruction(generated.firstOrNull()?.type ?: mode)
         prefs.edit().putInt("count", count).putString("codes", codes).putString("mode", mode).putString("kinds", kinds).putInt("step", 0).apply()
