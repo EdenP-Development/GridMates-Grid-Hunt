@@ -1,8 +1,11 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V32-D — startup behavior regression added, pending execution.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V33-A — Settings return navigation corrected, regression pending.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V32-D
+## Authoritative current checkpoint — GH-V33-A
+- Recovered draft PR #12, branch feature/gh-v02-in-puzzle-map-look. QA333 core/build/unsigned beta/exact startup artwork packaging/fixed QA signer/artifact upload passed; emulator still executing at inspection. GH-V33-A source 94a80d650f5b78dcaa2c28907f50405aa969059b remembers Settings entry hub across recreation; toolbar and system Back return to Home or Quick Play as appropriate. Regression b3db0221428e596a1902af34a9da4973ffab0582 extends existing settings test with Quick Play return, recreation and Android Back. Fresh combined CI pending. No save changes, icon changes, merge or release. Next: Home Adventure summary still only reflects Chapter 1; derive current chapter/world completion from registry while preserving existing Chapter 1 progress test. Then audit remaining UI, icon, save upgrade, consolidated owner APK.
+
+## GH-V32-D
 - Added isolated Compose startup behavior tests for stage order, first/second tap skip, normal completion, Back, reduced motion, restored entry and stop/resume. Injectable animator policy defaults to actual Android ValueAnimator setting; approved timing unchanged. Test clock checks behavior, not real wall-clock timing; physical validation still required. QA332 core/compile passed at inspection, packaging and emulator pending. Fresh CI needed for new tests. Next interface audit, icon, save compatibility and consolidated APK.
 
 ## GH-V32-C
