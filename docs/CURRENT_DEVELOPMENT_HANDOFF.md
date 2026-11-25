@@ -1,8 +1,13 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V35-A — defensive save reads and regression tests committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V35-B — populated save regression committed; full CI and actual upgrade pending.**
 
-## Authoritative current checkpoint — GH-V35-A
+## Authoritative current checkpoint — GH-V35-B
+- QA354 (https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45565311819) build/JVM/packaging job passed; emulator was running at inspection. Do not infer combined pass; newer commits can cancel older runs.
+- Added PopulatedSaveTest.kt (81c535bc2b12571c4b7e6efb4f115024e1a4d344), a ten-namespace seeded fixture with two finished chapters and partial third, Academy qualification, Quick Play progress, custom resume and precision setting. Asserts visible summaries and exact unchanged fixture values after navigation and activity recreation; restores original fixture state in finally. Not a cold process restart or actual APK upgrade; no result yet.
+- Next verify new combined CI, expand fixture coverage for discovered checklist landmarks, actual settings values and journal, then execute old-to-new signed APK install-over on emulator with no clear/uninstall. No release, merge, or new artwork.
+
+## GH-V35-A
 - Recovered existing branch feature/gh-v02-in-puzzle-map-look and draft PR #12. Independently confirmed both QA345 jobs passed for GH-V34 launcher integration (https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45562420181). Actual phone launcher acceptance remains pending.
 - Added SafeSaveReads.kt (10c421b6d68ad5009af34c44317b902458180574): typed SharedPreferences reads fall back for ClassCastException, do not erase unrelated values; defensive string-set copy. Wired existing preference reads in MainActivity, CustomHuntScreen, ExplorerAcademyScreen, GridHuntSettings, WoodlandMixedExpeditionScreen, ReversePracticeScreen, TreasureChecklistScreen, WoodlandIdentifyScreen and HuntUi. Existing keys and package/signing identities unchanged. Screen write effects may naturally replace invalid values with defaults; this is not a backup or recovery mechanism.
 - Added three Android instrumentation tests for missing, wrong-typed and valid values in an isolated test-only preference namespace (ae693243e3837af3a8d2e4f72aeed6d53e3deb94). Compilation and emulator execution not yet verified. Next inspect combined CI, audit remaining direct preference reads and semantic corruption, test multi-namespace cold relaunch with populated saves and actual old-to-new signed QA APK upgrade without clearing data. Journal is to be checked through derived progress rather than assuming a separate save. Verify custom target consistency and retired settings behavior.
