@@ -109,7 +109,13 @@ class MainActivity : ComponentActivity() {
                     onPrimary = Color.White,
                     background = Paper,
                     onBackground = Ink,
-                    surface = Color(0xFFFFFBF1)
+                    surface = Color(0xFFFFFBF1),
+                    onSurface = Ink,
+                    onSurfaceVariant = Muted,
+                    outline = Color(0xFF8D907D),
+                    outlineVariant = JournalEdge,
+                    secondary = Pine,
+                    onSecondary = Color.White
                 )
             ) {
                 GridHuntScreen()

@@ -54,7 +54,7 @@ internal fun ExplorerDeskHome(
     onAcademy: () -> Unit
 ) {
     Column(
-        Modifier.fillMaxSize().background(Paper)
+        Modifier.fillMaxSize().journalPaper()
             .statusBarsPadding().navigationBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 17.dp, vertical = 8.dp),
@@ -71,6 +71,7 @@ internal fun ExplorerDeskHome(
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = Color(0xFFE0EBD4),
+            border = JournalPanelBorder,
             shape = RoundedCornerShape(22.dp),
             shadowElevation = 3.dp
         ) {
@@ -162,6 +163,7 @@ private fun HomeDestinationStrip(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = color,
+        border = JournalPanelBorder,
         shape = RoundedCornerShape(18.dp),
         shadowElevation = 1.dp
     ) {
@@ -236,7 +238,7 @@ internal fun WoodlandAdventureJourney(
     val logArt = ImageBitmap.imageResource(R.drawable.gh_env_log)
     val pondArt = ImageBitmap.imageResource(R.drawable.gh_env_pond)
     Column(
-        Modifier.fillMaxSize().background(Paper)
+        Modifier.fillMaxSize().journalPaper()
             .statusBarsPadding().navigationBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 17.dp, vertical = 8.dp),
@@ -254,7 +256,7 @@ internal fun WoodlandAdventureJourney(
             }
         }
         Surface(shape = RoundedCornerShape(21.dp),
-            color = Color(0xFFE4EDDA), shadowElevation = 2.dp) {
+            color = Color(0xFFE4EDDA), border = JournalPanelBorder, shadowElevation = 2.dp) {
             Column(Modifier.fillMaxWidth().padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -436,7 +438,7 @@ internal fun WoodlandCustomPlayPreview(
     onBack: () -> Unit
 ) {
     Column(
-        Modifier.fillMaxSize().background(Paper)
+        Modifier.fillMaxSize().journalPaper()
             .statusBarsPadding().navigationBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(19.dp),

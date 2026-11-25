@@ -42,6 +42,7 @@ internal fun QuickPlayModeTile(
     Surface(
         modifier = modifier,
         color = color,
+        border = JournalPanelBorder,
         shape = RoundedCornerShape(19.dp),
         shadowElevation = 2.dp
     ) {

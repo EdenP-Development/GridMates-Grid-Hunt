@@ -78,7 +78,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
         dismissButton = { TextButton(onClick = { replaceHunt = false },
             modifier = Modifier.testTag("customCancelReplace")) { Text("Keep hunt") } }
     )
-    Column(Modifier.fillMaxSize().background(Paper).statusBarsPadding().navigationBarsPadding().imePadding()
+    Column(Modifier.fillMaxSize().journalPaper().statusBarsPadding().navigationBarsPadding().imePadding()
         .padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Custom Play", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Ink,

@@ -2,7 +2,8 @@
 
 Updated 2026-11-24. **Current checkpoint: GH-V26-C — QA309 import passed; warm gameplay scenery pending CI.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V26-C
+## Authoritative current checkpoint — GH-V27-A
+- GH-V27-A introduces shared subtle deterministic parchment background, journal panel border and Material color roles for consistent menus. No layout, touch target, save or puzzle changes. CI and physical visual acceptance pending. GH-V26-C QA311 in progress at implementation; QA309 remains last confirmed full pass. Next verify combined screenshot evidence and polish only where needed, then dedicated launcher icon.
 - GH-V26-C warm gameplay map now uses five decorative placements of rocks, ferns, log and pond. World anchored, size limited, canonical landmark exclusion, beneath route/grid/objectives; survey unchanged. No new core answers or saves. Verify fresh CI and screenshots; QA310 menu-scene CI was in progress at implementation. Next interface texture/readability polish, then final launcher icon.
 - GH-V26-A four original transparent 256x256 decorative environment PNGs (rocks, ferns, log, pond) imported byte-for-byte at dc40a8ca7a5b08d6c7bff7498bb6cb6f0c30a6f0; QA309 full CI passed https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45520056258. Manifest docs/vision/WOODLAND_ENVIRONMENT_ASSET_MANIFEST.json. Sixteen total original illustrations. GH-V26-B adds these sprites to Home/Custom postcard and Adventure journey; CI and physical visual acceptance pending. Next verify screenshots, then cautiously integrate decorative scenery into warm gameplay only, preserving grid lines, canonical landmarks and survey style. Launcher icon still deferred.
 - QA307 evidence and signing proof below remain valid historical checkpoints.

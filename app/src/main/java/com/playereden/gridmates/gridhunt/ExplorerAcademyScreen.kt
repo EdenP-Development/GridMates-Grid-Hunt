@@ -61,7 +61,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
     val scroll = rememberScrollState()
     LaunchedEffect(active?.id, showOverview) { scroll.scrollTo(0) }
     Column(
-        Modifier.fillMaxSize().background(Paper).statusBarsPadding()
+        Modifier.fillMaxSize().journalPaper().statusBarsPadding()
             .navigationBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
@@ -96,7 +96,7 @@ internal fun ExplorerAcademyScreen(onHome: () -> Unit, mapLook: MapLook, onLook:
         }
 
         if (active != null) {
-            Surface(color = Color(0xFFFFF0CF), shape = RoundedCornerShape(16.dp)) {
+            Surface(color = Color(0xFFFFF0CF), border = JournalPanelBorder, shape = RoundedCornerShape(16.dp)) {
                 Column(Modifier.fillMaxWidth().padding(if (mapLesson) 8.dp else 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
