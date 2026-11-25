@@ -724,7 +724,7 @@ class HomeNavigationTest {
     @Test fun generatedLandmarkModesCompleteWithoutChangingAuthoredSaves() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val custom = context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE)
-        val authored = listOf("gridhunt_treasure_checklist_v1", "gridhunt_woodland_identify_v1")
+        val authored = listOf("gridhunt_treasure_checklist_v1", "gridhunt_identify_v1")
             .map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
         val before = authored.map { it.all.toMap() }
         check(custom.edit().clear().commit())
@@ -735,9 +735,11 @@ class HomeNavigationTest {
             "2641" to "acorn-nook", "2941" to "old-waystone")
         val codes = custom.getString("codes", "")!!.split(",")
         org.junit.Assert.assertEquals(3, codes.toSet().size)
-        codes.forEach { code ->
+        codes.forEachIndexed { index, code ->
             compose.onNodeWithTag("customIdentify_${ids.getValue(code)}").performClick()
             compose.onNodeWithTag("customIdentifyCheck").performClick()
+            compose.waitForIdle()
+            org.junit.Assert.assertEquals("Identify objective $index ($code), sequence=$codes", index + 1, custom.getInt("step", 0))
         }
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         compose.onNodeWithTag("finishHome").performClick()
@@ -746,10 +748,12 @@ class HomeNavigationTest {
         compose.onNodeWithTag("customStart").performScrollTo().performClick()
         val checklist = custom.getString("codes", "")!!.split(",")
         org.junit.Assert.assertEquals(3, checklist.toSet().size)
-        checklist.forEach { code ->
+        checklist.forEachIndexed { index, code ->
             compose.onNodeWithTag("customChecklistItem_${ids.getValue(code)}").assertExists()
             compose.onNodeWithTag("customChecklistInput").performTextReplacement(code)
             compose.onNodeWithTag("customChecklistCheck").performClick()
+            compose.waitForIdle()
+            org.junit.Assert.assertEquals("Checklist objective $index ($code), sequence=$checklist", index + 1, custom.getInt("step", 0))
         }
         compose.onNodeWithTag("puzzleFinishCard").assertExists()
         org.junit.Assert.assertEquals(3, custom.getInt("step", 0))
