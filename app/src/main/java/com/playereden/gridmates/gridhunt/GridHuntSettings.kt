@@ -24,7 +24,7 @@ internal fun GridHuntSettings(
     val controls = remember(context) {
         context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE)
     }
-    var precise by remember { mutableStateOf(controls.getBoolean("precise_selection", false)) }
+    var precise by remember { mutableStateOf(controls.savedBoolean("precise_selection", false)) }
     var guide by remember { mutableStateOf(false) }
     Column(
         Modifier.fillMaxSize().journalPaper().statusBarsPadding().navigationBarsPadding()
