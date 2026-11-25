@@ -1,8 +1,9 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V29-C — cartographic refinement implemented; combined CI pending; active alpha.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V29-D — QA324 verified; compass and frame pending CI; active alpha.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V29-C
+## Authoritative current checkpoint — GH-V29-D
+- QA324 complete success https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45547712485; combined terrain, creek, vegetation, trail and label changes verified. GH-V29-D replaces plain N arrow with compact drawn north-up compass, adds warm frame and double world-edge rule; no new pointer handlers, camera geometry or save changes. Fresh CI and phone visual acceptance pending. Next physical map review, then Adventure presentation.
 - GH-V29-C adds warm layered sandy dashed trail (original cubic control points unchanged), density-aware landmark scale and measured coordinate-label sizing/placement; matching trail guide swatch. No answer data, geometry or saves changed. QA323 running at inspection, QA322 superseded, QA321 last full pass. Verify combined CI and physical readability before further renderer changes. Next compass/frame.
 - GH-V29-B adds nine candidate small companion trees around existing decorative groves using shared original oak/pine PNGs, world-anchored bounds and canonical-landmark exclusion, muted alpha, zoom-size limits. Existing trees, core geometry, clues, coordinates and saves unchanged. QA322 compile/core/APK passed, emulator still running when inspected; QA321 latest full pass. Fresh combined CI and physical review needed. Next trail and grid-label readability.
 - QA321 journal build passed full workflow https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45545176066. GH-V29-A introduces world-anchored irregular terrain washes and layered rounded creek rendering in warm map only, preserving all original creek/trail control points, landmark coordinates, grid selection, save contracts and legacy survey rendering. No new artwork assets. CI and physical visual review pending. Next vegetation grouping and label readability after verification; active alpha, no release.

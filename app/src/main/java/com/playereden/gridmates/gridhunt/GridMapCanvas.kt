@@ -116,7 +116,7 @@ internal fun HuntMapPanel(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .border(2.dp, Color(0xFF929D81), RoundedCornerShape(16.dp))
+            .border(2.dp, Color(0xFF98805A), RoundedCornerShape(16.dp))
             .background(Color(0xFFD1DFCF))
     ) {
         TrainingMapCanvas(
@@ -141,17 +141,41 @@ internal fun HuntMapPanel(
                     maxLines = 2)
             }
         }
-        // World appearance is fixed during alpha; no overlay covers the grid.
-        // The north cue belongs to the map, not the crowded game header.
-        // Keep it compact and translucent so a marker near the edge stays visible.
-        Text(
-            "N ↑", color = Ink, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+        // Compact, fixed north-up cartographic cue. Decorative only: no
+        // pointer input, no camera rotation, no new interaction surface.
+        Row(
             modifier = Modifier.align(Alignment.TopEnd)
-                .padding(8.dp)
+                .padding(7.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xCFFFF9EA))
-                .padding(horizontal = 7.dp, vertical = 4.dp)
-        )
+                .background(Color(0xE8FFF5DA))
+                .border(1.dp, Color(0xAA9A855A), RoundedCornerShape(8.dp))
+                .padding(horizontal = 5.dp, vertical = 3.dp)
+                .semantics { contentDescription = "North is up" }
+                .testTag("mapNorthCompass"),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(3.dp)
+        ) {
+            Text("N", color = Ink, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
+            Canvas(Modifier.size(16.dp)) {
+                val r = size.minDimension * .45f
+                drawCircle(Color(0xFF9A855A), r, center, style = Stroke(1.dp.toPx()))
+                val needle = Path().apply {
+                    moveTo(center.x, center.y - r)
+                    lineTo(center.x - r * .40f, center.y)
+                    lineTo(center.x, center.y + r)
+                    lineTo(center.x + r * .40f, center.y)
+                    close()
+                }
+                drawPath(needle, Color(0xFFDDC595))
+                drawPath(Path().apply {
+                    moveTo(center.x, center.y - r)
+                    lineTo(center.x - r * .40f, center.y)
+                    lineTo(center.x + r * .40f, center.y)
+                    close()
+                }, Color(0xFF315A47))
+                drawPath(needle, Color(0xFF6D674C), style = Stroke(.65.dp.toPx()))
+            }
+        }
     }
 }
 
@@ -604,9 +628,16 @@ private fun TrainingMapCanvas(
                 }
             }
         }
+        // Double rule stays on the existing world edge; it does not inset
+        // the grid, alter the camera viewport or reserve touchable map space.
+        if (!surveyStyle) {
+            drawRect(Color(0xFFD5C092), topLeft = Offset(left, top),
+                size = Size(right - left, bottom - top), style = Stroke(3.dp.toPx()))
+        }
         drawRect(
-            color = Color(0xFF67785F), topLeft = Offset(left, top),
-            size = Size(right - left, bottom - top), style = Stroke(2.2f)
+            color = if (surveyStyle) Color(0xFF67785F) else Color(0xFF786849),
+            topLeft = Offset(left, top),
+            size = Size(right - left, bottom - top), style = Stroke(1.dp.toPx())
         )
     }
 }
