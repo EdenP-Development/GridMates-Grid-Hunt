@@ -129,7 +129,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
             }
         } else if (targets.isEmpty()) {
             Text("This hunt could not be restored.", color = Forest)
-            Button(onClick = { playing = false }) { Text("Return to setup") }
+            Button(shape = JournalActionShape, onClick = { playing = false }) { Text("Return to setup") }
         } else {
             val active = targets.getOrNull(step)
             val objectiveMode = if (mode == "mixed") mixed.getOrNull(step)?.type ?: "grid" else mode
@@ -199,7 +199,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f), { zoom(1.0/1.6) })
                     HuntToolButton(ExplorerTool.FIT, Modifier.weight(1f), ::fit)
                 }
-                Button(onClick = submitCode, enabled = answer.length == 4,
+                Button(shape = JournalActionShape, onClick = submitCode, enabled = answer.length == 4,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag(if (objectiveMode == "gold") "customGoldCheck" else "customChecklistCheck")) {
                     Text(if (objectiveMode == "gold") "Try this code" else "Mark found")
                 }
@@ -207,7 +207,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 WoodlandLandmarks.all.chunked(2).forEach { pair ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         pair.forEach { landmark ->
-                            OutlinedButton(onClick = { answer = landmark.id }, modifier = Modifier.weight(1f).heightIn(min = 60.dp).testTag("customIdentify_${landmark.id}"),
+                            OutlinedButton(shape = JournalActionShape, onClick = { answer = landmark.id }, modifier = Modifier.weight(1f).heightIn(min = 60.dp).testTag("customIdentify_${landmark.id}"),
                                 contentPadding = PaddingValues(4.dp),
                                 colors = ButtonDefaults.outlinedButtonColors(containerColor = if (answer == landmark.id) androidx.compose.ui.graphics.Color(0xFFF7DDA2) else androidx.compose.ui.graphics.Color(0xFFFFFBF0))) {
                                 WoodlandLandmarkSwatch(landmark.id, mapLook, symbolSize = 32.dp)
@@ -222,7 +222,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f), { zoom(1.0/1.6) })
                     HuntToolButton(ExplorerTool.FIT, Modifier.weight(1f), ::fit)
                 }
-                Button(onClick = {
+                Button(shape = JournalActionShape, onClick = {
                     if (WoodlandLandmarks.byId(answer)?.cell == active) {
                         step += 1; answer = ""; selected = null; hint = 0; feedback = "Found it!"
                         prefs.edit().putInt("step", step).apply()
