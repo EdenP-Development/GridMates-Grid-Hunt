@@ -1,8 +1,11 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V32-B — shared startup branding integration pending verification.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V32-C — Android regression passed, startup package verification repaired pending CI.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V32-B shared startup
+## Authoritative current checkpoint — GH-V32-C
+- QA331 source 4616b7b9e11bf2e2bde78491fc3375e6352dd061: Android emulator job PASSED, core/compile and both source artwork SHA256 checks passed. Packaging gate failed on beta Spudacus filename assertion; signed QA artifact not published. GH-V32-C replaces filename assumption with aapt2 compiled drawable table mapping + ZIP PNG signature checks, retaining exact source hash gate. Fresh CI required; resource renaming is a hypothesis until verified. Next animation-enabled startup tests and physical verification, consistency/icon/save rehearsal. No release. https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45554377658
+
+## GH-V32-B shared startup
 - Owner approved adoption of centralized game startup v1.0 via normal milestone. Read central BRAND_IDENTITY.md, ARTWORK_PIPELINE.md, RELEASE_CHECKLIST.md, startup guide/reference and both asset guides. Implemented adapted Compose overlay over existing root, Spudacus then GridMates, #FAE7CD, 250/1000/250 ms, tap/Back skip, animator-disabled skip, ON_STOP dismissal, no replay when savedInstanceState is non-null, safe bounds, silent, bitmap fallback, hidden underlying accessibility semantics. Pinned manifest branding/startup-v1.json; connector binary read failed and local runtime has no network, so build-time public pinned download with exact byte count/SHA256 and cached generated resources; no runtime internet. CI independently checks generated hashes and APK resource presence; actual CI and physical checks pending. Do not claim transferred bytes verified until run passes. No identifiers, keys, saves, launcher icon or public release changed. Next dedicated startup instrumentation and consolidation. Owner requests one combined phone playtest. QA330 pending at inspection, QA324 last full pass.
 - Remaining: startup behavioral verification, interface consistency, original launcher icon, comprehensive save upgrade, consolidated signed QA, owner physical acceptance. Future worlds deferred. 
 
