@@ -55,11 +55,11 @@ internal fun QuickPlayModeTile(
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                 PuzzleModeIllustration(tag, glyph, Modifier.size(38.dp))
-                Text(label, fontSize = 13.sp, maxLines = 3,
+                Text(label, fontSize = 13.sp,
                     fontWeight = FontWeight.ExtraBold, color = Ink, modifier = Modifier.weight(1f))
             }
-            Text(instruction, fontSize = 11.sp, maxLines = 2, color = Muted)
-            Text(progress, fontSize = 11.sp, maxLines = 1,
+            Text(instruction, fontSize = 11.sp, color = Muted)
+            Text(progress, fontSize = 11.sp,
                 fontWeight = FontWeight.Bold, color = Forest)
             Spacer(Modifier.weight(1f))
             Button(
