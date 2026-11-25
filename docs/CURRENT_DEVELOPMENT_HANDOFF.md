@@ -1,8 +1,13 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V39-D — Woodland terrain extraction and bounds-derived grid committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V39-E — injectable scene provider committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V39-D
+## Authoritative current checkpoint — GH-V39-E
+- QA403 run 45582634566 passed JVM/build/signing/packaging and QA345 install-over upgrade; Android instrumentation running at inspection. New commits may supersede that run.
+- MapScene.kt encapsulates Woodland bitmap loading, terrain palette and draw callback (523b44293437d0bc85b94deee0fb98bbf856f135). HuntMapPanel accepts optional MapScene, defaults to original Woodland provider; shared canvas consumes injected backdrop, paper, grid ink and terrain callback (9679724860ed1b3f60cebb36b40ca4d5232805f2). Shared frame, compass, label and selection styling remain unchanged. No new published world or selectable scene; future caller must supply matching bounds and scene. Fresh CI and visual comparison required.
+- Next GH-V39-F explicit world/map identity persistence design and isolated store adapter, with existing Woodland preference keys untouched. Consider injectable scene identity validation and renderer regression before exposing new worlds. No save migration, package/signing change, merge or release.
+
+## GH-V39-D
 - QA401 run 45581675197 passed core/build/signing/packaging and real signed QA345 upgrade; Android instrumentation still running at inspection. New commits supersede this run.
 - GH-V39-C introduced read-only MapHuntSession/MapHuntSessions exact map ID/revision validation, mode and sequence checks, progress validation and historical Woodland compatibility adapter (e9db07915408c46f7534e701a9e1bcecfabc7846); tests include overlapping coordinates, unknown revisions, malformed sessions and 100 seeded mixed sessions (d4ec4477198be98af284d517521018aff1e11935). No Android storage integration or migration.
 - GH-V39-D extracted existing world-anchored Woodland scenery and landmark drawing from GridMapCanvas into WoodlandTerrain.kt (83258b9c3883efe3089b70ae2f738398df8fde10). Shared canvas continues to own gesture handling, map frame, grid, labels, selection, completion stamps and active marker; grid/label ranges now derive from bounds and pointerInput keyed by viewport and bounds (661e16ba2c467535b26c1a28128145c06883c759). Artwork draw order and numeric positions intentionally preserved. Still Woodland-specific sprite loading/palette/terrain invocation; not yet pluggable or selectable at runtime. Fresh CI and visual regression required.
