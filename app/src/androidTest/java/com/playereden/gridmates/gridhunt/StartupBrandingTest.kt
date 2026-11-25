@@ -55,16 +55,24 @@ class StartupBrandingTest {
 
     @Test fun secondLogoFollowsFirstAndCanBeSkipped() {
         mount()
-        compose.mainClock.advanceTimeBy(1900)
+        compose.mainClock.advanceTimeBy(2500)
         compose.onNodeWithContentDescription("GridMates").assertExists()
         compose.onNodeWithContentDescription("Spudacus").assertDoesNotExist()
         compose.onNodeWithTag("startup_branding").performClick()
         homeReady()
     }
 
+    @Test fun firstLogoRemainsVisibleAtPreviousTransitionTime() {
+        mount()
+        compose.mainClock.advanceTimeBy(1600)
+        compose.onNodeWithContentDescription("Spudacus").assertExists()
+        compose.onNodeWithTag("startup_branding").performClick()
+        homeReady()
+    }
+
     @Test fun normalSequenceFinishesWithoutInput() {
         mount()
-        compose.mainClock.advanceTimeBy(3500)
+        compose.mainClock.advanceTimeBy(4800)
         homeReady()
     }
 
