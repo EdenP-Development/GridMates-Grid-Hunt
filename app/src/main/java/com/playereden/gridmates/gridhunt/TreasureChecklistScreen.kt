@@ -77,13 +77,13 @@ internal fun TreasureChecklistScreen(
     }
     val mission = TreasureChecklistMission
     var savedIds by rememberSaveable {
-        mutableStateOf(prefs.getString("completed_ids", "") ?: "")
+        mutableStateOf(prefs.savedString("completed_ids", "") ?: "")
     }
     var preferredId by rememberSaveable {
-        mutableStateOf(prefs.getString("selected_id", null))
+        mutableStateOf(prefs.savedString("selected_id", null))
     }
     var answer by rememberSaveable {
-        mutableStateOf(prefs.getString("answer", "") ?: "")
+        mutableStateOf(prefs.savedString("answer", "") ?: "")
     }
     var hintVisible by rememberSaveable { mutableStateOf(false) }
     var showMapGuide by rememberSaveable { mutableStateOf(false) }
