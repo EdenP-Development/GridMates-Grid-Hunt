@@ -100,19 +100,19 @@ internal fun WoodlandMixedExpeditionScreen(
         context.getSharedPreferences(mission.saveName, Context.MODE_PRIVATE)
     }
     var step by androidx.compose.runtime.saveable.rememberSaveable(mission.chapter.id) {
-        mutableStateOf(mission.restoreStep(prefs.getInt("step", 0)))
+        mutableStateOf(mission.restoreStep(prefs.savedInt("step", 0)))
     }
     var selectedCell by rememberSaveable(mission.chapter.id) {
-        mutableStateOf(prefs.getString("selected_cell", null)?.takeIf {
+        mutableStateOf(prefs.savedString("selected_cell", null)?.takeIf {
             runCatching { GridReference.parse(it).digits == 4 }.getOrDefault(false)
         })
     }
     var enteredCode by rememberSaveable(mission.chapter.id) {
-        mutableStateOf((prefs.getString("entered_code", "") ?: "")
+        mutableStateOf((prefs.savedString("entered_code", "") ?: "")
             .filter { it in '0'..'9' }.take(4))
     }
     var chosenLandmark by rememberSaveable(mission.chapter.id) {
-        mutableStateOf(prefs.getString("chosen_landmark", null)?.takeIf { id ->
+        mutableStateOf(prefs.savedString("chosen_landmark", null)?.takeIf { id ->
             WoodlandLandmarks.byId(id) != null
         })
     }
