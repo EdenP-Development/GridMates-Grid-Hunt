@@ -184,7 +184,7 @@ private fun GridHuntScreen() {
 
     when (screen) {
         "home" -> ExplorerDeskHome(
-            expeditionProgress = expeditionProgress,
+            worldProgress = GridHuntCampaign.registry.worldProgress(GridHuntCampaign.littleWoodlandId, campaignSnapshot),
             onAdventure = { screen = "adventure" },
             onQuickPlay = { screen = "quick" },
             onCustom = { screen = "custom" },
