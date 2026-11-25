@@ -14,6 +14,9 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroid
@@ -323,6 +326,13 @@ private fun ReverseControls(
     completed: Int, total: Int, onHint: () -> Unit,
     onFit: () -> Unit, onZoom: (Double) -> Unit, onCheck: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+    val submitCode: () -> Unit = {
+        if (answer.length == 4) {
+            focusManager.clearFocus()
+            onCheck()
+        }
+    }
     Text(
         if (finished) "Every golden spot found!" else "Find the gold dot. Which square is it in?",
         color = Forest, fontWeight = FontWeight.SemiBold, fontSize = 12.sp
@@ -339,7 +349,8 @@ private fun ReverseControls(
             modifier = Modifier.fillMaxWidth().testTag("reverseCodeInput"),
             singleLine = true, label = { Text("Four-digit map code") },
             placeholder = { Text("Enter 4 digits") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { submitCode() })
         )
     }
     Text(
@@ -356,7 +367,7 @@ private fun ReverseControls(
         ReverseToolButton(ExplorerTool.FIT, Modifier.weight(1f), onFit)
     }
     Button(
-        onClick = onCheck, enabled = finished || answer.length == 4,
+        onClick = { if (finished) onCheck() else submitCode() }, enabled = finished || answer.length == 4,
         modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("checkReverse"),
         colors = ButtonDefaults.buttonColors(containerColor = Forest)
     ) { Text(if (finished) "Find them again" else "Try this code", fontWeight = FontWeight.Bold) }

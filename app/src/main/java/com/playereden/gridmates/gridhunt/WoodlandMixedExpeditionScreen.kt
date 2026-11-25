@@ -19,6 +19,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -381,6 +384,13 @@ private fun MixedExpeditionControls(
     onFit: () -> Unit,
     onCheck: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+    val submitCode: () -> Unit = {
+        if (enteredCode.length == 4) {
+            focusManager.clearFocus()
+            onCheck()
+        }
+    }
     val actionReady = when (active.verb) {
         ExpeditionVerb.FIND_SQUARE -> selectedCell != null
         ExpeditionVerb.READ_MARKER, ExpeditionVerb.LOCATE_LANDMARK ->
@@ -431,7 +441,8 @@ private fun MixedExpeditionControls(
                     singleLine = true,
                     placeholder = { Text("Enter 4 digits") },
                     label = { Text("Grid square") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { submitCode() }),
                     modifier = Modifier.weight(1f).testTag("mixedCodeInput")
                 )
             }
@@ -478,7 +489,7 @@ private fun MixedExpeditionControls(
         HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(0.85f), { onZoom(1.0 / 1.6) })
         HuntToolButton(ExplorerTool.FIT, Modifier.weight(0.85f), onFit)
         Button(
-            onClick = onCheck, enabled = actionReady,
+            onClick = { if (active.verb == ExpeditionVerb.READ_MARKER || active.verb == ExpeditionVerb.LOCATE_LANDMARK) submitCode() else onCheck() }, enabled = actionReady,
             modifier = Modifier.weight(1.6f).heightIn(min = 50.dp)
                 .testTag("mixedCheck"),
             colors = ButtonDefaults.buttonColors(containerColor = Forest),

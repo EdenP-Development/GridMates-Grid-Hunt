@@ -2,6 +2,9 @@ package com.playereden.gridmates.gridhunt
 
 import android.content.Context
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -167,9 +170,21 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
             if (active == null) PuzzleFinishCard("Your hunt is complete!", "A little woodland adventure, all yours.",
                 "${targets.size} OF ${targets.size} FOUND", "New hunt", { nextMode = mode; count = targets.size; start() }, onHome)
             else if (objectiveMode in listOf("gold", "checklist")) {
+                val focusManager = LocalFocusManager.current
+                val submitCode: () -> Unit = {
+                    if (answer.length == 4) {
+                        focusManager.clearFocus()
+
+                    if (answer == active.reference) {
+                        step += 1; answer = ""; selected = null; hint = 0; feedback = "Found it!"
+                        prefs.edit().putInt("step",step).apply()
+                    } else { hint = 0; feedback = "Not quite. Try another code." }
+                    }
+                }
                 OutlinedTextField(value = answer, onValueChange = { answer = it.filter { c -> c in '0'..'9' }.take(4) },
                     label = { Text("Four-digit map code") }, singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { submitCode() }),
                     modifier = Modifier.fillMaxWidth().testTag(if (objectiveMode == "gold") "customGoldInput" else "customChecklistInput"))
                 Text(if (objectiveMode == "checklist" && hint > 0) landmark?.clue ?: feedback else when(hint) {
                     1 -> "Read the grid line left of the dot."
@@ -182,12 +197,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f), { zoom(1.0/1.6) })
                     HuntToolButton(ExplorerTool.FIT, Modifier.weight(1f), ::fit)
                 }
-                Button(onClick = {
-                    if (answer == active.reference) {
-                        step += 1; answer = ""; selected = null; hint = 0; feedback = "Found it!"
-                        prefs.edit().putInt("step",step).apply()
-                    } else { hint = 0; feedback = "Not quite. Try another code." }
-                }, enabled = answer.length == 4,
+                Button(onClick = submitCode, enabled = answer.length == 4,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag(if (objectiveMode == "gold") "customGoldCheck" else "customChecklistCheck")) {
                     Text(if (objectiveMode == "gold") "Try this code" else "Mark found")
                 }

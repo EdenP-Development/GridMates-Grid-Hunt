@@ -11,6 +11,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -384,7 +385,7 @@ class HomeNavigationTest {
         compose.onNodeWithTag("mixedCheck").performClick()
         compose.onNodeWithText("1 of 4 pages found").assertExists()
         compose.onNodeWithTag("mixedCodeInput").performTextReplacement("2440")
-        compose.onNodeWithTag("mixedCheck").performClick()
+        compose.onNodeWithTag("mixedCodeInput").performImeAction()
         compose.onNodeWithText("2 of 4 pages found").assertExists()
 
         compose.onNodeWithTag("mixedHome").performClick()

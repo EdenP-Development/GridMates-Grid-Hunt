@@ -1,8 +1,9 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V28-A — style retirement implemented; QA313 prior pass; active alpha.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V28-B — numeric keyboard submission implemented; CI pending; active alpha.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V28-A
+## Authoritative current checkpoint — GH-V28-B
+- GH-V28-B numeric fields now explicitly request keyboard Done and use the same four-digit submission validation as on-screen Check in both campaign chapters, Golden Spots, Treasure Checklist and Custom numeric modes. Clear input focus on valid-length submission to dismiss keyboard; no auto-submit on typing. Existing mixed expedition regression now exercises IME submission. Physical keyboard layout/visibility still requires device verification; next Map Guide accuracy and scroll affordances. QA315 style retirement was running at implementation.
 - GH-V28-A retires player-facing Cool Sketch toggle in maps and Quick Play; legacy style preference normalized to FIELD_GUIDE, haptics and progression untouched, underlying renderer retained. Updated regression assertions and required screenshot name; fresh CI pending. Next keyboard submission and Map Guide accuracy. Owner has not approved public beta.
 - QA313 attempt 2 passed full workflow https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45529337991 ; original failure was emulator SDK extraction, not app code. Owner supplied 19 physical screenshots and completed Chapter 1, unlocked Chapter 2; exact installed version not independently verified. Owner explicitly says not ready for itch beta, favors removing Cool Sketch and exploring distinct seasonal/area worlds including possible space side adventure. See docs/vision/GH_V28_PHYSICAL_PLAYTEST_AND_ALPHA_ROADMAP.md for prioritized fixes and scope. Next implement map style retirement safely, keyboard/guide/scroll fixes, then visual composition and richer content. Launcher icon deferred. Historical readiness estimates superseded.
 

@@ -21,6 +21,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
@@ -320,6 +323,13 @@ private fun TreasureChecklistAnswer(
     onFit: () -> Unit,
     onCheck: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+    val submitCode: () -> Unit = {
+        if (answer.length == 4) {
+            focusManager.clearFocus()
+            onCheck()
+        }
+    }
     if (active == null) return
     Row(
         Modifier.fillMaxWidth().testTag("activeTreasurePreview"),
@@ -349,11 +359,12 @@ private fun TreasureChecklistAnswer(
             singleLine = true,
             label = { Text("Four-digit square") },
             placeholder = { Text("Enter 4 digits") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { submitCode() }),
             modifier = Modifier.weight(1f).testTag("treasureCodeInput")
         )
         Button(
-            onClick = onCheck, enabled = answer.length == 4,
+            onClick = submitCode, enabled = answer.length == 4,
             modifier = Modifier.heightIn(min = 56.dp).testTag("checkTreasure"),
             colors = ButtonDefaults.buttonColors(containerColor = Forest)
         ) { Text("Mark found", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
