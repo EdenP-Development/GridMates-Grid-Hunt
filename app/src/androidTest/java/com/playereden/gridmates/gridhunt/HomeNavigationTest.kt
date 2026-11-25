@@ -57,6 +57,45 @@ class HomeNavigationTest {
         compose.onNodeWithText("Choose your puzzle").assertExists()
     }
 
+    @Test fun homeAdventureReflectsAllThreeChapters() {
+        val ctx = InstrumentationRegistry.getInstrumentation().targetContext
+        val prefs = listOf(
+            com.playereden.gridhunt.core.WoodlandExpedition.saveName,
+            com.playereden.gridhunt.core.WoodlandSupplyExpedition.saveName,
+            com.playereden.gridhunt.core.WoodlandReturnExpedition.saveName
+        ).map { ctx.getSharedPreferences(it, Context.MODE_PRIVATE) }
+        val original = prefs.map { if (it.contains("step")) it.getInt("step", 0) else null }
+        fun show(first: Int, second: Int, third: Int) {
+            prefs.zip(listOf(first, second, third)).forEach { (p, step) ->
+                check(p.edit().putInt("step", step).commit())
+            }
+            compose.activityRule.scenario.recreate()
+        }
+        try {
+            show(0, 0, 0)
+            compose.onNodeWithText("The Missing Field Notes").assertExists()
+            compose.onNodeWithText("0 of 3 chapters complete").assertExists()
+            show(1, 0, 0)
+            compose.onNodeWithText("1 of 4 objectives solved").assertExists()
+            show(4, 0, 0)
+            compose.onNodeWithText("The Lost Supplies").assertExists()
+            compose.onNodeWithText("1 of 3 chapters complete").assertExists()
+            show(4, 4, 2)
+            compose.onNodeWithText("The Return Trail").assertExists()
+            compose.onNodeWithText("2 of 3 chapters complete").assertExists()
+            compose.onNodeWithText("2 of 4 objectives solved").assertExists()
+            show(4, 4, 4)
+            compose.onNodeWithText("3 of 3 chapters complete").assertExists()
+            compose.onNodeWithText("Revisit Adventure").assertExists()
+        } finally {
+            prefs.zip(original).forEach { (p, step) ->
+                val edit = p.edit()
+                if (step == null) edit.remove("step") else edit.putInt("step", step)
+                check(edit.commit())
+            }
+        }
+    }
+
     @Test fun threePillarNavigationAndAdventureChapterAreReal() {
         compose.onNodeWithTag("openAdventure").performClick()
         compose.onNodeWithText("The Missing Field Notes").assertExists()
