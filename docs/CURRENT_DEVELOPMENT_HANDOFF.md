@@ -1,8 +1,11 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V27-B — final menu consistency pass; combined CI pending.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V28 — physical playtest reviewed; QA313 passed; active alpha, not public-beta ready.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V27-B
+## Authoritative current checkpoint — GH-V28
+- QA313 attempt 2 passed full workflow https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45529337991 ; original failure was emulator SDK extraction, not app code. Owner supplied 19 physical screenshots and completed Chapter 1, unlocked Chapter 2; exact installed version not independently verified. Owner explicitly says not ready for itch beta, favors removing Cool Sketch and exploring distinct seasonal/area worlds including possible space side adventure. See docs/vision/GH_V28_PHYSICAL_PLAYTEST_AND_ALPHA_ROADMAP.md for prioritized fixes and scope. Next implement map style retirement safely, keyboard/guide/scroll fixes, then visual composition and richer content. Launcher icon deferred. Historical readiness estimates superseded.
+
+## Prior checkpoint — GH-V27-B
 - GH-V27-B closes Quick Play styling gap: shared journal background and panel borders, existing field notebook illustration for mixed expedition; no new assets, behavior or saved-state changes. QA312 was still running when inspected; QA310/311 cancelled by superseding commits, QA309 last confirmed full pass. Next verify latest combined CI and review screenshots; then launcher icon design. Do not assume cancelled runs are failures or visual acceptance.
 - GH-V27-A introduces shared subtle deterministic parchment background, journal panel border and Material color roles for consistent menus. No layout, touch target, save or puzzle changes. CI and physical visual acceptance pending. GH-V26-C QA311 in progress at implementation; QA309 remains last confirmed full pass. Next verify combined screenshot evidence and polish only where needed, then dedicated launcher icon.
 - GH-V26-C warm gameplay map now uses five decorative placements of rocks, ferns, log and pond. World anchored, size limited, canonical landmark exclusion, beneath route/grid/objectives; survey unchanged. No new core answers or saves. Verify fresh CI and screenshots; QA310 menu-scene CI was in progress at implementation. Next interface texture/readability polish, then final launcher icon.
