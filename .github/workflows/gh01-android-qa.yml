@@ -214,3 +214,59 @@ jobs:
             vision-screenshots/
           if-no-files-found: warn
           retention-days: 14
+
+  android-save-upgrade:
+    name: Rehearse QA345 to candidate APK save upgrade
+    if: github.event_name == 'pull_request'
+    needs: android-qa
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: android-actions/setup-android@v4
+      - name: Download exact earlier QA artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: gridhunt-visionlab-345
+          run-id: 45562420181
+          github-token: ${{ github.token }}
+          path: upgrade-baseline
+      - name: Download this run's candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: gridhunt-visionlab-${{ github.run_number }}
+          path: upgrade-candidate
+      - name: Verify APK checksums and fixed signer
+        run: |
+          set -euo pipefail
+          for folder in upgrade-baseline upgrade-candidate; do
+            (cd "$folder" && sha256sum -c APK_SHA256.txt)
+            "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$folder/GridHunt-VisionLab-QA.apk" | grep -F 'Signer #1 certificate SHA-256 digest: 0ff2e763e5667bdfda45aab662639ea6c1c7efa813f82cd4a5cdba8225febd52'
+          done
+          test "$(cat upgrade-candidate/SOURCE_SHA.txt)" = "$GITHUB_SHA"
+      - name: Allow KVM acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Actual install-over without clearing data
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_5
+          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
+          disable-animations: true
+          script: bash -o pipefail -c 'python3 scripts/verify_save_upgrade.py upgrade-baseline/GridHunt-VisionLab-QA.apk upgrade-candidate/GridHunt-VisionLab-QA.apk 2>&1 | tee save-upgrade-result.txt'
+      - name: Preserve upgrade evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gridhunt-save-upgrade-evidence
+          path: save-upgrade-result.txt
+          if-no-files-found: warn
+          retention-days: 14
