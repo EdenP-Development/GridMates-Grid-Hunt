@@ -22,7 +22,8 @@ data class ExpeditionObjective(
     val expectedCell: GridCell,
     val landmarkId: String? = null,
     val markerId: String? = null,
-    val discovery: String = ""
+    val discovery: String = "",
+    val map: ExplorationMap = ExplorationMaps.woodland
 ) {
     init {
         require(id.isNotBlank() && title.isNotBlank() && prompt.isNotBlank())
@@ -36,7 +37,7 @@ data class ExpeditionObjective(
             ExpeditionVerb.IDENTIFY_LANDMARK ->
                 require(landmarkId != null && markerId == null)
         }
-        require(WoodlandTrainingMap.bounds.contains(
+        require(map.bounds.contains(
             WorldPoint(expectedCell.westMeters.toDouble(), expectedCell.southMeters.toDouble())
         ))
     }
@@ -47,7 +48,8 @@ data class ExpeditionChapter(
     val revision: Int,
     val name: String,
     val story: String,
-    val objectives: List<ExpeditionObjective>
+    val objectives: List<ExpeditionObjective>,
+    val map: ExplorationMap = ExplorationMaps.woodland
 ) {
     init {
         require(id.isNotBlank() && revision > 0 && name.isNotBlank() && story.isNotBlank())
@@ -55,16 +57,18 @@ data class ExpeditionChapter(
         require(objectives.map { it.id }.distinct().size == objectives.size)
         // Fail publishing if authored story data diverges from canonical content.
         for (objective in objectives) {
+            require(objective.map == map) { "Objective map must match chapter map" }
             when (objective.verb) {
                 ExpeditionVerb.FIND_SQUARE -> Unit
                 ExpeditionVerb.READ_MARKER -> require(
+                    map == ExplorationMaps.woodland &&
                     ReverseTraining.markers.singleOrNull { it.id == objective.markerId }?.cell ==
                         objective.expectedCell
                 )
                 ExpeditionVerb.LOCATE_LANDMARK, ExpeditionVerb.IDENTIFY_LANDMARK -> require(
-                    WoodlandLandmarks.byId(objective.landmarkId ?: "")?.cell ==
+                    map.landmark(objective.landmarkId ?: "")?.cell ==
                         objective.expectedCell &&
-                        WoodlandLandmarks.all.count { it.cell == objective.expectedCell } == 1
+                        map.landmarks.count { it.cell == objective.expectedCell } == 1
                 )
             }
         }
