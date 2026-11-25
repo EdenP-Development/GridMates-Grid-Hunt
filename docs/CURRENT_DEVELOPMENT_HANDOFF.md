@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V40-J — three coastal draft chapters authored; finale tests pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V41-A — staged two-world campaign and progression tests committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V40-J
+## Authoritative current checkpoint — GH-V41-A
+- QA438 run 45684682594 at 0827922f15184ce6b70f17ee4a012c756461aa37 passed all three jobs; artwork review #18 run 45684682456 also passed. QA438 is latest fully green baseline.
+- WorldDestination now verifies exact chapter map identity/revision (1b2816ce307c67212003d5fd5816aeaa664e5b48). CoastalCampaignDraft stages existing Woodland and three coastal chapters in a separate registry and selection policy (4324927c91de419b6aef8f164be7bed7c78705c3). All Woodland chapters required for each coastal chapter, plus all earlier coastal chapters. No live registry or save changes.
+- CoastalCampaignDraftTest verifies unlocks, locked out-of-order progress, completion/revisit, distinct progress namespaces, publication isolation and wrong map revision rejection. Fresh CI pending.
+- Next verify CI and implement exact scene dispatch plus map-specific marker data. Artwork visual approval, geographic anchors, real runtime navigation and persistence still required. No release or merge.
+
+## GH-V40-J
 - QA436 run 45683056148 at 0219f49149b3e09f4f86ceb23c6f98580aa0437e passed all three jobs; APK artifact 15054469065, UI evidence 15055358548, upgrade evidence 15054409451. Artwork review #16 run 45683056127 passed. QA436 is latest fully green baseline.
 - CoastalLightExpedition.kt implements unpublished four-objective finale The Last Light, with landmark reading, independently checkable grid offsets and identification (9fc4f3d8b1fe7330d51bba05c91626811cf28492). Three draft chapters now contain twelve objectives and distinct reserved namespaces. No live writes, publication or coastal marker dependency.
 - CoastalLightExpeditionTest.kt covers canonical offset geometry, wrong answers and completion, all three chapter identities, twelve objectives and unpublished registry isolation. Fresh CI pending.
