@@ -477,13 +477,25 @@ private fun TrainingMapCanvas(
                 val d = p(30000.0, 40700.0)
                 cubicTo(b.x, b.y, c.x, c.y, d.x, d.y)
             }
-            drawPath(trail, if (surveyStyle) Color(0x33809F9B) else Color(0x44BAA078),
-                style = Stroke(width = 10f))
-            drawPath(trail, trailInk,
-                style = Stroke(width = 3f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(11f, 7f))))
+            if (surveyStyle) {
+                drawPath(trail, Color(0x33809F9B), style = Stroke(width = 10f))
+                drawPath(trail, trailInk, style = Stroke(width = 3f,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(11f, 7f))))
+            } else {
+                val pathWidth = (75.0 * cam.pixelsPerMeter).toFloat()
+                    .coerceIn(3.dp.toPx(), 9.dp.toPx())
+                drawPath(trail, Color(0x447A8056), style = Stroke(width = pathWidth * 1.6f,
+                    cap = androidx.compose.ui.graphics.StrokeCap.Round))
+                drawPath(trail, Color(0xFFD7BE8B), style = Stroke(width = pathWidth,
+                    cap = androidx.compose.ui.graphics.StrokeCap.Round))
+                drawPath(trail, Color(0xFF987B50), style = Stroke(width = 1.1.dp.toPx(),
+                    cap = androidx.compose.ui.graphics.StrokeCap.Round,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(5.dp.toPx(), 4.dp.toPx()))))
+            }
             // The exact same glyph renderer powers the interactive Map Guide.
             // World positions are shared with the core answer data, not copied.
-            val landmarkScale = (130.0 * cam.pixelsPerMeter).toFloat().coerceIn(10f, 29f)
+            val landmarkScale = if (surveyStyle) (130.0 * cam.pixelsPerMeter).toFloat().coerceIn(10f, 29f)
+                else (150.0 * cam.pixelsPerMeter).toFloat().coerceIn(5.dp.toPx(), 15.dp.toPx())
             WoodlandLandmarks.all.forEach { landmark ->
                 drawWoodlandLandmark(
                     landmarkId = landmark.id,
@@ -550,7 +562,7 @@ private fun TrainingMapCanvas(
             val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = if (surveyStyle) android.graphics.Color.rgb(30, 64, 78)
                 else android.graphics.Color.rgb(38, 68, 56)
-                textSize = (12f * density).coerceAtMost(18f)
+                textSize = 11.sp.toPx().coerceAtMost((1000 * cam.pixelsPerMeter).toFloat() * .28f).coerceAtLeast(9f)
                 isFakeBoldText = true
             }
             // Tiny white paper halos preserve label contrast over forest/creek
@@ -566,18 +578,29 @@ private fun TrainingMapCanvas(
                 canvas.nativeCanvas.drawText(text, x, y, halo)
                 canvas.nativeCanvas.drawText(text, x, y, paint)
             }
-            val eastingBaseline = (bottom + 21f).coerceAtMost(size.height - 8f)
-            val northingColumn = (left - 26f).coerceAtLeast(7f)
+            val labelHeight = paint.fontMetrics.descent - paint.fontMetrics.ascent
+            val labelWidth = paint.measureText("00")
+            val inset = 3.dp.toPx()
+            val eastingBaseline = (bottom + labelHeight + inset)
+                .coerceAtMost(size.height - inset - paint.fontMetrics.descent)
+            val northingColumn = (left - labelWidth - inset).coerceAtLeast(inset)
+            // Reserve the lower-left intersection for northing labels, and
+            // use measured glyph width rather than raw-pixel guesses.
             for (easting in 24000..29000 step 1000) {
                 val x = p(easting.toDouble(), bounds.south).x
-                if (x >= 3f && x + 26f < size.width) {
-                    gridLabel((easting / 1000).toString(), x + 3f, eastingBaseline)
+                val labelX = x + inset
+                if (x >= 0f && labelX + labelWidth <= size.width - inset &&
+                    !(labelX < northingColumn + labelWidth + inset &&
+                        bottom >= size.height - labelHeight - 2 * inset)) {
+                    gridLabel((easting / 1000).toString(), labelX, eastingBaseline)
                 }
             }
             for (northing in 37000..42000 step 1000) {
                 val y = p(bounds.west, northing.toDouble()).y
-                if (y >= 12f && y < size.height - 12f) {
-                    gridLabel((northing / 1000).toString(), northingColumn, y + 5f)
+                val baseline = y - (paint.fontMetrics.ascent + paint.fontMetrics.descent) / 2f
+                if (baseline + paint.fontMetrics.ascent >= inset &&
+                    baseline + paint.fontMetrics.descent <= size.height - inset) {
+                    gridLabel((northing / 1000).toString(), northingColumn, baseline)
                 }
             }
         }

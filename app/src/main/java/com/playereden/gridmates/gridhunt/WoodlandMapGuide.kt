@@ -155,7 +155,12 @@ private fun MapFeatureGuideRow(
                     drawPath(stream, Color(0xFF719DA2), style = Stroke(width = 3f))
                 }
                 "trail" -> {
-                    drawLine(if (survey) Color(0xFF5F7D7C) else Color(0xFF856E50),
+                    if (!survey) {
+                        drawLine(Color(0xFFD7BE8B), Offset(4f, size.height * 0.68f),
+                            Offset(size.width - 4f, size.height * 0.32f), 5.dp.toPx(),
+                            cap = androidx.compose.ui.graphics.StrokeCap.Round)
+                    }
+                    drawLine(if (survey) Color(0xFF5F7D7C) else Color(0xFF987B50),
                         Offset(4f, size.height * 0.68f),
                         Offset(size.width - 4f, size.height * 0.32f), 3.4f,
                         pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 6f)))
