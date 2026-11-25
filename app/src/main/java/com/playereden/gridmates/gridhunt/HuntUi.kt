@@ -334,6 +334,7 @@ internal fun HuntControlPanel(
             modifier = Modifier.testTag("huntCloseTools")) { Text("Done") } }
     )
     Button(
+        shape = JournalActionShape,
         modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("checkChapter"),
         enabled = finished || selected != null,
         onClick = onCheck,
