@@ -23,6 +23,11 @@
       "git_blob_sha": "76f2b10f3c24c652ce7c26ed8b1625144c6e570c"
     }
   ],
-  "status": "byte-verified import; visual and integration acceptance pending",
-  "usage": "decorative only; preserve playable map geometry and answer-bearing landmarks"
+  "status": "byte-verified import; QA309 import passed; Home/Custom postcard and Adventure integration pending CI and visual acceptance",
+  "usage": "decorative only; preserve playable map geometry and answer-bearing landmarks",
+  "reuse": [
+    "Home postcard",
+    "Custom Play postcard",
+    "Adventure journey"
+  ]
 }

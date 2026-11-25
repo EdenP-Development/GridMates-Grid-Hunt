@@ -231,6 +231,10 @@ internal fun WoodlandAdventureJourney(
 ) {
     val oakArt = ImageBitmap.imageResource(R.drawable.gh_wood_oak_sm)
     val pineArt = ImageBitmap.imageResource(R.drawable.gh_wood_pine_sm)
+    val rocksArt = ImageBitmap.imageResource(R.drawable.gh_env_rocks)
+    val fernsArt = ImageBitmap.imageResource(R.drawable.gh_env_ferns)
+    val logArt = ImageBitmap.imageResource(R.drawable.gh_env_log)
+    val pondArt = ImageBitmap.imageResource(R.drawable.gh_env_pond)
     Column(
         Modifier.fillMaxSize().background(Paper)
             .statusBarsPadding().navigationBarsPadding()
@@ -312,6 +316,11 @@ internal fun WoodlandAdventureJourney(
                         tree(.77f,.76f,.27f,false)
                         tree(.66f,.98f,.33f,true)
                         tree(.96f,.97f,.30f,false)
+                        // Scenery stays outside chapter controls and route nodes.
+                        drawWoodlandSprite(rocksArt, Offset(w*.42f,h*.26f), h*.18f)
+                        drawWoodlandSprite(fernsArt, Offset(w*.48f,h*.83f), h*.19f)
+                        drawWoodlandSprite(logArt, Offset(w*.80f,h*.91f), h*.24f)
+                        drawWoodlandSprite(pondArt, Offset(w*.65f,h*.57f), h*.27f)
                         repeat(72) { i ->
                             drawCircle(Color(0x12695335),.55.dp.toPx(),
                                 Offset(w*((i*43+7)%101)/101f,h*((i*67+13)%103)/103f))

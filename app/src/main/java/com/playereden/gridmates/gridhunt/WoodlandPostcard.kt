@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * Original vector illustration for the home screen.
+ * Layered illustrated woodland postcard for Home and Custom Play.
  * It is intentionally a picture-book scene, NOT the answer-bearing grid.
  * The real puzzle map and all its world coordinates remain in GridMapCanvas.
  */
@@ -34,6 +34,10 @@ import androidx.compose.ui.unit.sp
 internal fun WoodlandPostcard(modifier: Modifier = Modifier) {
     val oakArt = ImageBitmap.imageResource(R.drawable.gh_wood_oak_sm)
     val pineArt = ImageBitmap.imageResource(R.drawable.gh_wood_pine_sm)
+    val rocksArt = ImageBitmap.imageResource(R.drawable.gh_env_rocks)
+    val fernsArt = ImageBitmap.imageResource(R.drawable.gh_env_ferns)
+    val logArt = ImageBitmap.imageResource(R.drawable.gh_env_log)
+    val pondArt = ImageBitmap.imageResource(R.drawable.gh_env_pond)
     Box(
         modifier = modifier.fillMaxWidth()
             .clip(RoundedCornerShape(22.dp))
@@ -100,6 +104,11 @@ internal fun WoodlandPostcard(modifier: Modifier = Modifier) {
             pine(.91f,.79f,.56f)
             oak(.82f,.85f,.38f)
             pine(.98f,.91f,.47f)
+            // Decorative foreground accents; leave the golden marker and trail clear.
+            drawWoodlandSprite(rocksArt, point(.30f, .59f), h * .24f)
+            drawWoodlandSprite(fernsArt, point(.46f, .86f), h * .26f)
+            drawWoodlandSprite(logArt, point(.87f, .87f), h * .32f)
+            drawWoodlandSprite(pondArt, point(.66f, .35f), h * .30f)
             // Fine meadow marks and golden blossoms at fixed decorative points.
             repeat(26) { i ->
                 val x = ((i*37+11)%97)/100f
