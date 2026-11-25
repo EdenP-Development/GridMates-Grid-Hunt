@@ -1,6 +1,6 @@
 # START HERE — GridMates: Grid Hunt
 
-**Current checkpoint: GH-V28-A — active alpha.** Start with [CURRENT_DEVELOPMENT_HANDOFF.md](CURRENT_DEVELOPMENT_HANDOFF.md) and [physical playtest roadmap](vision/GH_V28_PHYSICAL_PLAYTEST_AND_ALPHA_ROADMAP.md). QA313 passed; owner explicitly deferred public beta. Continue [draft PR #12](https://github.com/EdenP-Development/GridMates-Grid-Hunt/pull/12). Cool Sketch retirement implemented pending CI; next keyboard, guide and scroll fixes. [Central standards](https://github.com/EdenP-Development/Eden-Development-Standards).
+**Current checkpoint: GH-V31-A — active alpha.** Read [CURRENT_DEVELOPMENT_HANDOFF.md](CURRENT_DEVELOPMENT_HANDOFF.md) first. QA324 last confirmed full pass; latest Adventure marker/Home/compass changes awaiting combined CI. Chapter 3 candidate authored but not player-accessible yet. Owner wants one consolidated physical playtest after content, consistency and save checks; no public beta or merge without approval. Continue [draft PR #12](https://github.com/EdenP-Development/GridMates-Grid-Hunt/pull/12). [Central standards](https://github.com/EdenP-Development/Eden-Development-Standards).
 
 ## Product in one sentence
 
