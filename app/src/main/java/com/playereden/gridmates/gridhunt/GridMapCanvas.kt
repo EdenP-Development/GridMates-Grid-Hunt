@@ -369,6 +369,35 @@ private fun TrainingMapCanvas(
                 24450.0 to 39600.0, 24900.0 to 40200.0, 27200.0 to 38500.0,
                 29350.0 to 37450.0, 28700.0 to 38100.0, 26500.0 to 37650.0
             )
+            // Small companion trees form groves around existing decorative
+            // anchors. They never enter the core map vocabulary or save state.
+            if (!surveyStyle) {
+                val companions = listOf(
+                    Triple(24320.0, 42580.0, 290.0),
+                    Triple(24760.0, 42720.0, 330.0),
+                    Triple(25890.0, 42800.0, 270.0),
+                    Triple(29120.0, 42660.0, 310.0),
+                    Triple(29650.0, 41930.0, 280.0),
+                    Triple(24190.0, 39870.0, 260.0),
+                    Triple(26300.0, 37340.0, 310.0),
+                    Triple(26840.0, 37410.0, 270.0),
+                    Triple(29060.0, 37240.0, 300.0)
+                )
+                companions.forEachIndexed { i, (e, n, meters) ->
+                    val half = meters / 2.0
+                    val clear = bounds.contains(WorldPoint(e-half,n-half)) &&
+                        bounds.contains(WorldPoint(e+half,n+half)) &&
+                        WoodlandLandmarks.all.none { landmark ->
+                            kotlin.math.abs(landmark.point.easting-e) < half+700.0 &&
+                            kotlin.math.abs(landmark.point.northing-n) < half+700.0
+                        }
+                    val bitmap = if (i % 2 == 0) pineSprite else oakSprite
+                    val side = (meters * cam.pixelsPerMeter).toFloat().coerceAtMost(44.dp.toPx())
+                    if (clear && bitmap != null && side >= 8.dp.toPx()) {
+                        drawWoodlandSprite(bitmap, p(e,n), side, alpha = .58f)
+                    }
+                }
+            }
             trees.forEachIndexed { i, pair ->
                 val center = p(pair.first, pair.second)
                 val base = (205.0 * cam.pixelsPerMeter).toFloat().coerceIn(7f, 40f)
