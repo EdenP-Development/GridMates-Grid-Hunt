@@ -133,7 +133,7 @@ internal fun ExplorerDeskHome(
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                         .testTag("openAdventure"),
                     colors = ButtonDefaults.buttonColors(containerColor = Forest),
-                    shape = RoundedCornerShape(15.dp)
+                    shape = JournalActionShape
                 ) {
                     Text(when {
                         worldComplete -> "Revisit Adventure"
@@ -202,7 +202,7 @@ private fun HomeDestinationStrip(
         ) {
             Surface(
                 color = Color(0xFFFFFAED),
-                shape = RoundedCornerShape(13.dp)
+                shape = JournalActionShape
             ) {
                 val artwork = when (tag) {
                     "openAcademy" -> R.drawable.gh_tool_compass
@@ -232,7 +232,7 @@ private fun HomeDestinationStrip(
                     horizontal = 11.dp, vertical = 4.dp
                 ),
                 colors = ButtonDefaults.buttonColors(containerColor = Forest),
-                shape = RoundedCornerShape(12.dp)
+                shape = JournalActionShape
             ) {
                 Text(actionLabel, fontSize = 12.sp,
                     fontWeight = FontWeight.Bold)
