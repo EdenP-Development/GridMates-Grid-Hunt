@@ -566,7 +566,7 @@ private fun ExpeditionJournalDialog(
         text = {
             Column(
                 Modifier.fillMaxWidth().journalScroll(),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Surface(color = Color(0xFFE6D6AD), border = JournalPanelBorder,
                     shape = RoundedCornerShape(12.dp)) {
@@ -583,7 +583,7 @@ private fun ExpeditionJournalDialog(
                         }
                     }
                 }
-                Text(mission.chapter.story, color = Ink, fontSize = 13.sp)
+                Text(mission.chapter.story, color = Ink, fontSize = 13.sp, lineHeight = 18.sp)
                 Text(if (chapterNumber > 1) "${earned.size} of ${mission.size} clues solved"
                     else "${earned.size} of ${mission.size} pages found",
                     color = Forest, fontWeight = FontWeight.SemiBold,
@@ -594,11 +594,16 @@ private fun ExpeditionJournalDialog(
                         val recovered = index < earned.size
                         Surface(modifier = Modifier.weight(1f).heightIn(min = 40.dp)
                             .semantics { contentDescription = "$unit ${index + 1}, " +
-                                if (recovered) "recovered" else "not yet recovered" },
+                                if (recovered) "recovered" else if (index == earned.size) "current objective" else "not yet recovered" },
                             shape = RoundedCornerShape(7.dp), border = JournalPanelBorder,
-                            color = if (recovered) Color(0xFFDDE9CD) else Color(0xFFF9EBCB)) {
+                            color = when {
+                                recovered -> Color(0xFFDDE9CD)
+                                index == earned.size -> Color(0xFFF8DCA0)
+                                else -> Color(0xFFF9EBCB)
+                            }) {
                             Column(Modifier.padding(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(if (recovered) "✓" else "◇", color = Forest, fontWeight = FontWeight.Bold)
+                                Text(if (recovered) "✓" else if (index == earned.size) "✦" else "◇",
+                                    color = if (index == earned.size) Ink else Forest, fontWeight = FontWeight.Bold)
                                 Text((index + 1).toString(), color = Muted, fontSize = 10.sp)
                             }
                         }
@@ -618,7 +623,7 @@ private fun ExpeditionJournalDialog(
                             Text(objective.title, color = Ink,
                                 fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             Text(objective.discovery.ifBlank { "Discovery recorded." },
-                                color = Ink, fontSize = 13.sp)
+                                color = Ink, fontSize = 13.sp, lineHeight = 18.sp)
                         }
                     }
                 }
@@ -629,7 +634,7 @@ private fun ExpeditionJournalDialog(
                             Text("CURRENT OBJECTIVE", color = Forest,
                                 fontWeight = FontWeight.Bold, fontSize = 11.sp)
                             Text(active.title, color = Ink, fontWeight = FontWeight.Bold)
-                            Text(active.prompt, color = Ink, fontSize = 13.sp)
+                            Text(active.prompt, color = Ink, fontSize = 13.sp, lineHeight = 18.sp)
                         }
                     }
                 } else {
