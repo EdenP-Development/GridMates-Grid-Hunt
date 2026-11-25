@@ -1,8 +1,13 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V35-B — populated save regression committed; full CI and actual upgrade pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V35-C — actual signed APK upgrade gate implemented; execution pending.**
 
-## Authoritative current checkpoint — GH-V35-B
+## Authoritative current checkpoint — GH-V35-C
+- QA356 (https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45565918758) JVM/build/packaging job passed, emulator was running at inspection. QA354 superseded/cancelled; do not claim combined pass.
+- Added scripts/verify_save_upgrade.py (7fa39f7f71117f66eb02b667a1ccc5cee6463696) and separate Android emulator CI job (25e8c0ab6af9bb54be48985f3ab213f6b0fba672). Uses exact QA345 artifact, run 45562420181 artifact 14997709544, confirmed unexpired at inspection, and same-run candidate. Verifies receipts, signer, baseline version 10345 and increasing candidate version. Fresh emulator only; seeds 11 preference XML maps under QA app UID, checks exact values before/after adb install -r, and checks actual cold-launched Home progress on both versions. Never clears or uninstalls app data. Uploads text evidence. No execution result yet.
+- Fixture is synthetic, not a real player's save; checklist discovery IDs and Academy lesson/graduation completeness still require expanded assertions. Baseline artifact has finite retention; establish a durable reproducible baseline or rotate with a recorded verification receipt before it expires. Check actual workflow/ADB behavior and UI accessibility dump; fix if needed. Do not claim device acceptance. Next verify combined jobs and expand remaining persistence coverage, then consolidate owner APK. No release, merge, signing or artwork changes.
+
+## GH-V35-B
 - QA354 (https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45565311819) build/JVM/packaging job passed; emulator was running at inspection. Do not infer combined pass; newer commits can cancel older runs.
 - Added PopulatedSaveTest.kt (81c535bc2b12571c4b7e6efb4f115024e1a4d344), a ten-namespace seeded fixture with two finished chapters and partial third, Academy qualification, Quick Play progress, custom resume and precision setting. Asserts visible summaries and exact unchanged fixture values after navigation and activity recreation; restores original fixture state in finally. Not a cold process restart or actual APK upgrade; no result yet.
 - Next verify new combined CI, expand fixture coverage for discovered checklist landmarks, actual settings values and journal, then execute old-to-new signed APK install-over on emulator with no clear/uninstall. No release, merge, or new artwork.
