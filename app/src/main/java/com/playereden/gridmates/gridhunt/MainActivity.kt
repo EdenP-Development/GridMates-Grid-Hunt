@@ -342,7 +342,7 @@ private fun GridHuntHome(
     var showAppearance by rememberSaveable { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Paper)
+        modifier = Modifier.fillMaxSize().journalPaper()
             .statusBarsPadding().navigationBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 18.dp, vertical = 8.dp),
@@ -358,7 +358,7 @@ private fun GridHuntHome(
                 Text("Home", color = Forest)
             }
         }
-        Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFDFEAD4)) {
+        Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFDFEAD4), border = JournalPanelBorder) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp)) {
                 Text("✦  YOUR LITTLE DISCOVERIES", color = Forest,
                     fontWeight = FontWeight.Bold, fontSize = 11.sp)
@@ -399,12 +399,13 @@ private fun GridHuntHome(
                 onClick = onIdentify, modifier = Modifier.weight(1f)
             )
         }
-        Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFE8CA)) {
+        Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFE8CA), border = JournalPanelBorder) {
             Row(
                 Modifier.fillMaxWidth().padding(11.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(9.dp)
             ) {
+                PuzzleModeIllustration("mixed", "", Modifier.size(38.dp))
                 Column(Modifier.weight(1f)) {
                     Text("The Missing Field Notes", color = Ink,
                         fontSize = 14.sp, fontWeight = FontWeight.Bold)
@@ -428,7 +429,7 @@ private fun GridHuntHome(
                 else "Make it yours: maps & options  ↓")
         }
         if (showAppearance) {
-            Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFF0E8D5)) {
+            Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFF0E8D5), border = JournalPanelBorder) {
                 Column(Modifier.fillMaxWidth().padding(13.dp),
                     verticalArrangement = Arrangement.spacedBy(9.dp)) {
                     Text("Pick your map's look", color = Ink, fontWeight = FontWeight.Bold,
