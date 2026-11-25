@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V40-H — map-specific expedition validation and first coastal chapter committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V40-I — coastal chapter 2 and directional tests committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V40-H
+## Authoritative current checkpoint — GH-V40-I
+- QA434 run 45677415200 passed JVM/build and Android gameplay regression; signed upgrade blocked during original QA345 cold launch by system nexuslauncher ANR, after seeding/verifying 11 exact preferences, before candidate install. QA429 remains last fully green baseline. Artwork review #14 passed.
+- CoastalTideExpedition.kt implements unpublished chapter 2, Along the Tide Trail, four objectives including directional square offsets and landmark identification (8614d3bfef8a6f821a8d108dd82c67d1231ecbd8). Directions refer to square offsets, not walking routes. Dedicated future namespace gridhunt_coast_tide_v1, no live writes.
+- Tests independently derive directional offsets and verify completion, wrong answers, answer-type isolation, distinct chapter namespace and publication isolation (506ab72377741eb742396ffd877d33e9f3967d70). Fresh CI pending.
+- Next author The Last Light, validate cross-world prerequisites and map-specific marker data if needed; inspect artwork and resolve shoreline/exact anchors before publication. Preserve existing Woodland progress, package, signing and approved art. No merge or release.
+
+## GH-V40-H
 - QA431 run 45671572768 passed JVM/build and signed QA345 upgrade; Android job failed before test execution during emulator SDK ZIP extraction. Artwork review #11 passed. QA429 remains last fully green runtime baseline.
 - ExpeditionObjective and ExpeditionChapter now accept explicit ExplorationMap with original Woodland defaults, validate objective/chapter map equality and map-scoped landmark data; READ_MARKER remains Woodland-only until map-specific marker data is authored (c02e0e8784aa736e639416a80d847b3fad18be4f). ExpeditionPlaythrough accepts landmark IDs from chapter.map (4389f2de177fca06623ac8661be0ed54fabd3b38). Existing save names and published registry unchanged.
 - CoastalBeaconExpedition.kt implements unpublished four-objective The Beacon's Message chapter (d41bff41482be20caeba7e958a670ca1c19cc322), with tests for completion, wrong answers, map mismatch, invalid landmark cell and publication isolation (f597d53f50a3a5ca71fa30fe272e211f79b92ffe). Fresh CI pending; no actual coastal runtime UI or save writes.
