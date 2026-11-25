@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V40-I — coastal chapter 2 and directional tests committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V40-J — three coastal draft chapters authored; finale tests pending.**
 
-## Authoritative current checkpoint — GH-V40-I
+## Authoritative current checkpoint — GH-V40-J
+- QA436 run 45683056148 at 0219f49149b3e09f4f86ceb23c6f98580aa0437e passed all three jobs; APK artifact 15054469065, UI evidence 15055358548, upgrade evidence 15054409451. Artwork review #16 run 45683056127 passed. QA436 is latest fully green baseline.
+- CoastalLightExpedition.kt implements unpublished four-objective finale The Last Light, with landmark reading, independently checkable grid offsets and identification (9fc4f3d8b1fe7330d51bba05c91626811cf28492). Three draft chapters now contain twelve objectives and distinct reserved namespaces. No live writes, publication or coastal marker dependency.
+- CoastalLightExpeditionTest.kt covers canonical offset geometry, wrong answers and completion, all three chapter identities, twelve objectives and unpublished registry isolation. Fresh CI pending.
+- Next validate the draft campaign as a whole with cross-world prerequisites, enforce map identity in world publication and scene dispatch, refine geography and inspect actual rendered artwork. Coastal Golden Spots and Survey Table assets remain unimplemented; no public coast release. Existing Woodland saves, artwork, package and signing unchanged.
+
+## GH-V40-I
 - QA434 run 45677415200 passed JVM/build and Android gameplay regression; signed upgrade blocked during original QA345 cold launch by system nexuslauncher ANR, after seeding/verifying 11 exact preferences, before candidate install. QA429 remains last fully green baseline. Artwork review #14 passed.
 - CoastalTideExpedition.kt implements unpublished chapter 2, Along the Tide Trail, four objectives including directional square offsets and landmark identification (8614d3bfef8a6f821a8d108dd82c67d1231ecbd8). Directions refer to square offsets, not walking routes. Dedicated future namespace gridhunt_coast_tide_v1, no live writes.
 - Tests independently derive directional offsets and verify completion, wrong answers, answer-type isolation, distinct chapter namespace and publication isolation (506ab72377741eb742396ffd877d33e9f3967d70). Fresh CI pending.
