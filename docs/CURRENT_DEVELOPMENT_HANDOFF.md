@@ -1,8 +1,12 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V33-C — regression compilation repair and Quick Play text wrapping, verification pending.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V34 — launcher icon design; GH-V33 combined CI verified.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V33-C
+## Authoritative current checkpoint — GH-V34
+- QA343 exact branch source 45682dfe849453d0d96f37cee46f67ea73d868f3 https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45558381898 passed both jobs, including 43 executed Android emulator tests, core/build, unsigned beta identity, exact startup artwork packaging, fixed QA signer and artifact upload. Startup behavior, Settings navigation and Home campaign regressions now have combined automated evidence. Physical timing, large-text layouts, phone acceptance and comprehensive upgrade remain open.
+- GH-V34 begins original launcher icon design. Manifest currently has no explicit application icon. Read shared BRAND_IDENTITY.md and ARTWORK_PIPELINE.md and local GH_V21_ASSET_PRODUCTION_BIBLE.md. Design candidate: warm parchment illustrated grid map, woodland foliage, gold discovery marker and full-bleed forest-green surround; recognizable at launcher scale, no text, no corporate mark, no black outer surround. Preserve distinct game identity and all package/signing/save contracts. Candidate needs owner visual acceptance and verified binary import before final status. Next adaptive/legacy icon integration and CI, comprehensive save upgrade, consolidated owner APK. No release or merge.
+
+## GH-V33-C
 - QA340 https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45557536309 failed both jobs; build log explicitly reports unresolved Espresso in HomeNavigationTest.kt line 611. Replaced unavailable Espresso call with ActivityScenario.onActivity and onBackPressedDispatcher.onBackPressed(), plus waitForIdle, commit 311e0a370ae061055f2d627feabaca5a99ef7376. This tests dispatcher behavior, not a physical hardware key. QuickPlayModeTile removes fixed title/instruction/progress line caps to allow text wrapping while retaining artwork, aligned action rows and 48dp buttons, commit fb5eff43262920634004e541dc0d3b0b8fc75aad. Fresh combined CI and actual small-screen/large-text visual review pending. Do not claim full accessibility audit complete. Next verify latest CI, then targeted responsive layouts if necessary and original launcher icon, save upgrade and consolidated phone build. No save, package, signer, map geometry or release changes.
 
 ## GH-V33-B
