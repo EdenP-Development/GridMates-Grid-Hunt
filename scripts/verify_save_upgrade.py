@@ -73,14 +73,28 @@ def version():
     return int(re.search(r"versionCode=(\d+)", output).group(1))
 
 def launch_home():
-    adb("shell", "am", "start", "-W", "-n", PACKAGE + "/com.playereden.gridmates.gridhunt.MainActivity")
-    for _ in range(12):
+    # A fresh emulator may still be asleep or showing its keyguard.
+    adb("shell", "input", "keyevent", "KEYCODE_WAKEUP")
+    adb("shell", "wm", "dismiss-keyguard")
+    print(adb("shell", "am", "start", "-W", "-n",
+              PACKAGE + "/com.playereden.gridmates.gridhunt.MainActivity").decode(), flush=True)
+    deadline = time.monotonic() + 90
+    screen = ""
+    while time.monotonic() < deadline:
         time.sleep(2)
-        adb("shell", "uiautomator", "dump", "/sdcard/gridhunt-upgrade-ui.xml")
-        screen = adb("shell", "cat", "/sdcard/gridhunt-upgrade-ui.xml").decode()
+        try:
+            adb("shell", "rm", "-f", "/sdcard/gridhunt-upgrade-ui.xml")
+            adb("shell", "uiautomator", "dump", "/sdcard/gridhunt-upgrade-ui.xml")
+            screen = adb("shell", "cat", "/sdcard/gridhunt-upgrade-ui.xml").decode()
+        except subprocess.CalledProcessError as exc:
+            print("UI dump unavailable:", exc.stderr.decode(errors="replace"), flush=True)
+            continue
         if "2 of 3 chapters complete" in screen and "2 of 4 objectives solved" in screen:
             print("PASS: cold launch shows restored Adventure progress", flush=True)
             return
+    print("Last UI hierarchy:", screen, flush=True)
+    print("Activity state:", adb("shell", "dumpsys", "activity", "activities").decode(), flush=True)
+    print("Crash log:", adb("logcat", "-d", "-b", "crash", "-t", "100").decode(), flush=True)
     raise AssertionError("Restored Home progress not visible")
 
 def main():
