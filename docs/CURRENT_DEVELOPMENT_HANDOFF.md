@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V40-G — coastal draft geography and tests committed; QA429 and artwork review #9 passed.**
+Updated 2026-11-25. **Current checkpoint: GH-V40-H — map-specific expedition validation and first coastal chapter committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V40-G
+## Authoritative current checkpoint — GH-V40-H
+- QA431 run 45671572768 passed JVM/build and signed QA345 upgrade; Android job failed before test execution during emulator SDK ZIP extraction. Artwork review #11 passed. QA429 remains last fully green runtime baseline.
+- ExpeditionObjective and ExpeditionChapter now accept explicit ExplorationMap with original Woodland defaults, validate objective/chapter map equality and map-scoped landmark data; READ_MARKER remains Woodland-only until map-specific marker data is authored (c02e0e8784aa736e639416a80d847b3fad18be4f). ExpeditionPlaythrough accepts landmark IDs from chapter.map (4389f2de177fca06623ac8661be0ed54fabd3b38). Existing save names and published registry unchanged.
+- CoastalBeaconExpedition.kt implements unpublished four-objective The Beacon's Message chapter (d41bff41482be20caeba7e958a670ca1c19cc322), with tests for completion, wrong answers, map mismatch, invalid landmark cell and publication isolation (f597d53f50a3a5ca71fa30fe272e211f79b92ffe). Fresh CI pending; no actual coastal runtime UI or save writes.
+- Next verify new CI, refine shoreline and exact sprite anchors, inspect rendered artwork, author remaining coastal chapters and map-scoped marker data as needed. Exact scene dispatch, campaign registry integration and physical approval still required before publication. No release, merge, signing or legacy save changes.
+
+## GH-V40-G
 - QA429 run 45669650921 at 405268f5bc6125946a3a894a200307268fd0340f passed all three jobs. APK artifact 15050075281, UI evidence 15049671819, upgrade evidence 15050320440. Coastal artwork review #9 run 45669650884 passed, artifact 15049710412 with 50 PNG exports, manifest and review sheet. Visual inspection still pending.
 - Prior artwork review failed small-size edge clearance; wave master scaled to 85% with padding (b1b0495d7925eb61e2e95b06905002eb841a9ce0), terrain and postcard copies synchronized. Validation requirements unchanged.
 - WhisperingCoastDraft.kt encodes unpublished 36-cell map and six candidate landmarks using existing validated ExplorationMap (e858d5068107ed59d8ace164f7388ce6ba32ef84). Tests cover grid references, publication isolation, 100 seeded disjoint landmark pairs and mixed round trips across 100 seeds. Tests committed, fresh CI pending. No registry addition or live UI.
