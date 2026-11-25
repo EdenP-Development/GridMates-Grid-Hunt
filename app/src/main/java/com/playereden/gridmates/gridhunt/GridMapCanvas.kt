@@ -89,6 +89,8 @@ import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.GridCell
 import com.playereden.gridhunt.core.GridReference
 import com.playereden.gridhunt.core.HuntRules
+import com.playereden.gridhunt.core.ExplorationMap
+import com.playereden.gridhunt.core.ExplorationMaps
 import com.playereden.gridhunt.core.MapCamera
 import com.playereden.gridhunt.core.PixelPoint
 import com.playereden.gridhunt.core.WoodlandLandmarks
@@ -112,9 +114,11 @@ internal fun HuntMapPanel(
     mapLook: MapLook,
     discoveryMessage: String? = null,
     onLook: ((MapLook) -> Unit)? = null,
-    scene: MapScene? = null
+    scene: MapScene? = null,
+    map: ExplorationMap = ExplorationMaps.woodland
 ) {
-    val activeScene = scene ?: woodlandMapScene(mapLook)
+    val activeScene = scene ?: publishedMapScene(map, mapLook)
+    requireSceneMap(activeScene.map, map, bounds)
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
