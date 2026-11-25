@@ -418,7 +418,7 @@ private fun MixedExpeditionControls(
                 ).forEach { (symbol, dx, dy) ->
                     OutlinedButton(
                         onClick = { onMove(dx, dy) },
-                        modifier = Modifier.weight(1f).heightIn(min = 46.dp)
+                        modifier = Modifier.weight(1f).heightIn(min = 48.dp)
                             .semantics { contentDescription = when (symbol) {
                                 "←" -> "Expedition move west"
                                 "→" -> "Expedition move east"
@@ -466,6 +466,7 @@ private fun MixedExpeditionControls(
                         pair.forEach { landmark ->
                             OutlinedButton(
                                 onClick = { onChoose(landmark.id) },
+                                shape = JournalActionShape,
                                 modifier = Modifier.weight(1f).heightIn(min = 65.dp)
                                     .testTag("mixedOption_${landmark.id}"),
                                 contentPadding = PaddingValues(horizontal = 4.dp, vertical = 3.dp),
@@ -500,6 +501,7 @@ private fun MixedExpeditionControls(
         HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(0.85f), { onZoom(1.0 / 1.6) })
         HuntToolButton(ExplorerTool.FIT, Modifier.weight(0.85f), onFit)
         Button(
+            shape = JournalActionShape,
             onClick = { if (active.verb == ExpeditionVerb.READ_MARKER || active.verb == ExpeditionVerb.LOCATE_LANDMARK) submitCode() else onCheck() }, enabled = actionReady,
             modifier = Modifier.weight(1.6f).heightIn(min = 50.dp)
                 .testTag("mixedCheck"),
