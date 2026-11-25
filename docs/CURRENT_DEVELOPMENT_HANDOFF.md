@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V37-E — QA388 all three gates passed; physical icon review pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V38-B — overlap-minimizing Custom Play generation and regression tests committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V37-E
+## Authoritative current checkpoint — GH-V38-B
+- QA388 physical screenshots show intact populated progress, completed Chapter 1 journal, full and zoomed map, Map Guide and all main hubs. No launcher or splash approval in this set. Proposed future minor improvements: fit map on completion and improve zoom-edge labels.
+- GH-V38-A added generateFresh, generateFreshLandmarks and generateFreshMixed to CustomHuntGenerator; UI passes immediately preceding restored target set when starting a new hunt (1affe84e32e5db288f8efa64f4d4b7445881403c, 0f71d67df078d43820af350bb57047d74f07ed49). Prefers unused cells then reuses only where pool limits require. Original APIs and serialization/restore rules unchanged. Four landmarks with three targets require at least two repeats between successive landmark hunts. No lifetime history or new save keys. QA391 was running at inspection, superseded by tests.
+- GH-V38-B adds four JVM test methods covering 100 seeds across supported lengths, minimal repeat counts, mixed verb coverage, exact restore and deterministic exhausted-pool fallback (55ad54c2f4f9f208bb0505ccdf323c6d75d001d4). Tests committed, not yet verified by CI.
+- Next let combined CI finish; then audit map/campaign model dependencies for multi-world architecture. Little Woodland remains a permanent authored map, with existing IDs, coordinates, save namespaces preserved. Future worlds are proposals, not published content. No release/merge.
+
+## GH-V37-E
 - QA385 owner screenshots confirm much improved compact Home/Academy/Quick Play, state-aware Adventure cards, all six full-map eastings and northings visible, Journal current-slot gold highlight, Settings and Custom Play visual changes; populated progress visible. Startup duration and full zoom/landscape acceptance not confirmed. Owner supplied canonical GridMates Master App Icon Standard v1.0 (EdenP-Development/Eden-Development-Standards/branding/gridmates/app-icons/v1.0/README.md).
 - GH-V37-C adopted exact adaptive surround #214F3F (b13b504a68b94d6931ebf8ce467c01ed6bb55b03); source master, adaptive foreground, historical legacy bitmap unchanged. CI checks source checksum, exact canonical color, measured alpha bounds within 232px nominal box and compiled resources; exports circle, rounded-square, approximate squircle previews in QA artifact (22dc30addb6fa8856ce77fc6b8c117218c83b281, 74ae2a2997109bb7db89fd55eb9b99bdf788a675). Legacy bitmap remains original #032C14; minSdk26 adaptive runtime. Optical gold-frame proportions and native OS startup require phone comparison. No claim that exact shared frame asset exists.
 - QA385 build/upgrade passed; Android 47/48 passed, generatedLandmarkModesCompleteWithoutChangingAuthoredSaves failed at finish-card assertion. GH-V37-D strengthened per-objective saved-step assertions and corrected authored identify save key in test (c74ffc7cbe932c57c6d26799c4380045919edb5c). No gameplay fix claimed; cause of prior intermittent failure not established.
