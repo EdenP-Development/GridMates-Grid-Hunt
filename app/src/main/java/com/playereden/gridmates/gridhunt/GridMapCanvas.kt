@@ -308,16 +308,50 @@ private fun TrainingMapCanvas(
                 val se = p(e + radiusE, n - radiusN)
                 drawOval(ink, topLeft = nw, size = Size(se.x - nw.x, se.y - nw.y))
             }
-            // Irregular clearings add texture without inventing navigable features.
-            listOf(
+            // Soft irregular world-anchored washes, not new geographic features.
+            // Preserve the original clearing centers and extents.
+            fun organicPatch(e: Double, n: Double, re: Double, rn: Double, seed: Int, ink: Color) {
+                val points = (0 until 12).map { i ->
+                    val angle = i * Math.PI / 6.0
+                    val variation = 0.82 + ((i * 37 + seed * 19) % 17) / 100.0
+                    p(e + kotlin.math.cos(angle) * re * variation,
+                        n + kotlin.math.sin(angle) * rn * variation)
+                }
+                val patch = Path().apply {
+                    val start = (points.last() + points.first()) / 2f
+                    moveTo(start.x, start.y)
+                    points.forEachIndexed { i, point ->
+                        val next = points[(i + 1) % points.size]
+                        val midpoint = (point + next) / 2f
+                        quadraticBezierTo(point.x, point.y, midpoint.x, midpoint.y)
+                    }
+                    close()
+                }
+                drawPath(patch, ink)
+            }
+            val patches = listOf(
                 doubleArrayOf(24480.0, 41100.0, 510.0, 360.0),
                 doubleArrayOf(26720.0, 41900.0, 630.0, 400.0),
                 doubleArrayOf(29000.0, 40300.0, 700.0, 450.0),
                 doubleArrayOf(25800.0, 38100.0, 640.0, 510.0),
                 doubleArrayOf(28100.0, 39350.0, 390.0, 300.0)
-            ).forEachIndexed { i, oval ->
-                landEllipse(oval[0], oval[1], oval[2], oval[3],
+            )
+            patches.forEachIndexed { i, oval ->
+                if (surveyStyle) landEllipse(oval[0], oval[1], oval[2], oval[3],
                     if (i % 2 == 0) meadow else meadowLight)
+                else {
+                    val tint = if (i % 2 == 0) Color(0x307DA263) else Color(0x38D6C58C)
+                    organicPatch(oval[0], oval[1], oval[2] * 1.16, oval[3] * 1.16, i, tint.copy(alpha = .10f))
+                    organicPatch(oval[0], oval[1], oval[2], oval[3], i, tint)
+                    organicPatch(oval[0], oval[1], oval[2] * .72, oval[3] * .70, i + 7,
+                        if (i % 2 == 0) Color(0x18A2B77A) else Color(0x20F1DFAC))
+                }
+            }
+            if (!surveyStyle) {
+                // Quiet broad ground washes unify the scene at all zoom levels.
+                organicPatch(24800.0, 42400.0, 1000.0, 740.0, 11, Color(0x197FAD78))
+                organicPatch(28700.0, 41900.0, 1150.0, 650.0, 12, Color(0x167FAD78))
+                organicPatch(28000.0, 37800.0, 1480.0, 600.0, 13, Color(0x1F9FB37C))
             }
             // Fixed flecks suggest grasses and paper grain. No random frame jitter.
             for (i in 0 until 46) {
@@ -386,13 +420,26 @@ private fun TrainingMapCanvas(
                 val d = p(27900.0, 37800.0)
                 cubicTo(b.x, b.y, c.x, c.y, d.x, d.y)
             }
-            // Layered creek banks/water; keep the original centerline exact.
+            // Original centerline is unchanged. Round, layered banks and water
+            // replace the ruler-like central stripe in the illustrated map.
             val creekWidth = (90.0 * cam.pixelsPerMeter).toFloat().coerceIn(9f, 25f)
-            drawPath(stream, if (surveyStyle) Color(0xFFAAC4C3) else Color(0xFFB6C5AD),
-                style = Stroke(width = creekWidth + 8f))
-            drawPath(stream, if (surveyStyle) Color(0xFFA1CCD2) else Color(0xFFB5D7D8),
-                style = Stroke(width = creekWidth))
-            drawPath(stream, streamInk, style = Stroke(width = creekWidth * 0.27f))
+            if (surveyStyle) {
+                drawPath(stream, Color(0xFFAAC4C3), style = Stroke(width = creekWidth + 8f))
+                drawPath(stream, Color(0xFFA1CCD2), style = Stroke(width = creekWidth))
+                drawPath(stream, streamInk, style = Stroke(width = creekWidth * 0.27f))
+            } else {
+                val round = androidx.compose.ui.graphics.StrokeCap.Round
+                fun creekStroke(color: Color, width: Float) {
+                    drawPath(stream, color, style = Stroke(width = width, cap = round,
+                        join = androidx.compose.ui.graphics.StrokeJoin.Round))
+                }
+                creekStroke(Color(0x387D9D69), creekWidth * 1.90f)
+                creekStroke(Color(0xFFB4B693), creekWidth * 1.48f)
+                creekStroke(Color(0xFFDFD0A4), creekWidth * 1.19f)
+                creekStroke(Color(0xFF719EA4), creekWidth)
+                creekStroke(Color(0xFF9BC5C6), creekWidth * .77f)
+                creekStroke(Color(0x99D5E7D9), creekWidth * .25f)
+            }
             val trail = Path().apply {
                 val a = p(24000.0, 38950.0)
                 moveTo(a.x, a.y)
