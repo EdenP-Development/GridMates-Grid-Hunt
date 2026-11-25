@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V39-B — map-scoped generator and compatibility tests committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V39-D — Woodland terrain extraction and bounds-derived grid committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V39-B
+## Authoritative current checkpoint — GH-V39-D
+- QA401 run 45581675197 passed core/build/signing/packaging and real signed QA345 upgrade; Android instrumentation still running at inspection. New commits supersede this run.
+- GH-V39-C introduced read-only MapHuntSession/MapHuntSessions exact map ID/revision validation, mode and sequence checks, progress validation and historical Woodland compatibility adapter (e9db07915408c46f7534e701a9e1bcecfabc7846); tests include overlapping coordinates, unknown revisions, malformed sessions and 100 seeded mixed sessions (d4ec4477198be98af284d517521018aff1e11935). No Android storage integration or migration.
+- GH-V39-D extracted existing world-anchored Woodland scenery and landmark drawing from GridMapCanvas into WoodlandTerrain.kt (83258b9c3883efe3089b70ae2f738398df8fde10). Shared canvas continues to own gesture handling, map frame, grid, labels, selection, completion stamps and active marker; grid/label ranges now derive from bounds and pointerInput keyed by viewport and bounds (661e16ba2c467535b26c1a28128145c06883c759). Artwork draw order and numeric positions intentionally preserved. Still Woodland-specific sprite loading/palette/terrain invocation; not yet pluggable or selectable at runtime. Fresh CI and visual regression required.
+- Next GH-V39-E explicit renderer/palette dispatch, then world-specific persistence and UI integration. Audit exact existing visual baseline before adding other worlds. No new playable world, save migration, package/signing change, release or merge. Last confirmed fully passing QA388 remains fallback.
+
+## GH-V39-B
 - QA396 run 45579885971 passed core/build/signing/packaging and actual QA345 upgrade; Android instrumentation running at inspection. Later commits may supersede it.
 - Extracted MapHuntGenerator accepting ExplorationMap, with supported lengths filtered by map capacity and landmark availability, preserving existing algorithm and objective ordering (ff7383fe457d646b15f1c51acf94c349c707c978). CustomHuntGenerator remains the Woodland compatibility facade with identical caller methods and Objective type (0deacfdc021707ee1f8f93d0c2747d7ccea9690e). No Android save or UI changes.
 - MapHuntGeneratorTest covers independent nonpublished test map, 100 seeds, exact restoration, cross-map out-of-bounds rejection, unsupported capacity and Woodland compatibility (368360fc9ac4589815d729fb6e2aa094d76c02ba). New tests require CI. Coordinate overlap between distinct maps is still possible: explicit map ID/revision session identity is required before integrating new playable maps, not implied by coordinate validation.
