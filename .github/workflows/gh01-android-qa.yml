@@ -74,6 +74,22 @@ jobs:
             echo 'Unexpected signed staging APK'; exit 1
           fi
           echo 'PASS: isolated unsigned beta APK verified; no private secrets used.'
+      - name: Verify exact startup artwork in APKs
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib, zipfile
+          assets = json.loads(pathlib.Path('branding/startup-v1.json').read_text())['assets']
+          # Android may losslessly crunch PNG resource bytes. Verify exact
+          # generated sources and presence in both packages independently.
+          for asset in assets:
+              path = pathlib.Path('app/build/generated/startupBranding/res/drawable-nodpi') / asset['file']
+              assert hashlib.sha256(path.read_bytes()).hexdigest() == asset['sha256'], path
+          for apk in ['app/build/outputs/apk/debug/app-debug.apk','app/build/outputs/apk/beta/app-beta-unsigned.apk']:
+              with zipfile.ZipFile(apk) as z:
+                  for asset in assets:
+                      assert any(n.startswith('res/') and n.endswith('/'+asset['file']) for n in z.namelist()), (apk, asset['file'])
+          print('PASS: exact source hashes and packaged startup resources')
+          PY
       - name: Capture exact source, signer and APK checksum
         run: |
           mkdir -p vision-qa-output

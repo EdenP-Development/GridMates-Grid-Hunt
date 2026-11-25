@@ -120,7 +120,10 @@ class MainActivity : ComponentActivity() {
                     onSecondary = Color.White
                 )
             ) {
-                GridHuntScreen()
+                StartupBranding(showInitially = savedInstanceState == null,
+                    seriesDrawable = R.drawable.gridmates_v1_runtime_transparent) {
+                    GridHuntScreen()
+                }
             }
         }
     }
