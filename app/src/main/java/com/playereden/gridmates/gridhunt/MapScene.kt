@@ -6,12 +6,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.imageResource
+import com.playereden.gridhunt.core.ExplorationMap
+import com.playereden.gridhunt.core.ExplorationMaps
 import com.playereden.gridhunt.core.MapCamera
 import com.playereden.gridhunt.core.WorldBounds
 import com.playereden.gridhunt.core.WoodlandLandmarks
 
 /** Scene-specific visuals; no selection, progress, or camera gesture ownership. */
 internal data class MapScene(
+    val map: ExplorationMap,
     val backdrop: List<Color>,
     val paper: Color,
     val gridInk: Color,
@@ -41,6 +44,7 @@ internal fun woodlandMapScene(mapLook: MapLook): MapScene {
     val streamInk = if (surveyStyle) Color(0xFF4E8C9E) else Color(0xFF6F9FA9)
     val trailInk = if (surveyStyle) Color(0xFF6D8090) else Color(0xFFA68858)
     return MapScene(
+        map = ExplorationMaps.woodland,
         backdrop = if (surveyStyle) listOf(mapBackdrop, Color(0xFF8EADAE))
             else listOf(Color(0xFFCFDBCB), Color(0xFFB4C9B3)),
         paper = mapPaper,
@@ -51,4 +55,15 @@ internal fun woodlandMapScene(mapLook: MapLook): MapScene {
                 treeDark, treeLight, streamInk, trailInk, p)
         }
     )
+}
+
+/** No fallback to Woodland for an unknown map or revision. */
+@Composable
+internal fun publishedMapScene(map: ExplorationMap, mapLook: MapLook): MapScene {
+    require(map == ExplorationMaps.woodland) { "No published scene for ${map.id} revision ${map.revision}" }
+    return woodlandMapScene(mapLook)
+}
+
+internal fun requireSceneMap(sceneMap: ExplorationMap, requested: ExplorationMap, bounds: WorldBounds) {
+    require(sceneMap == requested && requested.bounds == bounds) { "Scene, map identity/revision and bounds must agree" }
 }
