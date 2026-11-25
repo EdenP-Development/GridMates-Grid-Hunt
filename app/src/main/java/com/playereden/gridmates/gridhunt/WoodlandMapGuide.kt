@@ -1,6 +1,8 @@
 package com.playereden.gridmates.gridhunt
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -68,13 +70,13 @@ internal fun WoodlandMapGuideDialog(mapLook: MapLook, onDismiss: () -> Unit) {
                             Text(
                                 when (landmark.id) {
                                     WoodlandLandmarks.mushrooms.id ->
-                                        "A pair of little red-capped mushrooms"
+                                        if (mapLook == MapLook.SURVEY_TABLE) "Two mushroom caps" else "A red-capped mushroom with white spots"
                                     WoodlandLandmarks.flowers.id ->
-                                        "Three clusters of tiny pale flowers"
+                                        if (mapLook == MapLook.SURVEY_TABLE) "Three pale flower symbols" else "A yellow flower with green leaves"
                                     WoodlandLandmarks.acorn.id ->
-                                        "One brown acorn with a green cap"
+                                        if (mapLook == MapLook.SURVEY_TABLE) "An acorn with a green cap" else "A golden-brown acorn with a textured cap"
                                     WoodlandLandmarks.waystone.id ->
-                                        "A small upright gray-green stone"
+                                        "A small upright stone with a carved mark"
                                     else -> "Woodland landmark"
                                 },
                                 color = Muted, fontSize = 11.sp
@@ -82,7 +84,7 @@ internal fun WoodlandMapGuideDialog(mapLook: MapLook, onDismiss: () -> Unit) {
                         }
                     }
                 }
-                Text("OTHER MAP DETAILS", color = Forest,
+                Text("PATHS AND WATER", color = Forest,
                     fontWeight = FontWeight.Bold, fontSize = 11.sp)
                 MapFeatureGuideRow(
                     "Creek", "Blue winding water; helps you find your way.",
@@ -92,11 +94,20 @@ internal fun WoodlandMapGuideDialog(mapLook: MapLook, onDismiss: () -> Unit) {
                     "Trail", "Dashed line showing a path through the woods.",
                     mapLook, "trail"
                 )
-                MapFeatureGuideRow(
-                    "Trees and clearings",
-                    "Green treetops and pale open patches are scenery.",
-                    mapLook, "grove"
-                )
+                Text("SCENERY", color = Forest, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                Text("These details help you recognize the landscape. They are not additional named discovery targets in Little Woodland.",
+                    color = Muted, fontSize = 11.sp)
+                if (mapLook == MapLook.SURVEY_TABLE) {
+                    MapFeatureGuideRow("Trees and clearings", "Treetop symbols and pale open patches.", mapLook, "grove")
+                } else {
+                    SceneryGuideRow("Oak trees", "Broad, leafy canopies.", R.drawable.gh_wood_oak_sm)
+                    SceneryGuideRow("Pine trees", "Tall, pointed evergreen trees.", R.drawable.gh_wood_pine_sm)
+                    SceneryGuideRow("Mossy rocks", "Low clusters of rounded stones.", R.drawable.gh_env_rocks)
+                    SceneryGuideRow("Ferns", "Low green fronds.", R.drawable.gh_env_ferns)
+                    SceneryGuideRow("Fallen logs", "Weathered wood resting on the ground.", R.drawable.gh_env_log)
+                    SceneryGuideRow("Ponds", "Small pools of water edged with reeds.", R.drawable.gh_env_pond)
+                    Text("Pale open patches represent clearings.", color = Muted, fontSize = 11.sp)
+                }
                 Text("READING A FOUR-DIGIT SQUARE", color = Forest,
                     fontWeight = FontWeight.Bold, fontSize = 11.sp)
                 Text(
@@ -162,6 +173,19 @@ private fun MapFeatureGuideRow(
                 }
             }
         }
+        Column(Modifier.weight(1f)) {
+            Text(name, color = Ink, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            Text(description, color = Muted, fontSize = 11.sp)
+        }
+    }
+}
+
+/** Use the same original drawable as the warm map, not a substitute drawing. */
+@Composable
+private fun SceneryGuideRow(name: String, description: String, resource: Int) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(11.dp)) {
+        Image(painterResource(resource), contentDescription = null, modifier = Modifier.size(62.dp))
         Column(Modifier.weight(1f)) {
             Text(name, color = Ink, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             Text(description, color = Muted, fontSize = 11.sp)
