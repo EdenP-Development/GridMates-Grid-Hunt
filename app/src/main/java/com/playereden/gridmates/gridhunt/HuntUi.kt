@@ -289,7 +289,7 @@ internal fun HuntControlPanel(
     )
     val context = LocalContext.current
     val controls = remember(context) { context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE) }
-    var precise by remember { mutableStateOf(controls.getBoolean("precise_selection", false)) }
+    var precise by remember { mutableStateOf(controls.savedBoolean("precise_selection", false)) }
     var options by rememberSaveable { mutableStateOf(false) }
     if (precise) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         GridStepButton("←", "Move selected square west", Modifier.weight(1f)) { onMove(-1, 0) }
