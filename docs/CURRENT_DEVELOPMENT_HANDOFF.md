@@ -1,8 +1,11 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V32-C — Android regression passed, startup package verification repaired pending CI.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V32-D — startup behavior regression added, pending execution.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V32-C
+## Authoritative current checkpoint — GH-V32-D
+- Added isolated Compose startup behavior tests for stage order, first/second tap skip, normal completion, Back, reduced motion, restored entry and stop/resume. Injectable animator policy defaults to actual Android ValueAnimator setting; approved timing unchanged. Test clock checks behavior, not real wall-clock timing; physical validation still required. QA332 core/compile passed at inspection, packaging and emulator pending. Fresh CI needed for new tests. Next interface audit, icon, save compatibility and consolidated APK.
+
+## GH-V32-C
 - QA331 source 4616b7b9e11bf2e2bde78491fc3375e6352dd061: Android emulator job PASSED, core/compile and both source artwork SHA256 checks passed. Packaging gate failed on beta Spudacus filename assertion; signed QA artifact not published. GH-V32-C replaces filename assumption with aapt2 compiled drawable table mapping + ZIP PNG signature checks, retaining exact source hash gate. Fresh CI required; resource renaming is a hypothesis until verified. Next animation-enabled startup tests and physical verification, consistency/icon/save rehearsal. No release. https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45554377658
 
 ## GH-V32-B shared startup
