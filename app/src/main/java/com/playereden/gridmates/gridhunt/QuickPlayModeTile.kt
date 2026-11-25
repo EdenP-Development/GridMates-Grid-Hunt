@@ -67,7 +67,7 @@ internal fun QuickPlayModeTile(
                 modifier = Modifier.fillMaxWidth()
                     .heightIn(min = 48.dp).testTag(tag),
                 contentPadding = PaddingValues(horizontal = 4.dp, vertical = 3.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = JournalActionShape,
                 colors = ButtonDefaults.buttonColors(containerColor = Forest)
             ) {
                 Text("Play", fontSize = 12.sp, fontWeight = FontWeight.Bold)
