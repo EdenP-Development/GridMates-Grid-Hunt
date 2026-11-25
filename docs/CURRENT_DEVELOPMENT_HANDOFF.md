@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V38-B — overlap-minimizing Custom Play generation and regression tests committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V39-A — validated map registry foundation committed; CI pending.**
 
-## Authoritative current checkpoint — GH-V38-B
+## Authoritative current checkpoint — GH-V39-A
+- QA393 run 45579076301 passed JVM/build/signing/packaging including GH-V38 fresh-generation tests; emulator and upgrade were running at inspection, may be superseded by new commits. QA388 remains last confirmed all-green run.
+- Architecture audit: CampaignRegistry supports multiple worlds and explicit cross-world prerequisites already; Android rendering, selection, landmark UI and session storage still bind to woodland. GridMath camera/reference primitives are reusable.
+- New ExplorationMap and ExplorationMaps define stable map ID, revision, name, whole-kilometer bounds, canonical cells and landmark lookup; reject invalid bounds, duplicate IDs, out-of-bounds landmarks and ambiguous four-digit landmark cells (62297b68241f8661ad04abd0dd8154290fbc4cdd). Registry publishes only existing Woodland. Current landmark type retains historical WoodlandLandmark name; no new world or renderer is published.
+- CustomHuntGenerator now derives cell and landmark pools from registered Woodland map, preserving original cell ordering, APIs, generation behavior and save format (087e621930e459e3fa421cac20f376df8b7e115c). New tests cover exact Woodland compatibility, unregistered test map with other bounds, revision lookup and validation rejection (6c87885d883f28d5de7d76cf323e39e621bfb262). Fresh CI required.
+- Next introduce map-scoped generator while retaining existing Woodland facade, then explicit map/revision session identity for future maps with legacy Woodland compatibility, and audit renderer hardcoded art/axis dependencies. Do not publish placeholder worlds; no new art, IDs, signing or save migration in this milestone.
+
+## GH-V38-B
 - QA388 physical screenshots show intact populated progress, completed Chapter 1 journal, full and zoomed map, Map Guide and all main hubs. No launcher or splash approval in this set. Proposed future minor improvements: fit map on completion and improve zoom-edge labels.
 - GH-V38-A added generateFresh, generateFreshLandmarks and generateFreshMixed to CustomHuntGenerator; UI passes immediately preceding restored target set when starting a new hunt (1affe84e32e5db288f8efa64f4d4b7445881403c, 0f71d67df078d43820af350bb57047d74f07ed49). Prefers unused cells then reuses only where pool limits require. Original APIs and serialization/restore rules unchanged. Four landmarks with three targets require at least two repeats between successive landmark hunts. No lifetime history or new save keys. QA391 was running at inspection, superseded by tests.
 - GH-V38-B adds four JVM test methods covering 100 seeds across supported lengths, minimal repeat counts, mixed verb coverage, exact restore and deterministic exhausted-pool fallback (55ad54c2f4f9f208bb0505ccdf323c6d75d001d4). Tests committed, not yet verified by CI.
