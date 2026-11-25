@@ -1,8 +1,11 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-24. **Current checkpoint: GH-V33-B — Home campaign presentation corrected, regression pending.** Read the authoritative section first.
+Updated 2026-11-24. **Current checkpoint: GH-V33-C — regression compilation repair and Quick Play text wrapping, verification pending.** Read the authoritative section first.
 
-## Authoritative current checkpoint — GH-V33-B
+## Authoritative current checkpoint — GH-V33-C
+- QA340 https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45557536309 failed both jobs; build log explicitly reports unresolved Espresso in HomeNavigationTest.kt line 611. Replaced unavailable Espresso call with ActivityScenario.onActivity and onBackPressedDispatcher.onBackPressed(), plus waitForIdle, commit 311e0a370ae061055f2d627feabaca5a99ef7376. This tests dispatcher behavior, not a physical hardware key. QuickPlayModeTile removes fixed title/instruction/progress line caps to allow text wrapping while retaining artwork, aligned action rows and 48dp buttons, commit fb5eff43262920634004e541dc0d3b0b8fc75aad. Fresh combined CI and actual small-screen/large-text visual review pending. Do not claim full accessibility audit complete. Next verify latest CI, then targeted responsive layouts if necessary and original launcher icon, save upgrade and consolidated phone build. No save, package, signer, map geometry or release changes.
+
+## GH-V33-B
 - Home Adventure card now consumes existing registry worldProgress, shows actual next unlocked chapter name, completed chapter count, active objective progress and Continue/Revisit action. UI d4f6f11cf767dc45e94032da2f6d7d9ba3a0fc22, wiring 9977377da04f6bf9c1783b5a5169e6bebcbbb2b7, Android regression 58489a15fa6995aa1178e2203a51fa9fe78eb779 seeds/restores only the three existing step keys and checks fresh, partial, second, third and complete states. No save schema, geometry, artwork, signing or release changes. QA333 build passed but emulator cancelled by superseding work; no startup full pass claimed. Fresh combined CI pending. Next inspect CI and remaining interface consistency (especially small screen/large text), then launcher icon, save compatibility and consolidated owner APK. No intermediate APK requested.
 
 ## GH-V33-A
