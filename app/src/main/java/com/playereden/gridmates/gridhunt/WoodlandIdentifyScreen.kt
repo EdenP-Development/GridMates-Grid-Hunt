@@ -299,7 +299,7 @@ private fun IdentifyAnswers(
                         modifier = Modifier.weight(1f).heightIn(min = 66.dp)
                             .testTag("identifyOption_${choice.id}"),
                         contentPadding = PaddingValues(horizontal = 5.dp, vertical = 3.dp),
-                        shape = RoundedCornerShape(13.dp),
+                        shape = JournalActionShape,
                         colors = ButtonDefaults.outlinedButtonColors(
                             containerColor = if (selected) Color(0xFFF7DDA2)
                                 else Color(0xFFFFFBF0)
@@ -337,6 +337,7 @@ private fun IdentifyActions(
         HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(0.85f), { onZoom(1.0 / 1.6) })
         HuntToolButton(ExplorerTool.FIT, Modifier.weight(0.85f), onFit)
         Button(
+            shape = JournalActionShape,
             onClick = onCheck, enabled = selected,
             colors = ButtonDefaults.buttonColors(containerColor = Forest),
             modifier = Modifier.weight(1.8f).heightIn(min = 50.dp)
