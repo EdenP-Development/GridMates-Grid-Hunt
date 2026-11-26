@@ -1,5 +1,9 @@
 package com.playereden.gridmates.gridhunt
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -11,7 +15,8 @@ import com.playereden.gridhunt.core.ExplorationMap
 
 /** Draft native silhouettes. Canonical map points are the only answer anchors. */
 internal fun DrawScope.drawCoastalLandmarks(
-    map: ExplorationMap, survey: Boolean, project: (Double, Double) -> Offset
+    map: ExplorationMap, survey: Boolean, project: (Double, Double) -> Offset,
+    illustrations: Map<String, Painter> = emptyMap()
 ) {
     val ink = if (survey) Color(0xFF42686D) else Color(0xFF655E4C)
     val cream = if (survey) Color(0xFFE1EAE4) else Color(0xFFF4E5C5)
@@ -24,6 +29,20 @@ internal fun DrawScope.drawCoastalLandmarks(
     val s = (unit * 0.58f).coerceIn(0.20.dp.toPx(), 0.60.dp.toPx())
     map.landmarks.forEach { landmark ->
         val anchor = project(landmark.point.easting, landmark.point.northing)
+        val illustration = illustrations[landmark.id]
+        if (!survey && illustration != null) {
+            val side = 128f * s
+            val anchorY = when (landmark.id) {
+                "beacon-point" -> 104f
+                "gull-rock" -> 78f
+                "tidepool-bend" -> 74f
+                else -> 64f
+            }
+            translate(anchor.x - 64f*s, anchor.y - anchorY*s) {
+                with(illustration) { draw(Size(side,side)) }
+            }
+            return@forEach
+        }
         fun p(x: Float, y: Float) = anchor + Offset(x*s,y*s)
         fun poly(color: Color, vararg coords: Float) {
             val path = Path().apply {
