@@ -1,0 +1,6 @@
+<!-- Derived from artwork/worlds/whispering-coast/masters/wave-accent.svg. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="128dp" android:height="128dp" android:viewportWidth="128" android:viewportHeight="128">
+    <group android:translateX="9.6" android:translateY="9.6" android:scaleX="0.85" android:scaleY="0.85">
+    <path android:pathData="M9 54Q23 41 37 54T65 54T93 54T121 54M22 76Q36 63 50 76T78 76T106 76" android:fillColor="#00000000" android:fillAlpha=".85" android:strokeAlpha=".85" android:strokeColor="#e4eee1" android:strokeWidth="6" android:strokeLineCap="round" />
+    </group>
+</vector>
