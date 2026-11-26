@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V41-E — coastal terrain, landmarks, scenery and test-only preview committed; QA445 verified baseline.**
+Updated 2026-11-25. **Current checkpoint: GH-V41-G — coastal captures and mandatory CI checks committed; verification pending.**
 
-## Authoritative current checkpoint — GH-V41-E
+## Authoritative current checkpoint — GH-V41-G
+- QA448 run 45738831103 at f734b6e8bf85e7fd3b0b0d5574ba78ca3097e7be passed all three jobs, including the coastal interactive preview test. Artwork review #28 passed. QA448 remains latest fully green baseline.
+- GH-V41-F added three actual Android emulator captures to CoastalPreviewTest.kt (3a5e7c3ffacdd8c87426acfd82922bd1dc7208a2). QA449 run 45744840815 passed JVM/build at inspection; Android and upgrade jobs still running. Artwork review #29 run 45744840839 passed, artifact 15083595019. Captures not yet inspected.
+- GH-V41-G updated .github/workflows/gh01-android-qa.yml (29bbc3511d1986195ed4fb51be81e0fb927fa2ab) to require 23_coastal_survey_fit.png, 24_coastal_field_fit.png and 25_coastal_field_zoom.png, preserving all 22 existing required captures. Explicit :app:testDebugUnitTest added alongside :core:test; previously app local unit test execution was not guaranteed. Fresh CI pending. New commits may cancel earlier in-flight runs.
+- Next inspect actual captures, fix visual/anchor issues, consolidate duplicated draft fixture, then integrate final sprites and map-specific modes. Do not publish coast, alter existing save namespaces, or release before gates pass. Chapter expansion target remains 12 levels; migration design required.
+
+## GH-V41-E
 - QA445 run 45736541424 at 1aa4d5cb7c8080c0009002297ea584f51058616f passed all three jobs; coastal artwork review #25 run 45736541459 passed. QA445 is latest fully green baseline; coastal scene was not directly exercised by that run.
 - GH-V41-C terrain prototype (8c595612609b093e9a91a75a9269ad0923855243); GH-V41-D native landmark silhouettes (3baed7cfbf2951fadbfce5a8f18ce445dbd15420), connected scene (1aa4d5cb7c8080c0009002297ea584f51058616f). Draft geometry and native silhouettes are not final illustrated sprites. Exact terrain/anchor fit still requires review.
 - GH-V41-E world-anchored decorative scenery (5dea6c28bf00ce881f2c7dc36ecaf18f601d8152), layered below landmarks (b70ab73d9abdff4bd732d92ce86f1d00a0bca40e); test-only interactive coastal host verifies center selection across look and zoom (21c1ac210ff58d6ac0ca07a4244b7d6d80fe34bd). Test uses duplicated candidate coordinates because core draft is internal; consolidate fixture before publication. Fresh CI pending.
