@@ -27,6 +27,12 @@ internal fun coastalTerrainDraftScene(map: ExplorationMap, look: MapLook): MapSc
         "gull-rock" to painterResource(R.drawable.gh_coast_gull_rock),
         "tidepool-bend" to painterResource(R.drawable.gh_coast_tidepool_bend)
     )
+    val scenery = if (survey) emptyMap() else mapOf(
+        "grass" to painterResource(R.drawable.gh_coast_dune_grass),
+        "shrub" to painterResource(R.drawable.gh_coast_coastal_shrub),
+        "rocks" to painterResource(R.drawable.gh_coast_coastal_rocks),
+        "wave" to painterResource(R.drawable.gh_coast_wave_accent)
+    )
     return MapScene(
         map = map,
         backdrop = listOf(Color(0xFFB1C7C6), Color(0xFF8EADAE)),
@@ -35,7 +41,7 @@ internal fun coastalTerrainDraftScene(map: ExplorationMap, look: MapLook): MapSc
         drawTerrain = { bounds, _, project ->
             require(bounds == map.bounds)
             drawCoastalTerrainDraft(survey, project)
-            drawCoastalScenery(map, survey, project)
+            drawCoastalScenery(map, survey, project, scenery)
             drawCoastalLandmarks(map, survey, project, illustrations)
         }
     )
