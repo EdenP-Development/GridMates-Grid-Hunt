@@ -90,3 +90,47 @@ object TreasureChecklistMission {
     fun completed(completedIds: Set<String>): Boolean =
         restoreCompleted(completedIds).size == targets.size
 }
+
+/** Independent map-specific checklist; legacy facade remains unchanged. */
+class MapTreasureChecklist(val map: ExplorationMap, val missionId: String) {
+    val targets: List<WoodlandLandmark> = map.landmarks
+    init { require(missionId.isNotBlank() && targets.isNotEmpty()) }
+    private val targetIds: Set<String> = targets.mapTo(linkedSetOf()) { it.id }
+
+    fun restoreCompleted(rawIds: Set<String>): Set<String> =
+        rawIds.filterTo(linkedSetOf()) { it in targetIds }
+
+    fun activeTarget(completedIds: Set<String>, preferredId: String?): WoodlandLandmark? {
+        val completed = restoreCompleted(completedIds)
+        if (completed.size == targets.size) return null
+        return targets.firstOrNull { it.id == preferredId && it.id !in completed }
+            ?: targets.first { it.id !in completed }
+    }
+
+    fun correct(targetId: String, answer: String): Boolean {
+        val target = map.landmark(targetId) ?: return false
+        if (target.id !in targetIds || answer.length != 4 ||
+            answer.any { it !in '0'..'9' }) return false
+        return target.cell == GridReference.parse(answer)
+    }
+
+    /** Wrong/duplicate answers do not advance or clear discoveries. */
+    fun accept(completedIds: Set<String>, targetId: String, answer: String): Set<String> {
+        val known = restoreCompleted(completedIds)
+        return if (targetId in known || !correct(targetId, answer)) known
+        else known + targetId
+    }
+
+    fun completed(completedIds: Set<String>): Boolean =
+        restoreCompleted(completedIds).size == targets.size
+}
+
+object TreasureChecklistCatalog {
+    val woodland by lazy { MapTreasureChecklist(ExplorationMaps.woodland, TreasureChecklistMission.missionId) }
+    val coastalDraft by lazy { MapTreasureChecklist(WhisperingCoastDraft.map, "whispering-coast-findings-v1") }
+    fun forAuthoredMap(map: ExplorationMap): MapTreasureChecklist? = when (map) {
+        ExplorationMaps.woodland -> woodland
+        WhisperingCoastDraft.map -> coastalDraft
+        else -> null
+    }
+}
