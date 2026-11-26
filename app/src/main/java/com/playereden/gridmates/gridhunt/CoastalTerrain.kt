@@ -1,5 +1,7 @@
 package com.playereden.gridmates.gridhunt
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -12,11 +14,19 @@ import com.playereden.gridhunt.core.WhisperingCoastDraft
 /** Unpublished terrain and landmark prototype. Coordinates follow the composition study.
  * Final sprite artwork and terrain/anchor reconciliation remain publication gates.
  */
+@Composable
 internal fun coastalTerrainDraftScene(map: ExplorationMap, look: MapLook): MapScene {
     require(map == WhisperingCoastDraft.map)
     require(map.bounds.west == 42000.0 && map.bounds.south == 51000.0 &&
         map.bounds.east == 48000.0 && map.bounds.north == 57000.0)
     val survey = look == MapLook.SURVEY_TABLE
+    val illustrations = if (survey) emptyMap() else mapOf(
+        "beacon-point" to painterResource(R.drawable.gh_coast_beacon_point),
+        "driftwood-cove" to painterResource(R.drawable.gh_coast_driftwood_cove),
+        "shell-beach" to painterResource(R.drawable.gh_coast_shell_beach),
+        "gull-rock" to painterResource(R.drawable.gh_coast_gull_rock),
+        "tidepool-bend" to painterResource(R.drawable.gh_coast_tidepool_bend)
+    )
     return MapScene(
         map = map,
         backdrop = listOf(Color(0xFFB1C7C6), Color(0xFF8EADAE)),
@@ -26,7 +36,7 @@ internal fun coastalTerrainDraftScene(map: ExplorationMap, look: MapLook): MapSc
             require(bounds == map.bounds)
             drawCoastalTerrainDraft(survey, project)
             drawCoastalScenery(map, survey, project)
-            drawCoastalLandmarks(map, survey, project)
+            drawCoastalLandmarks(map, survey, project, illustrations)
         }
     )
 }
