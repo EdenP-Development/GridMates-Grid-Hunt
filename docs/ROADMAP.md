@@ -1,5 +1,31 @@
 # Roadmap — GridMates: Grid Hunt
 
+## Current roadmap — GH-V41-T (2026-11-26)
+
+This section supersedes historical status summaries below. See [current development handoff](CURRENT_DEVELOPMENT_HANDOFF.md) for exact source and QA receipts.
+
+| Workstream | Current state |
+| --- | --- |
+| Little Woodland | Existing live modes, three Adventure chapters, Academy, Custom Play and saved progress protected |
+| Multi-world architecture | Map, campaign, selection, scene and isolated session foundations implemented |
+| Whispering Coast | Unpublished six-landmark map, terrain and local vector art, three four-objective draft chapters |
+| Golden Spots | Five authored markers, shared gameplay, regression and Android playthrough implemented |
+| Treasure Checklist | Six discoveries, shared screen and coastal guide; QA471 Android playthrough passed |
+| Landmark identification | Six questions, shared screen, core and UI tests; QA473 JVM passed, UI pending |
+| Trail Treasures | Next map-specific gameplay adaptation |
+| Custom Play | Map-scoped generator/session foundations; Android world integration pending |
+| Adventure | Draft coastal campaign and prerequisites; shared runtime and navigation pending |
+| World selection | Core selection rules implemented; live UI and publication pending |
+| Chapter expansion | Working target 12 meaningful levels per chapter, minimum 10 mature; 72 target levels across two worlds; save migration gate required |
+| Quality and release | Final visual review, survey swatch parity, physical layout, process death, production signing and store readiness pending |
+
+QA473 source `7762e1075bbbfd7a62cade21a4ff051e523cd7c1`: JVM/app/build and exact 11-map install-over verification passed; Android instrumentation pending at inspection. Artwork #53 passed. QA463 remains last confirmed fully green baseline. No merge, release or production publication. Preserve original save namespaces and signed QA identity.
+
+Next sequence: finish QA473 verification; inspect actual coastal captures; adapt Trail Treasures; integrate Custom and Adventure; world selection; content expansion with migration tests; consolidated device QA and owner approval. The [chapter level standard](ADVENTURE_CHAPTER_LEVEL_STANDARD.md) governs expansion.
+
+## Historical roadmap and milestones
+
+
 **Latest actual milestone:** **GH-V14-A three-pillar Explorer Desk navigation BUILT and QA157 CI green.** QA157 game SHA `17a95c84e2a6d6105f740ecdd3db25ae3c44d645`, **both** Android/core/signing and executed emulator jobs passed, with **18** required screenshots. [QA157 APK ZIP](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45303371335/artifacts/14878854515). Physical QA157 phone approval/install-over remain open. [Draft PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12) remains unmerged/not production.\n**Existing play:** Four standalone puzzle modes and one four-step Mixed Expedition remain accessible with their independent saved progress; Adventure gives that story a Little Woodland chapter path. The Custom screen is an honest future-feature preview, not a generator.\n**Specification:** [Explorer Desk design Bible](GH_V14_EXPLORER_DESK_AND_NAVIGATION_BIBLE.md) and [QA157 handoff](vision/GH_V14_NAVIGATION_SHELL_QA157.md). No art library expansion yet.\n\n## Near-term milestones\n\n1. **GH-V14-A COMPLETE / PHONE PENDING:** new Home / Adventure / Quick / Custom routes, real chapter launch, native navigation tests and 18 emulator screenshots.\n2. **GH-V14-B NEXT:** owner phone QA157; refine chapter path visuals, Quick Play density and menu touch/scroll ergonomics. Only create essential art when it fixes an observed problem.\n3. **GH-V15:** stable multi-chapter/world registry, prerequisites and progress preservation.\n4. **GH-V16+:** thoughtful new authored puzzles/landmarks, difficulty progression, deterministic Custom Play; later Journal, cohesion art pass and store signing.\n\n**Explicit owner rule:** organize systems and content first; make individual assets when needed for legibility/fairness, with a fuller cohesive art pass after the core modes prove fun.
 
 ---
