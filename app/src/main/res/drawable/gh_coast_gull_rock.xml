@@ -1,0 +1,7 @@
+<!-- Derived from artwork/worlds/whispering-coast/masters/gull-rock.svg. Draft, not final approval. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="128dp" android:height="128dp" android:viewportWidth="128" android:viewportHeight="128">
+    <path android:pathData="M11,99 A53,12 0,1 0 117,99 A53,12 0,1 0 11,99 Z" android:fillColor="#9bc1c6" />
+    <path android:pathData="M16 94L30 67L52 60L68 37L94 56L112 94Z" android:fillColor="#8c9b97" android:strokeColor="#586c65" android:strokeWidth="3" />
+    <path android:pathData="M31 68L52 60L68 37L65 78L46 94H16Z" android:fillColor="#b5bcb0" />
+    <path android:pathData="M68 25Q52 12 39 25Q55 22 68 35Q81 22 98 25Q84 12 68 25Z" android:fillColor="#fff6e3" android:strokeColor="#65736b" android:strokeWidth="2" />
+</vector>
