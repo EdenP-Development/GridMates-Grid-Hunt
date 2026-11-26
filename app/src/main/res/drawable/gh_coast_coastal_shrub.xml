@@ -1,0 +1,6 @@
+<!-- Derived from artwork/worlds/whispering-coast/masters/coastal-shrub.svg. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="128dp" android:height="128dp" android:viewportWidth="128" android:viewportHeight="128">
+    <path android:pathData="M17,100 A48,12 0,1 0 113,100 A48,12 0,1 0 17,100 Z" android:fillColor="#526b55" android:fillAlpha=".2" android:strokeAlpha=".2" />
+    <path android:pathData="M14 91Q4 66 29 57Q28 31 53 36Q72 17 88 42Q118 37 115 65Q130 91 102 99H28Z" android:fillColor="#789779" android:strokeColor="#59765e" android:strokeWidth="3" />
+    <path android:pathData="M24 70Q43 43 60 58Q76 35 96 59" android:fillColor="#00000000" android:strokeColor="#aabd91" android:strokeWidth="8" android:strokeLineCap="round" />
+</vector>
