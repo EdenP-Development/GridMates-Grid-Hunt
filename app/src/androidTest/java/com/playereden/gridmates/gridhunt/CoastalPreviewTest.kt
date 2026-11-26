@@ -21,17 +21,9 @@ class CoastalPreviewTest {
     @get:Rule val compose = createComposeRule()
 
     @Test fun bothLooksUseSameMapAndSelectionAtFitAndZoom() {
-        // Test fixture mirrors candidate coordinates; no publication or save writes.
-        val map = ExplorationMap("whispering-coast-01",1,"Whispering Coast",
-            WorldBounds(42000.0,51000.0,48000.0,57000.0),
-            listOf(
-                WoodlandLandmark("beacon-point","Beacon Point",WorldPoint(46600.0,56100.0),"Lighthouse","▴"),
-                WoodlandLandmark("driftwood-cove","Driftwood Cove",WorldPoint(43800.0,52200.0),"Log","⌁"),
-                WoodlandLandmark("shell-beach","Shell Beach",WorldPoint(45200.0,51300.0),"Shell","✺"),
-                WoodlandLandmark("old-jetty","Old Jetty",WorldPoint(47600.0,53300.0),"Pier","▰"),
-                WoodlandLandmark("gull-rock","Gull Rock",WorldPoint(44500.0,55300.0),"Gull","◆"),
-                WoodlandLandmark("tidepool-bend","Tidepool Bend",WorldPoint(46100.0,54500.0),"Pool","◉")
-            ))
+        // Canonical unpublished map: no duplicated answer coordinates or save writes.
+        val map = WhisperingCoastDraft.map
+        assertNull(ExplorationMaps.find(map.id, map.revision))
         val look = mutableStateOf(MapLook.SURVEY_TABLE)
         val selection = mutableStateOf<String?>(null)
         val camera = mutableStateOf<MapCamera?>(null)
