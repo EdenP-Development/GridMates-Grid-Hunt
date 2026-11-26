@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-25. **Current checkpoint: GH-V41-B — exact scene binding and Adventure level standard committed; CI pending.**
+Updated 2026-11-25. **Current checkpoint: GH-V41-E — coastal terrain, landmarks, scenery and test-only preview committed; QA445 verified baseline.**
 
-## Authoritative current checkpoint — GH-V41-B
+## Authoritative current checkpoint — GH-V41-E
+- QA445 run 45736541424 at 1aa4d5cb7c8080c0009002297ea584f51058616f passed all three jobs; coastal artwork review #25 run 45736541459 passed. QA445 is latest fully green baseline; coastal scene was not directly exercised by that run.
+- GH-V41-C terrain prototype (8c595612609b093e9a91a75a9269ad0923855243); GH-V41-D native landmark silhouettes (3baed7cfbf2951fadbfce5a8f18ce445dbd15420), connected scene (1aa4d5cb7c8080c0009002297ea584f51058616f). Draft geometry and native silhouettes are not final illustrated sprites. Exact terrain/anchor fit still requires review.
+- GH-V41-E world-anchored decorative scenery (5dea6c28bf00ce881f2c7dc36ecaf18f601d8152), layered below landmarks (b70ab73d9abdff4bd732d92ce86f1d00a0bca40e); test-only interactive coastal host verifies center selection across look and zoom (21c1ac210ff58d6ac0ca07a4244b7d6d80fe34bd). Test uses duplicated candidate coordinates because core draft is internal; consolidate fixture before publication. Fresh CI pending.
+- Next verify preview tests, capture actual Android coastal map images, review artwork and correct exact shoreline/anchor alignment, then map-specific markers and world navigation. No publication or live save changes. Chapter standard remains 12 working target, minimum 10 mature levels; explicit migration required for existing completion.
+
+## GH-V41-B
 - QA441 run 45690563506 at fc5f2c761e0c9ff0dd41c720e825f6b74d6395ad passed all three jobs. Coastal artwork review #21 run 45690563464 passed. QA441 is latest fully green baseline.
 - Owner requested eventually at least 10–12 levels per chapter. docs/ADVENTURE_CHAPTER_LEVEL_STANDARD.md records 12-level working target, stable puzzle identities, migration design gates and protection of earned unlocks (fc5f2c761e0c9ff0dd41c720e825f6b74d6395ad). No actual level expansion or save migration yet.
 - MapScene now carries exact ExplorationMap; publishedMapScene rejects unknown maps/revisions rather than silently rendering Woodland (d4c7dc38ac043690b488116218242b30791c59e2). HuntMapPanel validates requested map, scene and bounds, preserving original Woodland defaults (cff474c3e7d96933e2498b62323d53f03ea9bc3c). Added local unit test for exact match and mismatched ID/revision/bounds. Fresh CI pending; verify app unit test task is executed.
