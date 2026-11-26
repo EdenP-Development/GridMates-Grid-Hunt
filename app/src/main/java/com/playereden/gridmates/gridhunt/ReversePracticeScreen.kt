@@ -88,6 +88,11 @@ import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.ChapterPosition
 import com.playereden.gridhunt.core.FirstBearingsChapter
 import com.playereden.gridhunt.core.ReverseTraining
+import com.playereden.gridhunt.core.ExplorationMaps
+import com.playereden.gridhunt.core.MapSurveyMarkers
+import com.playereden.gridhunt.core.SurveyMarkerCatalog
+import com.playereden.gridhunt.core.WhisperingCoastDraft
+import androidx.compose.runtime.key
 import com.playereden.gridhunt.core.GridCell
 import com.playereden.gridhunt.core.GridReference
 import com.playereden.gridhunt.core.HuntRules
@@ -102,14 +107,32 @@ internal fun ReversePracticeScreen(
     onBack: () -> Unit,
     mapLook: MapLook,
     onLook: (MapLook) -> Unit,
-    hapticsEnabled: Boolean
+    hapticsEnabled: Boolean,
+    catalog: MapSurveyMarkers = SurveyMarkerCatalog.woodland
 ) {
+    require(SurveyMarkerCatalog.forAuthoredMap(catalog.map) === catalog)
+    key(catalog.map.id, catalog.map.revision) {
+        MapReversePracticeContent(onBack, mapLook, onLook, hapticsEnabled, catalog)
+    }
+}
+
+@Composable
+private fun MapReversePracticeContent(
+    onBack: () -> Unit, mapLook: MapLook, onLook: (MapLook) -> Unit,
+    hapticsEnabled: Boolean, catalog: MapSurveyMarkers
+) {
+    val map = catalog.map
+    val isWoodland = map == ExplorationMaps.woodland
+    val scene = if (isWoodland) publishedMapScene(map, mapLook)
+        else coastalTerrainDraftScene(map, mapLook)
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
-    val prefs = remember(context) {
-        context.getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
+    val prefs = remember(context, map) {
+        val namespace = if (isWoodland) "gridhunt_reverse_v1"
+            else "gridhunt_reverse_${map.id}_r${map.revision}_v1"
+        context.getSharedPreferences(namespace, Context.MODE_PRIVATE)
     }
-    val targets = ReverseTraining.markers
+    val targets = catalog.markers
     var step by rememberSaveable {
         mutableIntStateOf(prefs.savedInt("step", 0).coerceIn(0, targets.size))
     }
@@ -134,7 +157,7 @@ internal fun ReversePracticeScreen(
     }
     val active = targets.getOrNull(step)
     val finished = active == null
-    val bounds = WoodlandTrainingMap.bounds
+    val bounds = map.bounds
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
     var centerE by rememberSaveable { mutableStateOf(bounds.center.easting) }
@@ -212,7 +235,7 @@ internal fun ReversePracticeScreen(
                     viewport = viewport, onViewport = resized, onCamera = ::setCamera,
                     onSelect = {}, markerPoint = active?.point, enableSelect = false,
                     mapLook = mapLook, discoveryMessage = discoveryMessage,
-                    onLook = onLook
+                    onLook = onLook, scene = scene, map = map
                 )
                 Column(
                     Modifier.width(controlsWidth).fillMaxHeight().journalScroll(),
@@ -249,7 +272,7 @@ internal fun ReversePracticeScreen(
                     viewport = viewport, onViewport = resized, onCamera = ::setCamera,
                     onSelect = {}, markerPoint = active?.point, enableSelect = false,
                     mapLook = mapLook, discoveryMessage = discoveryMessage,
-                    onLook = onLook
+                    onLook = onLook, scene = scene, map = map
                 )
                 Spacer(Modifier.height(5.dp))
                 if (finished) {
