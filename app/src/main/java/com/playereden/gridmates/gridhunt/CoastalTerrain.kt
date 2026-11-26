@@ -8,8 +8,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.playereden.gridhunt.core.ExplorationMap
 
-/** Unpublished terrain-only prototype. Coordinates follow the composition study.
- * Landmark artwork and anchor reconciliation are separate publication gates.
+/** Unpublished terrain and landmark prototype. Coordinates follow the composition study.
+ * Final sprite artwork and terrain/anchor reconciliation remain publication gates.
  */
 internal fun coastalTerrainDraftScene(map: ExplorationMap, look: MapLook): MapScene {
     require(map.id == "whispering-coast-01" && map.revision == 1)
@@ -24,6 +24,7 @@ internal fun coastalTerrainDraftScene(map: ExplorationMap, look: MapLook): MapSc
         drawTerrain = { bounds, _, project ->
             require(bounds == map.bounds)
             drawCoastalTerrainDraft(survey, project)
+            drawCoastalLandmarks(map, survey, project)
         }
     )
 }
