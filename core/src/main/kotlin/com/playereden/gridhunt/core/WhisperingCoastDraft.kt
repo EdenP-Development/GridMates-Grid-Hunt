@@ -4,8 +4,10 @@ package com.playereden.gridhunt.core
  * GH-V40-G: unpublished geographic candidate, for validation only.
  * Do not add to ExplorationMaps or PublishedWorlds until art and campaign gates pass.
  * Positions match the coordinate composition study, not final terrain anchors.
+ * Public visibility permits the Android development preview to consume the same
+ * definition; it does not register or publish this map.
  */
-internal object WhisperingCoastDraft {
+object WhisperingCoastDraft {
     val map = ExplorationMap(
         id = "whispering-coast-01",
         revision = 1,
