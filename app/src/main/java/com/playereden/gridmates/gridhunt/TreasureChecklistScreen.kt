@@ -53,7 +53,10 @@ import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.GridReference
 import com.playereden.gridhunt.core.MapCamera
 import com.playereden.gridhunt.core.PixelPoint
-import com.playereden.gridhunt.core.TreasureChecklistMission
+import com.playereden.gridhunt.core.ExplorationMaps
+import com.playereden.gridhunt.core.MapTreasureChecklist
+import com.playereden.gridhunt.core.TreasureChecklistCatalog
+import androidx.compose.runtime.key
 import com.playereden.gridhunt.core.WoodlandLandmark
 import com.playereden.gridhunt.core.WoodlandTrainingMap
 import com.playereden.gridhunt.core.WorldPoint
@@ -68,14 +71,31 @@ internal fun TreasureChecklistScreen(
     onHome: () -> Unit,
     mapLook: MapLook,
     onLook: (MapLook) -> Unit,
-    hapticsEnabled: Boolean
+    hapticsEnabled: Boolean,
+    mission: MapTreasureChecklist = TreasureChecklistCatalog.woodland
 ) {
+    require(TreasureChecklistCatalog.forAuthoredMap(mission.map) === mission)
+    key(mission.map.id, mission.map.revision) {
+        MapTreasureChecklistContent(onHome, mapLook, onLook, hapticsEnabled, mission)
+    }
+}
+
+@Composable
+private fun MapTreasureChecklistContent(
+    onHome: () -> Unit, mapLook: MapLook, onLook: (MapLook) -> Unit,
+    hapticsEnabled: Boolean, mission: MapTreasureChecklist
+) {
+    val map = mission.map
+    val woodland = map == ExplorationMaps.woodland
+    val region = if (woodland) "woodland" else "coastal"
+    val scene = if (woodland) publishedMapScene(map, mapLook) else coastalTerrainDraftScene(map, mapLook)
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
-    val prefs = remember(context) {
-        context.getSharedPreferences("gridhunt_treasure_checklist_v1", Context.MODE_PRIVATE)
+    val prefs = remember(context, map) {
+        val namespace = if (woodland) "gridhunt_treasure_checklist_v1"
+            else "gridhunt_treasure_checklist_${map.id}_r${map.revision}_v1"
+        context.getSharedPreferences(namespace, Context.MODE_PRIVATE)
     }
-    val mission = TreasureChecklistMission
     var savedIds by rememberSaveable {
         mutableStateOf(prefs.savedString("completed_ids", "") ?: "")
     }
@@ -103,7 +123,7 @@ internal fun TreasureChecklistScreen(
             .putString("answer", answer).apply()
     }
 
-    val bounds = WoodlandTrainingMap.bounds
+    val bounds = map.bounds
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
     var centerE by rememberSaveable { mutableStateOf(bounds.center.easting) }
@@ -166,7 +186,7 @@ internal fun TreasureChecklistScreen(
                 answer = ""
                 hintVisible = false
                 feedback = if (mission.completed(next))
-                    "Every woodland discovery found! Your journal is complete."
+                    "Every $region discovery found! Your journal is complete."
                 else "Found it! ${current.name} is crossed off your list."
             } else {
                 val attempted = runCatching { GridReference.parse(answer) }.getOrNull()
@@ -182,7 +202,7 @@ internal fun TreasureChecklistScreen(
         preferredId = null
         answer = ""
         hintVisible = false
-        feedback = "A fresh woodland checklist is ready."
+        feedback = "A fresh $region checklist is ready."
         fit()
     }
 
@@ -200,7 +220,7 @@ internal fun TreasureChecklistScreen(
                     bounds = bounds, camera = camera, selectedCell = null,
                     completed = mission.targets.filter { it.id in completed }.map { it.cell },
                     viewport = viewport, onViewport = onViewport, onCamera = ::setCamera,
-                    onSelect = {}, enableSelect = false, mapLook = mapLook, onLook = onLook
+                    onSelect = {}, enableSelect = false, mapLook = mapLook, onLook = onLook, scene = scene, map = map
                 )
                 Column(
                     Modifier.width(sidePanelWidth)
@@ -208,12 +228,12 @@ internal fun TreasureChecklistScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     TreasureChecklistHeader(completed.size, mission.targets.size,
-                        onGuide = { showMapGuide = true }, onHome = onHome)
+                        onGuide = { showMapGuide = true }, onHome = onHome, region = region)
                     if (finished) {
-                        TreasureChecklistFinished(onHome, replay)
+                        TreasureChecklistFinished(onHome, replay, region, mission.targets.size)
                     } else {
                         TreasureChecklistTargets(mission.targets, completed, active?.id, choose)
-                        TreasureChecklistAnswer(active, mapLook, answer, { answer = it },
+                        TreasureChecklistAnswer(active, mapLook, woodland, answer, { answer = it },
                             feedback, hintVisible, { hintVisible = !hintVisible },
                             ::zoomBy, ::fit, check)
                     }
@@ -222,7 +242,7 @@ internal fun TreasureChecklistScreen(
         } else {
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 TreasureChecklistHeader(completed.size, mission.targets.size,
-                        onGuide = { showMapGuide = true }, onHome = onHome)
+                        onGuide = { showMapGuide = true }, onHome = onHome, region = region)
                 if (!finished) {
                     TreasureChecklistTargets(mission.targets, completed, active?.id, choose)
                 }
@@ -231,31 +251,32 @@ internal fun TreasureChecklistScreen(
                     bounds = bounds, camera = camera, selectedCell = null,
                     completed = mission.targets.filter { it.id in completed }.map { it.cell },
                     viewport = viewport, onViewport = onViewport, onCamera = ::setCamera,
-                    onSelect = {}, enableSelect = false, mapLook = mapLook, onLook = onLook
+                    onSelect = {}, enableSelect = false, mapLook = mapLook, onLook = onLook, scene = scene, map = map
                 )
                 if (finished) {
-                    TreasureChecklistFinished(onHome, replay)
+                    TreasureChecklistFinished(onHome, replay, region, mission.targets.size)
                 } else {
-                    TreasureChecklistAnswer(active, mapLook, answer, { answer = it }, feedback,
+                    TreasureChecklistAnswer(active, mapLook, woodland, answer, { answer = it }, feedback,
                         hintVisible, { hintVisible = !hintVisible }, ::zoomBy, ::fit, check)
                 }
             }
         }
     }
     if (showMapGuide) {
-        WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showMapGuide = false })
+        if (woodland) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showMapGuide = false })
+        else CoastalMapGuideDialog(mapLook, onDismiss = { showMapGuide = false })
     }
 }
 
 @Composable
 private fun TreasureChecklistHeader(
-    found: Int, total: Int, onGuide: () -> Unit, onHome: () -> Unit
+    found: Int, total: Int, onGuide: () -> Unit, onHome: () -> Unit, region: String
 ) {
     Column(Modifier.fillMaxWidth()) {
         Text("Treasure Checklist", color = Ink, fontWeight = FontWeight.ExtraBold,
             fontSize = 21.sp, maxLines = 1)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("$found of $total woodland discoveries", color = Forest,
+            Text("$found of $total $region discoveries", color = Forest,
                 fontSize = 11.sp, fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f).testTag("treasureProgress"))
             TextButton(onClick = onGuide, modifier = Modifier.testTag("openWoodlandMapGuide")) {
@@ -315,6 +336,7 @@ private fun TreasureChecklistTargets(
 private fun TreasureChecklistAnswer(
     active: WoodlandLandmark?,
     mapLook: MapLook,
+    woodland: Boolean,
     answer: String,
     onAnswer: (String) -> Unit,
     feedback: String,
@@ -337,9 +359,8 @@ private fun TreasureChecklistAnswer(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(9.dp)
     ) {
-        WoodlandLandmarkSwatch(
-            active.id, mapLook, symbolSize = 46.dp
-        )
+        if (woodland) WoodlandLandmarkSwatch(active.id, mapLook, symbolSize = 46.dp)
+        else CoastalLandmarkSwatch(active, mapLook, 46.dp)
         Column(Modifier.weight(1f)) {
             Text("Find: ${active.name}", color = Forest,
                 fontWeight = FontWeight.Bold, fontSize = 13.sp)
@@ -381,11 +402,12 @@ private fun TreasureChecklistAnswer(
 }
 
 @Composable
-private fun TreasureChecklistFinished(onHome: () -> Unit, onReplay: () -> Unit) {
+private fun TreasureChecklistFinished(onHome: () -> Unit, onReplay: () -> Unit, region: String, total: Int) {
     PuzzleFinishCard(
-        title = "Your woodland checklist is complete!",
-        description = "Four little places discovered. Every item is marked in your journal.",
-        discoveries = "4 OF 4 WOODLAND FINDS",
+        title = "Your $region checklist is complete!",
+        description = if (region == "woodland") "Four little places discovered. Every item is marked in your journal."
+            else "Six little places discovered. Every item is marked in your journal.",
+        discoveries = "$total OF $total ${region.uppercase()} FINDS",
         primaryLabel = "Explore again",
         onPrimary = onReplay,
         onHome = onHome
