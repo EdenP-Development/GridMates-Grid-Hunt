@@ -56,7 +56,7 @@ jobs:
       - name: Compile, execute core tests and build debug APK
         run: |
           chmod +x gradlew
-          ./gradlew :core:test :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon --max-workers=2 --stacktrace --console=plain
+          ./gradlew :core:test :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon --max-workers=2 --stacktrace --console=plain
       - name: Assemble unsigned beta and verify separate package
         shell: bash
         run: |
@@ -205,6 +205,9 @@ jobs:
             test -s vision-screenshots/20_chapter_two_locked.png
             test -s vision-screenshots/21_chapter_two_unlocked.png
             test -s vision-screenshots/22_lost_supplies_opening.png
+            test -s vision-screenshots/23_coastal_survey_fit.png
+            test -s vision-screenshots/24_coastal_field_fit.png
+            test -s vision-screenshots/25_coastal_field_zoom.png
       - name: Publish Android instrumentation results
         if: always()
         uses: actions/upload-artifact@v4
