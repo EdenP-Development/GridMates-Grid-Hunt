@@ -1,0 +1,7 @@
+<!-- Derived from artwork/worlds/whispering-coast/masters/shell-beach.svg. Draft, not final approval. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="128dp" android:height="128dp" android:viewportWidth="128" android:viewportHeight="128">
+    <path android:pathData="M16,100 A48,12 0,1 0 112,100 A48,12 0,1 0 16,100 Z" android:fillColor="#e6d1a0" />
+    <path android:pathData="M64 96Q4 73 18 43Q26 25 45 35Q61 14 77 35Q105 23 112 49Q119 78 64 96Z" android:fillColor="#e7bfa0" android:strokeColor="#936d58" android:strokeWidth="3" />
+    <path android:pathData="M64 94L30 48M64 94L46 39M64 94L64 32M64 94L83 39M64 94L101 49" android:fillColor="#000000" android:strokeColor="#aa8066" android:strokeWidth="3" android:strokeLineCap="round" />
+    <path android:pathData="M54 96H74L70 103H58Z" android:fillColor="#c49275" />
+</vector>
