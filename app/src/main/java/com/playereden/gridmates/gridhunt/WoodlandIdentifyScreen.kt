@@ -44,7 +44,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.MapCamera
 import com.playereden.gridhunt.core.PixelPoint
-import com.playereden.gridhunt.core.WoodlandIdentifyMission
+import com.playereden.gridhunt.core.ExplorationMaps
+import com.playereden.gridhunt.core.MapIdentifyMission
+import com.playereden.gridhunt.core.IdentifyMissionCatalog
+import androidx.compose.runtime.key
 import com.playereden.gridhunt.core.WoodlandLandmark
 import com.playereden.gridhunt.core.WoodlandTrainingMap
 import com.playereden.gridhunt.core.WorldPoint
@@ -62,14 +65,27 @@ internal fun WoodlandIdentifyScreen(
     onHome: () -> Unit,
     mapLook: MapLook,
     onLook: (MapLook) -> Unit,
-    hapticsEnabled: Boolean
+    hapticsEnabled: Boolean,
+    mission: MapIdentifyMission = IdentifyMissionCatalog.woodland
 ) {
+    require(IdentifyMissionCatalog.forAuthoredMap(mission.map) === mission)
+    key(mission.map.id, mission.map.revision) {
+        MapIdentifyContent(onHome, mapLook, onLook, hapticsEnabled, mission)
+    }
+}
+
+@Composable
+private fun MapIdentifyContent(onHome: () -> Unit, mapLook: MapLook, onLook: (MapLook) -> Unit,
+    hapticsEnabled: Boolean, mission: MapIdentifyMission) {
+    val map = mission.map
+    val woodland = map == ExplorationMaps.woodland
+    val region = if (woodland) "woodland" else "coastal"
+    val scene = if (woodland) publishedMapScene(map, mapLook) else coastalTerrainDraftScene(map, mapLook)
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    val prefs = remember(context) {
-        context.getSharedPreferences(WoodlandIdentifyMission.saveName, Context.MODE_PRIVATE)
+    val prefs = remember(context, map) {
+        context.getSharedPreferences(mission.saveName, Context.MODE_PRIVATE)
     }
-    val mission = WoodlandIdentifyMission
     var step by rememberSaveable {
         mutableStateOf(mission.restoreStep(prefs.savedInt("step", 0)))
     }
@@ -89,7 +105,7 @@ internal fun WoodlandIdentifyScreen(
         prefs.edit().putInt("step", step).putString("chosen_id", chosenId).apply()
     }
 
-    val bounds = WoodlandTrainingMap.bounds
+    val bounds = map.bounds
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
     var centerE by rememberSaveable { mutableStateOf(bounds.center.easting) }
@@ -149,7 +165,7 @@ internal fun WoodlandIdentifyScreen(
                 step = mission.accept(step, chosenId)
                 chosenId = null
                 feedback = if (mission.finished(step)) {
-                    "Every woodland mystery identified!"
+                    "Every $region mystery identified!"
                 } else {
                     "Found it! A new square is waiting."
                 }
@@ -162,7 +178,7 @@ internal fun WoodlandIdentifyScreen(
     val replay: () -> Unit = {
         step = 0
         chosenId = null
-        feedback = "A fresh round of woodland mysteries is ready."
+        feedback = "A fresh round of $region mysteries is ready."
         fit()
     }
 
@@ -184,7 +200,7 @@ internal fun WoodlandIdentifyScreen(
                     bounds = bounds, camera = camera, selectedCell = null,
                     completed = solved, viewport = viewport, onViewport = onViewport,
                     onCamera = ::setCamera, onSelect = {}, enableSelect = false,
-                    mapLook = mapLook, onLook = onLook
+                    mapLook = mapLook, onLook = onLook, scene = scene, map = map
                 )
                 Column(
                     Modifier.width(sideWidth).fillMaxHeight()
@@ -194,10 +210,10 @@ internal fun WoodlandIdentifyScreen(
                     IdentifyHeader(step, mission.questions.size,
                         onGuide = { showGuide = true }, onHome = onHome)
                     if (finished) {
-                        IdentifyFinish(onHome, replay)
+                        IdentifyFinish(onHome, replay, mission.questions.size)
                     } else if (question != null) {
                         IdentifyPrompt(question.cell.reference)
-                        IdentifyAnswers(mission.choices, chosenId, mapLook) {
+                        IdentifyAnswers(mission.choices, chosenId, mapLook, woodland) {
                             chosenId = it
                             feedback = "Ready to check your choice?"
                         }
@@ -218,12 +234,12 @@ internal fun WoodlandIdentifyScreen(
                     bounds = bounds, camera = camera, selectedCell = null,
                     completed = solved, viewport = viewport, onViewport = onViewport,
                     onCamera = ::setCamera, onSelect = {}, enableSelect = false,
-                    mapLook = mapLook, onLook = onLook
+                    mapLook = mapLook, onLook = onLook, scene = scene, map = map
                 )
                 if (finished) {
-                    IdentifyFinish(onHome, replay)
+                    IdentifyFinish(onHome, replay, mission.questions.size)
                 } else {
-                    IdentifyAnswers(mission.choices, chosenId, mapLook) {
+                    IdentifyAnswers(mission.choices, chosenId, mapLook, woodland) {
                         chosenId = it
                         feedback = "Ready to check your choice?"
                     }
@@ -234,7 +250,8 @@ internal fun WoodlandIdentifyScreen(
         }
     }
     if (showGuide) {
-        WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showGuide = false })
+        if (woodland) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showGuide = false })
+        else CoastalMapGuideDialog(mapLook, onDismiss = { showGuide = false })
     }
 }
 
@@ -287,6 +304,7 @@ private fun IdentifyAnswers(
     choices: List<WoodlandLandmark>,
     selectedId: String?,
     mapLook: MapLook,
+    woodland: Boolean,
     onSelect: (String) -> Unit
 ) {
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -307,9 +325,8 @@ private fun IdentifyAnswers(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                            WoodlandLandmarkSwatch(
-                                choice.id, mapLook, symbolSize = 38.dp
-                            )
+                            if (woodland) WoodlandLandmarkSwatch(choice.id, mapLook, symbolSize = 38.dp)
+                            else CoastalLandmarkSwatch(choice, mapLook, 38.dp)
                             Text(choice.name, color = Ink, fontSize = 10.sp,
                                 fontWeight = FontWeight.SemiBold, maxLines = 2,
                                 modifier = Modifier.weight(1f))
@@ -350,11 +367,11 @@ private fun IdentifyActions(
 }
 
 @Composable
-private fun IdentifyFinish(onHome: () -> Unit, onReplay: () -> Unit) {
+private fun IdentifyFinish(onHome: () -> Unit, onReplay: () -> Unit, total: Int) {
     PuzzleFinishCard(
         title = "Every square identified!",
-        description = "Four little landmarks discovered by reading the map.",
-        discoveries = "4 OF 4 LANDMARKS",
+        description = if (total == 4) "Four little landmarks discovered by reading the map." else "Six little landmarks discovered by reading the map.",
+        discoveries = "$total OF $total LANDMARKS",
         primaryLabel = "Identify them again",
         onPrimary = onReplay,
         onHome = onHome
