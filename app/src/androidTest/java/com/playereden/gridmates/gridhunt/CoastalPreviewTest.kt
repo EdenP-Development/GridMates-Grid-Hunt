@@ -1,5 +1,10 @@
 package com.playereden.gridmates.gridhunt
 
+import android.content.ContentValues
+import android.graphics.Bitmap
+import android.os.Environment
+import android.provider.MediaStore
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -53,7 +58,13 @@ class CoastalPreviewTest {
                 .performTouchInput { click(center) }
             compose.runOnIdle { assertEquals("4554",selection.value) }
         }
+        capture("23_coastal_survey_fit.png")
         selectCenter()
+        compose.runOnIdle {
+            look.value = MapLook.values().first { it != MapLook.SURVEY_TABLE }
+            selection.value = null
+        }
+        capture("24_coastal_field_fit.png")
         compose.runOnIdle {
             look.value = MapLook.values().first { it != MapLook.SURVEY_TABLE }
             val fit = requireNotNull(camera.value)
@@ -61,5 +72,30 @@ class CoastalPreviewTest {
             selection.value = null
         }
         selectCenter()
+        capture("25_coastal_field_zoom.png")
+    }
+
+    private fun capture(filename: String) {
+        compose.waitForIdle()
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.waitForIdleSync()
+        android.os.SystemClock.sleep(500L)
+        val image = requireNotNull(instrumentation.uiAutomation.takeScreenshot())
+        val resolver = instrumentation.targetContext.contentResolver
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/GridHuntVisualQA")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+        val uri = requireNotNull(resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values))
+        try {
+            requireNotNull(resolver.openOutputStream(uri)).use { stream ->
+                check(image.compress(Bitmap.CompressFormat.PNG, 100, stream))
+            }
+            check(resolver.update(uri, ContentValues().apply {
+                put(MediaStore.Images.Media.IS_PENDING, 0)
+            }, null, null) == 1)
+        } finally { image.recycle() }
     }
 }
