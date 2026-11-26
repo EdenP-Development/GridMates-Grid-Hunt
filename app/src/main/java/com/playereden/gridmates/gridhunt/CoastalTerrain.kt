@@ -24,6 +24,7 @@ internal fun coastalTerrainDraftScene(map: ExplorationMap, look: MapLook): MapSc
         drawTerrain = { bounds, _, project ->
             require(bounds == map.bounds)
             drawCoastalTerrainDraft(survey, project)
+            drawCoastalScenery(map, survey, project)
             drawCoastalLandmarks(map, survey, project)
         }
     )
