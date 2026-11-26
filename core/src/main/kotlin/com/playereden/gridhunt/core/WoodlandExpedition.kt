@@ -61,8 +61,7 @@ data class ExpeditionChapter(
             when (objective.verb) {
                 ExpeditionVerb.FIND_SQUARE -> Unit
                 ExpeditionVerb.READ_MARKER -> require(
-                    map == ExplorationMaps.woodland &&
-                    ReverseTraining.markers.singleOrNull { it.id == objective.markerId }?.cell ==
+                    SurveyMarkerCatalog.forAuthoredMap(map)?.find(objective.markerId ?: "")?.cell ==
                         objective.expectedCell
                 )
                 ExpeditionVerb.LOCATE_LANDMARK, ExpeditionVerb.IDENTIFY_LANDMARK -> require(
