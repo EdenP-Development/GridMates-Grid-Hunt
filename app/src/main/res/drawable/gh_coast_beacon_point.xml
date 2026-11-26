@@ -1,0 +1,9 @@
+<!-- Derived from artwork/worlds/whispering-coast/masters/beacon-point.svg. Draft, not final approval. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="128dp" android:height="128dp" android:viewportWidth="128" android:viewportHeight="128">
+    <path android:pathData="M22,108 A42,10 0,1 0 106,108 A42,10 0,1 0 22,108 Z" android:fillColor="#435d50" android:fillAlpha=".18" />
+    <path android:pathData="M38 104L48 38H80L90 104Z" android:fillColor="#f4e5c5" android:strokeColor="#655e4c" android:strokeWidth="3" />
+    <path android:pathData="M44 70H84L87 85H41Z" android:fillColor="#af6653" />
+    <path android:pathData="M48,25 H80 Q83,25 83,28 V42 Q83,45 80,45 H48 Q45,45 45,42 V28 Q45,25 48,25 Z" android:fillColor="#e9c975" android:strokeColor="#655e4c" android:strokeWidth="3" />
+    <path android:pathData="M39 26L64 10L89 26Z" android:fillColor="#ad6957" android:strokeColor="#655e4c" android:strokeWidth="3" />
+    <path android:pathData="M58 104V90Q64 83 70 90V104" android:fillColor="#57736b" />
+</vector>
