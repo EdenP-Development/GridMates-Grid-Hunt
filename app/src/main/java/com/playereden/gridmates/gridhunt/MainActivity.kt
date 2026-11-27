@@ -160,20 +160,11 @@ private fun GridHuntScreen() {
         }
     }
     BackHandler(enabled = screen != "home") { goBack() }
-    val expeditionPrefs = remember(context) {
-        context.getSharedPreferences(WoodlandExpedition.saveName, Context.MODE_PRIVATE)
+    // Read active chapter progress and permanent accomplishments separately.
+    val completion = remember(context) {
+        CampaignCompletionStore(context, com.playereden.gridhunt.core.PublishedWorlds.selection, false)
     }
-    // Read the original GH-V13 save; the versioned campaign registry adds
-    // world/chapter metadata but never rewrites or migrates the old progress.
-    val supplyPrefs = remember(context) {
-        context.getSharedPreferences(WoodlandSupplyExpedition.saveName, Context.MODE_PRIVATE)
-    }
-    val returnPrefs = remember(context) {
-        context.getSharedPreferences(WoodlandReturnExpedition.saveName, Context.MODE_PRIVATE)
-    }
-    fun currentCampaignSnapshot() = GridHuntCampaign.snapshot(
-        expeditionPrefs.savedInt("step", 0), supplyPrefs.savedInt("step", 0), returnPrefs.savedInt("step", 0)
-    )
+    fun currentCampaignSnapshot() = completion.snapshot()
     val campaignSnapshot = currentCampaignSnapshot()
     val campaignState = requireNotNull(GridHuntCampaign.registry.state(
         WoodlandExpedition.chapter.id, campaignSnapshot
