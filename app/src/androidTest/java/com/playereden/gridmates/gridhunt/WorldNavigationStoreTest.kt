@@ -75,6 +75,37 @@ class WorldNavigationStoreTest {
             assertTrue(replay.everCompleted)
             assertTrue(ledger.captureCompleted())
             assertEquals(woodland.world.chapters.map { it.chapter.id }.toSet(),ledger.snapshot().earnedChapterIds)
+
+            // Preview-only earned records must never unlock published chapters.
+            assertTrue(publishedEarned.all.isEmpty())
+            assertTrue(CampaignCompletionStore(context,PublishedWorlds.selection,false)
+                .snapshot().earnedChapterIds.isEmpty())
+            // Exercise the opposite direction using actual published capture.
+            check(earnedPrefs.edit().clear().commit())
+            check(context.getSharedPreferences(first.progressKey,Context.MODE_PRIVATE)
+                .edit().putInt("step",first.chapter.objectives.size).commit())
+            val publishedLedger = CampaignCompletionStore(context,PublishedWorlds.selection,false)
+            assertTrue(publishedLedger.captureCompleted())
+            val publishedBefore = publishedEarned.all.toMap()
+            assertEquals(woodland.world.chapters.map { it.chapter.id }.toSet(),
+                publishedLedger.snapshot().earnedChapterIds)
+            check(context.getSharedPreferences(first.progressKey,Context.MODE_PRIVATE)
+                .edit().putInt("step",1).commit())
+            val bridged = WorldNavigationStore(context,selection,true)
+            assertEquals(coast.world.id,bridged.current()?.destination?.world?.id)
+            assertNotNull(bridged.openChapter(coast.world.id,coast.world.chapters.first().chapter.id))
+            val woodlandChoice = bridged.choices().first { it.destination == woodland }
+            assertTrue(woodlandChoice.complete)
+            assertEquals(3,woodlandChoice.completedChapters)
+            assertEquals(1,woodlandChoice.chapters.first().completedObjectives)
+            assertTrue(earnedPrefs.all.isEmpty())
+            val coastalFirst = coast.world.chapters.first()
+            check(context.getSharedPreferences(coastalFirst.progressKey,Context.MODE_PRIVATE)
+                .edit().putInt("step",coastalFirst.chapter.objectives.size).commit())
+            assertTrue(ledger.captureCompleted())
+            assertTrue(coastalFirst.chapter.id in ledger.snapshot().earnedChapterIds)
+            assertFalse(coastalFirst.chapter.id in publishedLedger.snapshot().earnedChapterIds)
+            assertEquals(publishedBefore,publishedEarned.all)
         } finally {
             allPrefs.zip(saved).forEach { (prefs,values) -> restore(prefs,values) }
         }
