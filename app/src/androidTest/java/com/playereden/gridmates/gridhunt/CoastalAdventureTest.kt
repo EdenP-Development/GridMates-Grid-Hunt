@@ -21,7 +21,8 @@ class CoastalAdventureTest {
             .map { context.getSharedPreferences(it,Context.MODE_PRIVATE) }
         val previewEarned = context.getSharedPreferences("gridhunt_campaign_earned_preview_v1",Context.MODE_PRIVATE)
         val publishedEarned = context.getSharedPreferences("gridhunt_campaign_earned_v1",Context.MODE_PRIVATE)
-        val stores = coastal + woodland + listOf(previewEarned,publishedEarned)
+        val previewSelection = context.getSharedPreferences("gridhunt_world_selection_preview_v1",Context.MODE_PRIVATE)
+        val stores = coastal + woodland + listOf(previewEarned,publishedEarned,previewSelection)
         val originals = stores.map { it.all.toMap() }
         fun restore(prefs: android.content.SharedPreferences, values: Map<String, *>) {
             val editor = prefs.edit().clear()
@@ -37,26 +38,28 @@ class CoastalAdventureTest {
             }
             check(editor.commit())
         }
-        val number = mutableStateOf(1)
         val visible = mutableStateOf(true)
-        val look = mutableStateOf(MapLook.SURVEY_TABLE)
         try {
             coastal.forEach { check(it.edit().clear().commit()) }
             check(previewEarned.edit().clear().commit())
+            check(previewSelection.edit().clear().commit())
             val woodlandChapters = GridHuntCampaign.registry.worlds.single().chapters.sortedBy { it.order }
             woodland.zip(woodlandChapters).forEach { (prefs,chapter) ->
                 check(prefs.edit().putInt("step",chapter.chapter.objectives.size).commit())
             }
             val seededWoodland = woodland.map { it.all.toMap() }
             val originalPublished = publishedEarned.all.toMap()
+        val destination = CoastalExpeditionPreview.selection.destinations.single { it.map == runs.first().chapter.map }
         compose.setContent {
-            if (visible.value) WoodlandMixedExpeditionScreen(
-                onHome = { visible.value=false },
-                mapLook = look.value, onLook = { look.value=it }, hapticsEnabled=false,
-                coastalPreview=CoastalExpeditionPreview.chapter(number.value),
-                onNextChapter=if (number.value<3) ({ number.value += 1 }) else null
-            )
+            if (visible.value) RegionalPreviewGameplay { visible.value=false }
         }
+        fun openChapter(chapter: Int) {
+            compose.onNodeWithTag("regionChapter_"+runs[chapter-1].chapter.id)
+                .performScrollTo().assertIsEnabled().performClick()
+        }
+        compose.onNodeWithTag("atlasOpen_"+destination.world.id).performScrollTo().performClick()
+        compose.onNodeWithTag("regionChapter_"+runs.last().chapter.id).assertIsNotEnabled()
+        openChapter(1)
         fun progress(chapter: Int, step: Int) {
             compose.waitUntil(10000) { coastal[chapter-1].getInt("step",-1)==step }
             compose.onNodeWithTag("mixedProgress").assertTextEquals("$step of 4 clues solved")
@@ -71,10 +74,10 @@ class CoastalAdventureTest {
             repeat(north-51) { move("north") }
             compose.onNodeWithTag("mixedSquarePick").assertTextEquals("YOUR PICK  $east$north")
         }
-        fun reopen(tag: String) {
+        fun reopen(tag: String, chapter: Int) {
             compose.onNodeWithTag(tag).performClick()
-            compose.waitForIdle()
-            compose.runOnIdle { visible.value=true }
+            compose.onNodeWithTag("regionGameplayHub").assertExists()
+            openChapter(chapter)
         }
             progress(1,0)
             compose.onNodeWithTag("mixedGuide").performClick()
@@ -97,7 +100,7 @@ class CoastalAdventureTest {
                     compose.onNodeWithTag("mixedCheck").performClick()
                     progress(chapter,index+1)
                     if(index==0) {
-                        reopen("mixedHome")
+                        reopen("mixedHome",chapter)
                         progress(chapter,1)
                         compose.onNodeWithTag("mixedJournal").performClick()
                         compose.onNodeWithText("WHISPERING COAST · CHAPTER $chapter").assertExists()
@@ -105,7 +108,6 @@ class CoastalAdventureTest {
                         compose.onNodeWithTag("journalCurrent").assertExists()
                         compose.onNodeWithTag("journalEntry_"+run.chapter.objectives.last().id).assertDoesNotExist()
                         compose.onNodeWithTag("closeJournal").performClick()
-                        if(chapter==1) compose.runOnIdle { look.value=MapLook.values().first { it!=MapLook.SURVEY_TABLE } }
                     }
                 }
                 compose.onNodeWithText(run.chapter.name+" complete!").assertExists()
@@ -115,7 +117,7 @@ class CoastalAdventureTest {
                 if(chapter<3) compose.onNodeWithTag("nextExpedition").performClick()
             }
             assertTrue(coastal.all { it.getInt("step",-1)==4 })
-            reopen("finishHome")
+            reopen("finishHome",3)
             progress(3,4)
             compose.onNodeWithTag("finishContinue").performClick()
             progress(3,0)
@@ -130,6 +132,11 @@ class CoastalAdventureTest {
             assertTrue(coast.complete)
             assertEquals(3,coast.completedChapters)
             assertEquals(0,coast.chapters.last().completedObjectives)
+            compose.onNodeWithTag("mixedHome").performClick()
+            compose.onNodeWithTag("regionProgress").assertTextEquals("3 of 3 chapters complete")
+            compose.onNodeWithTag("regionBack").performScrollTo().performClick()
+            compose.onNodeWithTag("atlasProgress_"+destination.world.id).assertTextEquals("3 of 3 chapters complete")
+            compose.onNodeWithTag("atlasSelected_"+destination.world.id).assertExists()
         } finally {
             compose.runOnIdle { visible.value=false }
             stores.zip(originals).forEach { (prefs,values) -> restore(prefs,values) }
