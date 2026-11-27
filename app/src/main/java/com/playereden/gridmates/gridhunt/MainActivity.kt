@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.content.Context
 import android.graphics.Paint
 import androidx.activity.ComponentActivity
+import androidx.core.view.WindowCompat
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
@@ -107,6 +108,11 @@ import com.playereden.gridhunt.core.WorldPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Parchment UI and cream startup both require dark system-bar icons.
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = true
+            isAppearanceLightNavigationBars = true
+        }
         setContent {
             MaterialTheme(
                 typography = JournalTypography,
