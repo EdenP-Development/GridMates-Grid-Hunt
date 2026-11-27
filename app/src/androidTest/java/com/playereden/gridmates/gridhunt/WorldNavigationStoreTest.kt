@@ -16,7 +16,10 @@ class WorldNavigationStoreTest {
         val chapterPrefs = chapters.map { context.getSharedPreferences(it.progressKey,Context.MODE_PRIVATE) }
         val previewPrefs = context.getSharedPreferences("gridhunt_world_selection_preview_v1",Context.MODE_PRIVATE)
         val publishedPrefs = context.getSharedPreferences("gridhunt_world_selection_v1",Context.MODE_PRIVATE)
-        val saved = (chapterPrefs + previewPrefs + publishedPrefs).map { it.all.toMap() }
+        val earnedPrefs = context.getSharedPreferences("gridhunt_campaign_earned_preview_v1",Context.MODE_PRIVATE)
+        val publishedEarned = context.getSharedPreferences("gridhunt_campaign_earned_v1",Context.MODE_PRIVATE)
+        val allPrefs = chapterPrefs + listOf(previewPrefs,publishedPrefs,earnedPrefs,publishedEarned)
+        val saved = allPrefs.map { it.all.toMap() }
         fun restore(prefs: android.content.SharedPreferences, values: Map<String, *>) {
             val editor = prefs.edit().clear()
             values.forEach { (key,value) ->
@@ -32,7 +35,7 @@ class WorldNavigationStoreTest {
             check(editor.commit())
         }
         try {
-            (chapterPrefs + previewPrefs + publishedPrefs).forEach { check(it.edit().clear().commit()) }
+            allPrefs.forEach { check(it.edit().clear().commit()) }
             val store = WorldNavigationStore(context,selection,true)
             assertEquals(woodland.world.id,store.current()?.destination?.world?.id)
             assertFalse(store.choose(coast.world.id))
@@ -56,8 +59,24 @@ class WorldNavigationStoreTest {
             check(previewPrefs.edit().putString("world_id","unknown").commit())
             assertEquals(woodland.world.id,store.current()?.destination?.world?.id)
             assertEquals("unknown",previewPrefs.getString("world_id",null))
+            val ledger = CampaignCompletionStore(context,selection,true)
+            assertTrue(ledger.captureCompleted())
+            assertEquals(woodland.world.chapters.map { it.chapter.id }.toSet(),ledger.snapshot().earnedChapterIds)
+            assertEquals(before,chapterPrefs.map { it.all })
+            assertTrue(publishedEarned.all.isEmpty())
+            assertTrue(store.choose(coast.world.id))
+            val first = woodland.world.chapters.first()
+            check(context.getSharedPreferences(first.progressKey,Context.MODE_PRIVATE).edit().putInt("step",0).commit())
+            val reopened = WorldNavigationStore(context,selection,true)
+            assertEquals(coast.world.id,reopened.current()?.destination?.world?.id)
+            assertNotNull(reopened.openChapter(coast.world.id,coast.world.chapters.first().chapter.id))
+            val replay = reopened.choices().first { it.destination.world.id == woodland.world.id }.chapters.first()
+            assertEquals(0,replay.completedObjectives)
+            assertTrue(replay.everCompleted)
+            assertTrue(ledger.captureCompleted())
+            assertEquals(woodland.world.chapters.map { it.chapter.id }.toSet(),ledger.snapshot().earnedChapterIds)
         } finally {
-            (chapterPrefs + previewPrefs + publishedPrefs).zip(saved).forEach { (prefs,values) -> restore(prefs,values) }
+            allPrefs.zip(saved).forEach { (prefs,values) -> restore(prefs,values) }
         }
     }
 }
