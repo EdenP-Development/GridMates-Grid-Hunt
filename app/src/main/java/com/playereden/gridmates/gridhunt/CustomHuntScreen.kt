@@ -23,24 +23,39 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.*
+import com.playereden.gridhunt.WorldHuntStore
 
 /** Independent custom session: never writes authored campaign or Quick Play saves. */
 @Composable
-internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHome: () -> Unit) {
+internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHome: () -> Unit,
+    map: ExplorationMap = ExplorationMaps.woodland) {
+    require(TrailChapterCatalog.forAuthoredMap(map) != null)
+    key(map.id, map.revision) { MapCustomHuntContent(mapLook, onLook, onHome, map) }
+}
+
+@Composable
+private fun MapCustomHuntContent(mapLook: MapLook, onLook: (MapLook) -> Unit, onHome: () -> Unit, map: ExplorationMap) {
+    val woodland = map == ExplorationMaps.woodland
+    val generator = remember(map) { MapHuntGenerator(map) }
+    val scene = if (woodland) publishedMapScene(map,mapLook) else coastalTerrainDraftScene(map,mapLook)
     val context = LocalContext.current
-    val prefs = remember(context) { context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE) }
-    var count by rememberSaveable { mutableIntStateOf(prefs.savedInt("count", 3).let { if (prefs.savedString("mode", "grid") == "mixed" && it !in CustomHuntGenerator.mixedLengths) 6 else if (it in CustomHuntGenerator.lengths) it else 3 }) }
-    var mode by rememberSaveable { mutableStateOf(prefs.savedString("mode", "grid")?.takeIf { it in listOf("grid", "gold", "identify", "checklist", "mixed") } ?: "grid") }
+    val prefs = remember(context,map) { if (woodland) context.getSharedPreferences("gridhunt_custom_v1", Context.MODE_PRIVATE) else null }
+    val store = remember(context,map) { if (woodland) null else WorldHuntStore(context,map) }
+    val initial = remember(store) { store?.read() }
+    val restored = (initial as? WorldHuntStore.ReadResult.Ready)?.session
+    var invalidSession by remember { mutableStateOf(initial == WorldHuntStore.ReadResult.Invalid) }
+    var count by rememberSaveable { mutableIntStateOf((prefs?.savedInt("count", 3) ?: restored?.codes?.split(",")?.size ?: 3).let { if ((prefs?.savedString("mode", "grid") ?: restored?.mode ?: "grid") == "mixed" && it !in generator.mixedLengths) 6 else if (it in generator.lengths) it else 3 }) }
+    var mode by rememberSaveable { mutableStateOf((prefs?.savedString("mode", "grid") ?: restored?.mode ?: "grid")?.takeIf { it in listOf("grid", "gold", "identify", "checklist", "mixed") } ?: "grid") }
     var nextMode by rememberSaveable { mutableStateOf(mode) }
     var answer by rememberSaveable { mutableStateOf("") }
-    var codes by rememberSaveable { mutableStateOf(prefs.savedString("codes", "") ?: "") }
-    var kinds by rememberSaveable { mutableStateOf(prefs.savedString("kinds", "") ?: "") }
-    val mixed = remember(codes, kinds, mode) { if (mode == "mixed") CustomHuntGenerator.restoreMixed(codes, kinds) else emptyList() }
+    var codes by rememberSaveable { mutableStateOf(prefs?.savedString("codes", "") ?: restored?.codes ?: "") }
+    var kinds by rememberSaveable { mutableStateOf(prefs?.savedString("kinds", "") ?: restored?.kinds ?: "") }
+    val mixed = remember(codes, kinds, mode) { if (mode == "mixed") generator.restoreMixed(codes, kinds) else emptyList() }
     val targets = remember(codes, mode, mixed) {
         if (mode == "mixed") mixed.map { it.cell }
-        else if (mode in listOf("identify", "checklist")) CustomHuntGenerator.restoreLandmarks(codes) else CustomHuntGenerator.restore(codes)
+        else if (mode in listOf("identify", "checklist")) generator.restoreLandmarks(codes) else generator.restore(codes)
     }
-    var step by rememberSaveable { mutableIntStateOf(prefs.savedInt("step", 0).coerceIn(0, targets.size)) }
+    var step by rememberSaveable { mutableIntStateOf((prefs?.savedInt("step", 0) ?: restored?.step ?: 0).coerceIn(0, targets.size)) }
     var playing by rememberSaveable { mutableStateOf(false) }
     var replaceHunt by rememberSaveable { mutableStateOf(false) }
     BackHandler(enabled = playing) { playing = false }
@@ -51,7 +66,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
     var hint by rememberSaveable { mutableIntStateOf(0) }
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
-    val bounds = WoodlandTrainingMap.bounds
+    val bounds = map.bounds
     fun fit() {
         if (viewport.width > 80 && viewport.height > 80)
             camera = MapCamera.fit(bounds, viewport.width.toDouble(), viewport.height.toDouble())
@@ -61,22 +76,31 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
             camera = camera?.transform(bounds, viewport.width.toDouble(), viewport.height.toDouble(),
                 PixelPoint(viewport.width/2.0,viewport.height/2.0),PixelPoint(0.0,0.0),scale)
     }
+    fun persistStep() {
+        if (woodland) prefs!!.edit().putInt("step",step).apply()
+        else check(store!!.apply(MapHuntSession(map.id,map.revision,mode,codes,kinds,step)))
+    }
     fun start() {
         val previous = targets.toSet()
-        val generated = if (nextMode == "mixed") CustomHuntGenerator.generateFreshMixed(count, previous) else emptyList()
+        val generated = if (nextMode == "mixed") generator.generateFreshMixed(count, previous) else emptyList()
         kinds = generated.joinToString(",") { it.type }
-        codes = CustomHuntGenerator.encode(if (generated.isNotEmpty()) generated.map { it.cell } else if (nextMode in listOf("identify", "checklist")) CustomHuntGenerator.generateFreshLandmarks(previous) else CustomHuntGenerator.generateFresh(count, previous))
+        codes = generator.encode(if (generated.isNotEmpty()) generated.map { it.cell } else if (nextMode in listOf("identify", "checklist")) generator.generateFreshLandmarks(previous) else generator.generateFresh(count, previous))
         mode = nextMode
         step = 0; selected = null; answer = ""; hint = 0; feedback = instruction(generated.firstOrNull()?.type ?: mode)
-        prefs.edit().putInt("count", count).putString("codes", codes).putString("mode", mode).putString("kinds", kinds).putInt("step", 0).apply()
+        if (woodland) prefs!!.edit().putInt("count", count).putString("codes", codes).putString("mode", mode).putString("kinds", kinds).putInt("step", 0).apply()
+        else check(store!!.apply(MapHuntSession(map.id,map.revision,mode,codes,kinds,0)))
+        invalidSession = false
         playing = true
         fit()
     }
-    if (showGuide) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showGuide = false })
+    if (showGuide) {
+        if (woodland) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showGuide = false })
+        else CoastalMapGuideDialog(mapLook, onDismiss = { showGuide = false })
+    }
     if (replaceHunt) AlertDialog(
         onDismissRequest = { replaceHunt = false },
         title = { Text("Start a new hunt?") },
-        text = { Text("Your unfinished custom hunt will be replaced.") },
+        text = { Text(if (invalidSession) "This saved hunt could not be restored. Replace it with a new hunt?" else "Your unfinished custom hunt will be replaced.") },
         confirmButton = { TextButton(onClick = { replaceHunt = false; start() },
             modifier = Modifier.testTag("customConfirmReplace")) { Text("New hunt") } },
         dismissButton = { TextButton(onClick = { replaceHunt = false },
@@ -93,9 +117,11 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
         }
         if (!playing) {
             Column(Modifier.weight(1f).journalScroll(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                WoodlandPostcard(Modifier.fillMaxWidth().height(96.dp))
+                if (woodland) WoodlandPostcard(Modifier.fillMaxWidth().height(96.dp))
+                else Text(map.name, fontWeight = FontWeight.Bold, color = Forest)
+                if (invalidSession) Text("Saved hunt could not be restored. It has not been changed.", color = Forest)
                 Text("Choose your puzzle", fontWeight = FontWeight.Bold, color = Ink, fontSize = 16.sp)
-                Text("Make a fresh woodland adventure at your own pace.", color = Muted, fontSize = 12.sp)
+                Text(if (woodland) "Make a fresh woodland adventure at your own pace." else "Make a fresh coastal adventure at your own pace.", color = Muted, fontSize = 12.sp)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf("grid" to "Trail Treasures", "gold" to "Golden Spots").forEach { (id,label) ->
                         FilterChip(selected = nextMode == id, onClick = { nextMode = id },
@@ -108,11 +134,11 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                             label = { CustomModeLabel(id, label) }, colors = customChipColors(), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("customMode_$id"))
                     }
                 }
-                FilterChip(selected = nextMode == "mixed", onClick = { nextMode = "mixed"; if (count !in CustomHuntGenerator.mixedLengths) count = 6 },
+                FilterChip(selected = nextMode == "mixed", onClick = { nextMode = "mixed"; if (count !in generator.mixedLengths) count = 6 },
                     label = { CustomModeLabel("mixed", "Mixed Expedition") }, colors = customChipColors(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("customMode_mixed"))
                 if (nextMode !in listOf("identify", "checklist")) Text("Discoveries", color = Ink, fontWeight = FontWeight.SemiBold)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    (when(nextMode) { "mixed" -> CustomHuntGenerator.mixedLengths; "identify", "checklist" -> CustomHuntGenerator.landmarkLengths; else -> CustomHuntGenerator.lengths }).forEach { n ->
+                    (when(nextMode) { "mixed" -> generator.mixedLengths; "identify", "checklist" -> generator.landmarkLengths; else -> generator.lengths }).forEach { n ->
                         if (nextMode in listOf("identify", "checklist")) Text("3 discoveries", color = Forest, modifier = Modifier.testTag("customLength_$n"))
                         else FilterChip(selected = count == n, onClick = { count = n },
                             label = { Text(n.toString(), modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center) }, colors = customChipColors(), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("customLength_$n"))
@@ -123,7 +149,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                         Text("Resume · " + (when(mode) { "gold" -> "Golden Spots"; "identify" -> "Landmark Identification"; "checklist" -> "Treasure Checklist"; "mixed" -> "Mixed Expedition"; else -> "Trail Treasures" }) + " · $step/${targets.size}")
                     }
                 }
-                Button(onClick = { if (targets.isNotEmpty() && step < targets.size) replaceHunt = true else start() }, shape = JournalActionShape, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("customStart")) {
+                Button(onClick = { if (invalidSession || (targets.isNotEmpty() && step < targets.size)) replaceHunt = true else start() }, shape = JournalActionShape, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("customStart")) {
                     Text("New hunt")
                 }
                 Text("Each new hunt chooses a fresh set of discoveries. Existing Adventure and Quick Play progress stays separate.", color = Muted, fontSize = 11.sp)
@@ -134,7 +160,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
         } else {
             val active = targets.getOrNull(step)
             val objectiveMode = if (mode == "mixed") mixed.getOrNull(step)?.type ?: "grid" else mode
-            val landmark = if (objectiveMode == "checklist") WoodlandLandmarks.all.firstOrNull { it.cell == active } else null
+            val landmark = if (objectiveMode == "checklist") map.landmarks.firstOrNull { it.cell == active } else null
             val prompt: @Composable () -> Unit = {
             if (active != null) {
                 if (objectiveMode == "gold") Text("Golden spot ${step+1} of ${targets.size}", color = Forest, fontWeight = FontWeight.Bold)
@@ -143,12 +169,12 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         val checklistTargets = if (mode == "mixed") listOf(active) else targets
                         checklistTargets.forEachIndexed { index, cell ->
-                            val item = WoodlandLandmarks.all.first { it.cell == cell }
+                            val item = map.landmarks.first { it.cell == cell }
                             Surface(modifier = Modifier.weight(1f), color = if (mode != "mixed" && index < step)
                                 androidx.compose.ui.graphics.Color(0xFFDDE9D4) else if (mode == "mixed" || index == step)
                                 androidx.compose.ui.graphics.Color(0xFFF8DDA0) else androidx.compose.ui.graphics.Color(0xFFFFFAEC)) {
                                 Column(Modifier.padding(4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    WoodlandLandmarkSwatch(item.id, mapLook, symbolSize = 32.dp)
+                                    if (woodland) WoodlandLandmarkSwatch(item.id, mapLook, symbolSize = 32.dp) else CoastalLandmarkSwatch(item,mapLook,32.dp)
                                     Text((if (mode != "mixed" && index < step) "✓ " else "") + item.name, fontSize = 10.sp,
                                         modifier = Modifier.testTag("customChecklistItem_${item.id}"))
                                 }
@@ -156,7 +182,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                         }
                     }
                     Text("Find: " + (landmark?.name ?: ""), fontWeight = FontWeight.Bold, color = Forest)
-                } else ObjectiveRibbon(step, targets.size, active, "Little Woodland", false)
+                } else ObjectiveRibbon(step, targets.size, active, map.name, false)
             }
             }
             val mapPanel: @Composable (Modifier) -> Unit = { mapModifier ->
@@ -167,10 +193,10 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 onViewport = { if (it != viewport || camera == null) { viewport = it; fit() } },
                 onCamera = { camera = it }, onSelect = { selected = it },
                 markerPoint = if (objectiveMode == "gold") active?.let { WorldPoint(it.eastIndex * 1000.0 + 500.0, it.northIndex * 1000.0 + 500.0) } else null,
-                enableSelect = active != null && objectiveMode == "grid", mapLook = mapLook, onLook = onLook)
+                enableSelect = active != null && objectiveMode == "grid", mapLook = mapLook, onLook = onLook, scene = scene, map = map)
             }
             val controls: @Composable () -> Unit = {
-            if (active == null) PuzzleFinishCard("Your hunt is complete!", "A little woodland adventure, all yours.",
+            if (active == null) PuzzleFinishCard("Your hunt is complete!", if (woodland) "A little woodland adventure, all yours." else "A little coastal adventure, all yours.",
                 "${targets.size} OF ${targets.size} FOUND", "New hunt", { nextMode = mode; count = targets.size; start() }, onHome)
             else if (objectiveMode in listOf("gold", "checklist")) {
                 val focusManager = LocalFocusManager.current
@@ -180,7 +206,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
 
                     if (answer == active.reference) {
                         step += 1; answer = ""; selected = null; hint = 0; feedback = "Found it!"
-                        prefs.edit().putInt("step",step).apply()
+                        persistStep()
                     } else { hint = 0; feedback = "Not quite. Try another code." }
                     }
                 }
@@ -205,13 +231,13 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     Text(if (objectiveMode == "gold") "Try this code" else "Mark found")
                 }
             } else if (objectiveMode == "identify") {
-                WoodlandLandmarks.all.chunked(2).forEach { pair ->
+                map.landmarks.chunked(2).forEach { pair ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         pair.forEach { landmark ->
                             OutlinedButton(shape = JournalActionShape, onClick = { answer = landmark.id }, modifier = Modifier.weight(1f).heightIn(min = 60.dp).testTag("customIdentify_${landmark.id}"),
                                 contentPadding = PaddingValues(4.dp),
                                 colors = ButtonDefaults.outlinedButtonColors(containerColor = if (answer == landmark.id) androidx.compose.ui.graphics.Color(0xFFF7DDA2) else androidx.compose.ui.graphics.Color(0xFFFFFBF0))) {
-                                WoodlandLandmarkSwatch(landmark.id, mapLook, symbolSize = 32.dp)
+                                if (woodland) WoodlandLandmarkSwatch(landmark.id, mapLook, symbolSize = 32.dp) else CoastalLandmarkSwatch(landmark,mapLook,32.dp)
                                 Text(landmark.name, fontSize = 11.sp, modifier = Modifier.weight(1f))
                             }
                         }
@@ -224,15 +250,15 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                     HuntToolButton(ExplorerTool.FIT, Modifier.weight(1f), ::fit)
                 }
                 Button(shape = JournalActionShape, onClick = {
-                    if (WoodlandLandmarks.byId(answer)?.cell == active) {
+                    if (map.landmark(answer)?.cell == active) {
                         step += 1; answer = ""; selected = null; hint = 0; feedback = "Found it!"
-                        prefs.edit().putInt("step", step).apply()
+                        persistStep()
                     } else feedback = "Not quite. Look inside the square."
                 }, enabled = answer.isNotEmpty(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("customIdentifyCheck")) { Text("Check find") }
             } else HuntControlPanel(step, targets.size, selected, feedback, hint, false,
                 onMove = { dx,dy ->
-                    val cell = GridReference.parse(selected ?: "2640")
-                    selected = GridCell((cell.eastIndex+dx).coerceIn(24,29),(cell.northIndex+dy).coerceIn(37,42)).reference
+                    val cell = selected?.let(GridReference::parse)
+                    selected = TrailChapterCatalog.forAuthoredMap(map)!!.moveSelection(cell,dx,dy).reference
                 },
                 onZoom = { scale ->
                     camera = camera?.transform(bounds, viewport.width.toDouble(), viewport.height.toDouble(),
@@ -242,7 +268,7 @@ internal fun CustomHuntScreen(mapLook: MapLook, onLook: (MapLook) -> Unit, onHom
                 onCheck = {
                     if (selected == active.reference) {
                         step += 1; selected = null; hint = 0; feedback = "Found it! On to the next square."
-                        prefs.edit().putInt("step",step).apply()
+                        persistStep()
                     } else { hint = 0; feedback = "Not quite. Try another square." }
                 }, actionLabel = "Try this square")
             }
