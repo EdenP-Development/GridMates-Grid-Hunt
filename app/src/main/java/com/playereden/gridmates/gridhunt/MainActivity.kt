@@ -195,6 +195,9 @@ private fun GridHuntScreen() {
             secondProgress = supplyState.completedObjectives,
             thirdStatus = returnState.status,
             thirdProgress = returnState.completedObjectives,
+            firstEarned = campaignState.everCompleted,
+            secondEarned = supplyState.everCompleted,
+            thirdEarned = returnState.everCompleted,
             onThirdChapter = {
                 if (returnState.status != CampaignChapterStatus.LOCKED) {
                     returnHub = "adventure"
