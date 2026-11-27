@@ -26,7 +26,7 @@ class HomeNavigationTest {
 
     private val earnedPrefs get() = InstrumentationRegistry.getInstrumentation().targetContext
         .getSharedPreferences("gridhunt_campaign_earned_v1", Context.MODE_PRIVATE)
-    private var originalEarned: Map<String, *> = emptyMap()
+    private var originalEarned: Map<String, *> = emptyMap<String, Any>()
 
     @org.junit.Before fun isolateEarnedCompletion() {
         originalEarned = earnedPrefs.all.toMap()
