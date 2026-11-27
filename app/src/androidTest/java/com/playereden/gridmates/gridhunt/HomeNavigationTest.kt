@@ -24,6 +24,31 @@ import org.junit.runner.RunWith
 class HomeNavigationTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
 
+    private val earnedPrefs get() = InstrumentationRegistry.getInstrumentation().targetContext
+        .getSharedPreferences("gridhunt_campaign_earned_v1", Context.MODE_PRIVATE)
+    private var originalEarned: Map<String, *> = emptyMap()
+
+    @org.junit.Before fun isolateEarnedCompletion() {
+        originalEarned = earnedPrefs.all.toMap()
+        check(earnedPrefs.edit().clear().commit())
+        compose.activityRule.scenario.recreate()
+    }
+
+    @org.junit.After fun restoreEarnedCompletion() {
+        val edit = earnedPrefs.edit().clear()
+        originalEarned.forEach { (key,value) ->
+            when(value) {
+                is Boolean -> edit.putBoolean(key,value)
+                is Int -> edit.putInt(key,value)
+                is String -> edit.putString(key,value)
+                is Long -> edit.putLong(key,value)
+                is Float -> edit.putFloat(key,value)
+                is Set<*> -> edit.putStringSet(key,value.filterIsInstance<String>().toSet())
+            }
+        }
+        check(edit.commit())
+    }
+
     private fun openQuickIfAtHome() {
         if (compose.onAllNodesWithTag("openQuickPlay").fetchSemanticsNodes().isNotEmpty()) {
             compose.onNodeWithTag("openQuickPlay").performScrollTo().performClick()
@@ -537,10 +562,17 @@ class HomeNavigationTest {
             org.junit.Assert.assertEquals(4, third.getInt("step", -1))
             org.junit.Assert.assertEquals(earlier, listOf(first, second).map { it.all.toMap() })
             compose.onNodeWithTag("finishContinue").performClick()
+            compose.waitUntil(10000) { third.getInt("step",-1) == 0 }
             compose.onNodeWithText("0 of 4 clues solved").assertExists()
             org.junit.Assert.assertEquals(0, third.getInt("step", -1))
             org.junit.Assert.assertEquals(earlier, listOf(first, second).map { it.all.toMap() })
             compose.onNodeWithTag("mixedHome").performClick()
+            compose.onNodeWithTag("chapterEarned_3").assertExists()
+            compose.onNodeWithTag("openThirdChapter").assertIsEnabled()
+            compose.onNodeWithTag("adventureBack").performClick()
+            compose.onNodeWithText("3 of 3 chapters complete").assertExists()
+            compose.activityRule.scenario.recreate()
+            compose.onNodeWithText("3 of 3 chapters complete").assertExists()
         } finally {
             listOf(first, second, third).zip(before).forEach { (prefs, snapshot) ->
                 val editor = prefs.edit().clear()
