@@ -59,6 +59,11 @@ import com.playereden.gridhunt.core.ExplorationMaps
 import com.playereden.gridhunt.core.SurveyMarkerCatalog
 import com.playereden.gridhunt.core.TrailChapterCatalog
 import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.playereden.gridhunt.core.PublishedWorlds
 import com.playereden.gridhunt.core.ExpeditionObjective
 import com.playereden.gridhunt.core.ExpeditionVerb
 import com.playereden.gridhunt.core.GridReference
@@ -150,6 +155,12 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
             "Follow the journal notes to trace the missing supplies."
             else "Follow the next clue to recover the missing field notes.")
     }
+    val completion = remember(context, woodland) {
+        CampaignCompletionStore(context, if (woodland) PublishedWorlds.selection else CoastalExpeditionPreview.selection, !woodland)
+    }
+    val scope = rememberCoroutineScope()
+    var replayPending by remember { mutableStateOf(false) }
+    var replaySaveError by remember { mutableStateOf(false) }
     val active = mission.objectiveAt(step)
     val finished = mission.finished(step)
     LaunchedEffect(mission.chapter.id, step, selectedCell, enteredCode, chosenLandmark) {
@@ -254,7 +265,19 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
             }
         }
     }
-    val replay: () -> Unit = {
+    val replay: () -> Unit = replayAction@{
+        if (replayPending) return@replayAction
+        replayPending = true
+        scope.launch {
+            try {
+                val recorded = withContext(Dispatchers.IO) {
+                    completion.captureCompleted() &&
+                        mission.chapter.id in completion.snapshot().earnedChapterIds
+                }
+                if (!recorded) {
+                    replaySaveError = true
+                    return@launch
+                }
         prefs.edit().putInt("step", 0)
             .remove("selected_cell").remove("entered_code")
             .remove("chosen_landmark").apply()
@@ -268,6 +291,18 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
             else if (chapterTwo) "The supply clues are ready to trace again."
             else "All four notes have been hidden again. Enjoy the hunt!"
         fit()
+            } finally {
+                replayPending = false
+            }
+        }
+    }
+    if (replaySaveError) {
+        AlertDialog(
+            onDismissRequest = { replaySaveError = false },
+            title = { Text("Progress protected") },
+            text = { Text("Your completed chapter could not be recorded permanently. Replay has not started. Please try again.") },
+            confirmButton = { TextButton(onClick = { replaySaveError = false }) { Text("OK") } }
+        )
     }
     val onMapSelect: (String) -> Unit = { reference ->
         if (active?.verb == ExpeditionVerb.FIND_SQUARE) {
