@@ -100,4 +100,72 @@ class CoastalCustomHuntTest {
             check(prefs.edit().clear().commit())
         }
     }
+
+    @Test fun mixedExpeditionSolvesEveryObjectiveAndReplaysWithFreshCells() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val map = WhisperingCoastDraft.map
+        val store = WorldHuntStore(context,map)
+        val prefs = context.getSharedPreferences("gridhunt_world_hunt_v1_whispering-coast-01_r1",Context.MODE_PRIVATE)
+        val precision = context.getSharedPreferences("gridhunt_ui_preferences",Context.MODE_PRIVATE)
+        val originalPrecision = precision.all["precise_selection"]
+        val legacy = context.getSharedPreferences("gridhunt_custom_v1",Context.MODE_PRIVATE)
+        val original = legacy.all.toMap()
+        check(prefs.edit().clear().commit())
+        check(precision.edit().putBoolean("precise_selection",true).commit())
+        val visible = mutableStateOf(true)
+        compose.setContent {
+            if (visible.value) CustomHuntScreen(MapLook.SURVEY_TABLE, {}, {},map)
+        }
+        fun ready(): WorldHuntStore.ReadResult.Ready {
+            compose.waitForIdle()
+            return store.read() as WorldHuntStore.ReadResult.Ready
+        }
+        fun move(direction: String) {
+            compose.onNodeWithContentDescription("Move selected square $direction").performClick()
+        }
+        try {
+            compose.onNodeWithTag("customMode_mixed").performScrollTo().performClick()
+            compose.onNodeWithTag("customLength_6").performScrollTo().performClick()
+            compose.onNodeWithTag("customStart").performScrollTo().performClick()
+            val first = ready()
+            first.restored.objectives.forEachIndexed { index, objective ->
+                when (objective.type) {
+                    "grid" -> {
+                        repeat(6) { move("west") }
+                        repeat(6) { move("south") }
+                        repeat(objective.cell.eastIndex-42) { move("east") }
+                        repeat(objective.cell.northIndex-51) { move("north") }
+                        compose.onNodeWithText("Try this square").performClick()
+                    }
+                    "gold", "checklist" -> {
+                        val prefix = if (objective.type=="gold") "customGold" else "customChecklist"
+                        compose.onNodeWithTag(prefix+"Input").performTextReplacement(objective.cell.reference)
+                        compose.onNodeWithTag(prefix+"Check").performClick()
+                    }
+                    "identify" -> {
+                        val landmark = map.landmarks.single { it.cell==objective.cell }
+                        compose.onNodeWithTag("customIdentify_"+landmark.id).performClick()
+                        compose.onNodeWithTag("customIdentifyCheck").performClick()
+                    }
+                    else -> error("Unexpected objective type")
+                }
+                assertEquals(index+1,ready().session.step)
+            }
+            compose.onNodeWithText("Your hunt is complete!").assertExists()
+            compose.onNodeWithTag("finishContinue").performClick()
+            val next = ready()
+            assertEquals(0,next.session.step)
+            assertEquals("mixed",next.session.mode)
+            assertEquals(6,next.restored.objectives.size)
+            assertTrue(first.restored.objectives.map { it.cell }.toSet().intersect(next.restored.objectives.map { it.cell }.toSet()).isEmpty())
+            assertEquals(original,legacy.all)
+        } finally {
+            compose.runOnIdle { visible.value=false }
+            check(prefs.edit().clear().commit())
+            val editor = precision.edit()
+            if (originalPrecision is Boolean) editor.putBoolean("precise_selection",originalPrecision)
+            else editor.remove("precise_selection")
+            check(editor.commit())
+        }
+    }
 }
