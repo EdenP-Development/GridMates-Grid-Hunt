@@ -95,9 +95,15 @@ private fun AtlasWorldCard(choice: WorldChoice, selected: Boolean, onOpen: () ->
     ) {
         Column(Modifier.fillMaxWidth().padding(13.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(world.name, color = Ink, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
-            Text("$widthKm × $heightKm km · ${map.cells.size} grid squares",
-                color = Muted, fontSize = 12.sp)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                RegionMapPortrait(map,Modifier.size(84.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(world.name, color = Ink, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                    Text("$widthKm × $heightKm km · ${map.cells.size} grid squares",
+                        color = Muted, fontSize = 12.sp)
+                }
+            }
             Text("${choice.completedChapters} of ${choice.chapters.size} chapters complete",
                 color = Forest, fontWeight = FontWeight.Bold, fontSize = 12.sp,
                 modifier = Modifier.testTag("atlasProgress_${world.id}"))
