@@ -1,6 +1,10 @@
 package com.playereden.gridmates.gridhunt
 
 import android.content.Context
+import android.content.ContentValues
+import android.graphics.Bitmap
+import android.os.Environment
+import android.provider.MediaStore
 import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.*
@@ -66,8 +70,12 @@ class RegionalPreviewGameplayTest {
             compose.setContent {
                 if (visible.value) RegionalPreviewGameplay { visible.value=false }
             }
+            compose.onNodeWithTag("regionPortrait_"+coast.map.id).performScrollTo().assertIsDisplayed()
+            capture("28_atlas_coast_unlocked.png")
             click("atlasOpen_"+coast.world.id)
             compose.onNodeWithTag("regionGameplayHub").assertExists()
+            compose.onNodeWithTag("regionPortrait_"+coast.map.id).performScrollTo().assertIsDisplayed()
+            capture("29_coastal_region_hub.png")
             val first = coast.world.chapters.first()
             compose.onNodeWithTag("regionChapter_"+coast.world.chapters.last().chapter.id)
                 .assertIsNotEnabled()
@@ -158,8 +166,12 @@ class RegionalPreviewGameplayTest {
                 if (visible.value) RegionalPreviewGameplay { visible.value=false }
             }
             compose.onNodeWithTag("atlasOpen_"+coast.world.id).assertIsNotEnabled()
+            compose.onNodeWithTag("regionPortrait_"+woodland.map.id).performScrollTo().assertIsDisplayed()
+            capture("26_atlas_woodland.png")
             click("atlasOpen_"+woodland.world.id)
             val first = woodland.world.chapters.first()
+            compose.onNodeWithTag("regionPortrait_"+woodland.map.id).performScrollTo().assertIsDisplayed()
+            capture("27_woodland_region_hub.png")
             compose.onNodeWithTag("regionChapter_"+woodland.world.chapters.last().chapter.id)
                 .assertIsNotEnabled()
             click("regionChapter_"+first.chapter.id)
@@ -202,5 +214,29 @@ class RegionalPreviewGameplayTest {
             compose.runOnIdle { visible.value=false }
             stores.forEach { (key,store) -> restore(store,originals.getValue(key)) }
         }
+    }
+
+    private fun capture(filename: String) {
+        compose.waitForIdle()
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.waitForIdleSync()
+        android.os.SystemClock.sleep(500L)
+        val image = requireNotNull(instrumentation.uiAutomation.takeScreenshot())
+        val resolver = instrumentation.targetContext.contentResolver
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/GridHuntVisualQA")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+        val uri = requireNotNull(resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values))
+        try {
+            requireNotNull(resolver.openOutputStream(uri)).use { stream ->
+                check(image.compress(Bitmap.CompressFormat.PNG, 100, stream))
+            }
+            check(resolver.update(uri, ContentValues().apply {
+                put(MediaStore.Images.Media.IS_PENDING, 0)
+            }, null, null) == 1)
+        } finally { image.recycle() }
     }
 }
