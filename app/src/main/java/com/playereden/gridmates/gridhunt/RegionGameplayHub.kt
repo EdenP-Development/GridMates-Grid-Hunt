@@ -59,10 +59,29 @@ internal fun RegionGameplayHub(
             Text("This region is unavailable. Return to the Atlas to choose another region.",
                 color = Ink, fontSize = 14.sp, modifier = Modifier.testTag("regionUnavailable"))
         } else {
-            RegionMapPortrait(destination.map,Modifier.fillMaxWidth().height(116.dp))
-            Text("${choice.completedChapters} of ${choice.chapters.size} chapters complete",
-                color = Forest, fontWeight = FontWeight.Bold, fontSize = 13.sp,
-                modifier = Modifier.testTag("regionProgress"))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                RegionMapPortrait(destination.map,Modifier.size(100.dp))
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Text("${choice.completedChapters} of ${choice.chapters.size} chapters complete",
+                        color = Forest, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                        modifier = Modifier.testTag("regionProgress"))
+                    Text("${destination.map.cells.size} grid squares to explore",
+                        color = Muted, fontSize = 12.sp)
+                }
+            }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { available()?.destination?.let(onQuickPlay) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("regionQuickPlay"),
+                    colors = ButtonDefaults.buttonColors(containerColor = Forest), shape = JournalActionShape) {
+                    Text("Quick Play")
+                }
+                Button(onClick = { available()?.destination?.let(onCustomPlay) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("regionCustomPlay"),
+                    colors = ButtonDefaults.buttonColors(containerColor = Forest), shape = JournalActionShape) {
+                    Text("Custom Play")
+                }
+            }
             Text("Adventure", color = Ink, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
             destination.world.chapters.sortedBy { it.order }.forEach { chapter ->
                 val progress = choice.chapters.first { it.chapterId == chapter.chapter.id }
@@ -108,17 +127,7 @@ internal fun RegionGameplayHub(
                     }
                 }
             }
-            Text("Choose your own path", color = Ink, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-            Button(onClick = { available()?.destination?.let(onQuickPlay) },
-                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("regionQuickPlay"),
-                colors = ButtonDefaults.buttonColors(containerColor = Forest), shape = JournalActionShape) {
-                Text("Quick Play")
-            }
-            Button(onClick = { available()?.destination?.let(onCustomPlay) },
-                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("regionCustomPlay"),
-                colors = ButtonDefaults.buttonColors(containerColor = Forest), shape = JournalActionShape) {
-                Text("Custom Play")
-            }
+
         }
     }
 }
