@@ -84,6 +84,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.ChapterPosition
 import com.playereden.gridhunt.core.FirstBearingsChapter
+import com.playereden.gridhunt.core.ExplorationMaps
+import com.playereden.gridhunt.core.MapTrailChapter
+import com.playereden.gridhunt.core.TrailChapterCatalog
 import com.playereden.gridhunt.core.TreasureChecklistMission
 import com.playereden.gridhunt.core.WoodlandIdentifyMission
 import com.playereden.gridhunt.core.WoodlandExpedition
@@ -450,19 +453,33 @@ private fun GridHuntHome(
 }
 
 @Composable
-private fun FirstBearingsScreen(
+internal fun FirstBearingsScreen(
     onHome: () -> Unit,
     mapLook: MapLook,
     onLook: (MapLook) -> Unit,
-    hapticsEnabled: Boolean
+    hapticsEnabled: Boolean,
+    chapter: MapTrailChapter = TrailChapterCatalog.woodland
 ) {
+    require(TrailChapterCatalog.forAuthoredMap(chapter.map) === chapter)
+    androidx.compose.runtime.key(chapter.map.id, chapter.map.revision) {
+        MapTrailContent(onHome, mapLook, onLook, hapticsEnabled, chapter)
+    }
+}
+
+@Composable
+private fun MapTrailContent(onHome: () -> Unit, mapLook: MapLook, onLook: (MapLook) -> Unit,
+    hapticsEnabled: Boolean, chapter: MapTrailChapter) {
+    val map = chapter.map
+    val woodland = map == ExplorationMaps.woodland
+    val scene = if (woodland) publishedMapScene(map, mapLook) else coastalTerrainDraftScene(map, mapLook)
+    val region = if (woodland) "woodland" else "coastal"
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
-    val prefs = remember(context) {
-        context.getSharedPreferences("gridhunt_first_bearings_v1", Context.MODE_PRIVATE)
+    val prefs = remember(context, map) {
+        context.getSharedPreferences(chapter.saveName, Context.MODE_PRIVATE)
     }
     val initial = remember(prefs) {
-        FirstBearingsChapter.restore(
+        chapter.restore(
             prefs.savedInt("hunt_index", 0),
             prefs.savedInt("objective_index", 0)
         )
@@ -473,9 +490,7 @@ private fun FirstBearingsScreen(
         mutableStateOf(prefs.savedString("selected", null)?.takeIf { ref ->
             runCatching {
                 val cell = GridReference.parse(ref)
-                cell.digits == 4 && WoodlandTrainingMap.bounds.contains(
-                    WorldPoint(cell.westMeters.toDouble(), cell.southMeters.toDouble())
-                )
+                cell.digits == 4 && cell in map.cells
             }.getOrDefault(false)
         })
     }
@@ -496,13 +511,13 @@ private fun FirstBearingsScreen(
         }
     }
 
-    val hunt = FirstBearingsChapter.hunts[huntIndex]
+    val hunt = chapter.hunts[huntIndex]
     val targets = hunt.objectives
     val finished = step >= targets.size
-    val chapterFinished = finished && huntIndex == FirstBearingsChapter.hunts.lastIndex
+    val chapterFinished = finished && huntIndex == chapter.hunts.lastIndex
     val active = targets.getOrNull(step)
     val selectedCell = selected?.let(GridReference::parse)
-    val bounds = WoodlandTrainingMap.bounds
+    val bounds = map.bounds
 
     // Save objective/hunt progress promptly, including hints and pending selection,
     // so returning after Android closes the activity resumes the same authored task.
@@ -548,11 +563,7 @@ private fun FirstBearingsScreen(
 
     fun moveSelected(eastDelta: Int, northDelta: Int) {
         if (finished) return
-        val origin = selectedCell ?: GridCell(26, 40)
-        selected = GridCell(
-            (origin.eastIndex + eastDelta).coerceIn(24, 29),
-            (origin.northIndex + northDelta).coerceIn(37, 42)
-        ).reference
+        selected = chapter.moveSelection(selectedCell, eastDelta, northDelta).reference
         feedback = "Square " + selected + " is your pick. Check it or choose another!"
     }
 
@@ -581,7 +592,7 @@ private fun FirstBearingsScreen(
 
     val onCheck: () -> Unit = {
         if (finished) {
-            val next = FirstBearingsChapter.nextHuntOrReplay(ChapterPosition(huntIndex, step))
+            val next = chapter.nextHuntOrReplay(ChapterPosition(huntIndex, step))
             val replayed = next.huntIndex == 0
             huntIndex = next.huntIndex
             step = next.objectiveIndex
@@ -597,7 +608,7 @@ private fun FirstBearingsScreen(
             if (attempt != null) {
                 if (HuntRules.isCorrect(expected, attempt)) {
                     if (hapticsEnabled) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    step = FirstBearingsChapter.acceptCorrect(
+                    step = chapter.acceptCorrect(
                         ChapterPosition(huntIndex, step)
                     ).objectiveIndex
                     selected = null
@@ -606,8 +617,8 @@ private fun FirstBearingsScreen(
                         else "A new discovery!"
                     discoverySequence += 1
                     feedback = when {
-                        step >= targets.size && huntIndex == FirstBearingsChapter.hunts.lastIndex ->
-                            "What a trail! You found all nine woodland squares."
+                        step >= targets.size && huntIndex == chapter.hunts.lastIndex ->
+                            "What a trail! You found all nine $region squares."
                         step >= targets.size ->
                             "Beautifully done! Your next trail is ready."
                         else -> "Nice find! ✦ " + expected.reference + " was the spot. Another clue awaits."
@@ -646,7 +657,7 @@ private fun FirstBearingsScreen(
                     onCamera = ::updateCamera,
                     onSelect = onMapSelect, mapLook = mapLook,
                     discoveryMessage = discoveryMessage,
-                    onLook = onLook
+                    onLook = onLook, scene = scene, map = map
                 )
                 Column(
                     modifier = Modifier
@@ -657,7 +668,7 @@ private fun FirstBearingsScreen(
                 ) {
                     HuntHeader(
                         compact = true, huntName = hunt.name,
-                        huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
+                        huntNumber = huntIndex + 1, huntTotal = chapter.hunts.size,
                         onGuide = { showGuide = !showGuide },
                         onHome = onHome
                     )
@@ -671,9 +682,9 @@ private fun FirstBearingsScreen(
                     }
                     if (finished) {
                         PuzzleFinishCard(
-                            title = if (chapterFinished) "Woodland adventure complete!" else "Trail complete!",
+                            title = if (chapterFinished) (if (woodland) "Woodland adventure complete!" else "Coastal adventure complete!") else "Trail complete!",
                             description = if (chapterFinished)
-                                "Nine clues found across three trails. The whole little woodland is yours to revisit."
+                                if (woodland) "Nine clues found across three trails. The whole little woodland is yours to revisit." else "Nine clues found across three trails. The coast is yours to revisit."
                             else "You found every square on this trail. There's another path to explore!",
                             discoveries = if (chapterFinished) "9 OF 9 LITTLE DISCOVERIES"
                                 else "${targets.size} OF ${targets.size} SQUARES FOUND",
@@ -704,7 +715,7 @@ private fun FirstBearingsScreen(
             Column(modifier = Modifier.fillMaxSize()) {
                 HuntHeader(
                     compact = false, huntName = hunt.name,
-                    huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
+                    huntNumber = huntIndex + 1, huntTotal = chapter.hunts.size,
                     onGuide = { showGuide = !showGuide },
                     onHome = onHome
                 )
@@ -729,14 +740,14 @@ private fun FirstBearingsScreen(
                     onCamera = ::updateCamera,
                     onSelect = onMapSelect, mapLook = mapLook,
                     discoveryMessage = discoveryMessage,
-                    onLook = onLook
+                    onLook = onLook, scene = scene, map = map
                 )
                 Spacer(Modifier.height(4.dp))
                 if (finished) {
                     PuzzleFinishCard(
-                        title = if (chapterFinished) "Woodland adventure complete!" else "Trail complete!",
+                        title = if (chapterFinished) (if (woodland) "Woodland adventure complete!" else "Coastal adventure complete!") else "Trail complete!",
                         description = if (chapterFinished)
-                            "Nine clues found across three trails. The whole little woodland is yours to revisit."
+                            if (woodland) "Nine clues found across three trails. The whole little woodland is yours to revisit." else "Nine clues found across three trails. The coast is yours to revisit."
                         else "You found every square on this trail. There's another path to explore!",
                         discoveries = if (chapterFinished) "9 OF 9 LITTLE DISCOVERIES"
                             else "${targets.size} OF ${targets.size} SQUARES FOUND",
