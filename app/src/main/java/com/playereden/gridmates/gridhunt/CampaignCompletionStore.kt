@@ -4,6 +4,7 @@ import android.content.Context
 import com.playereden.gridhunt.core.CampaignChapter
 import com.playereden.gridhunt.core.CampaignSnapshot
 import com.playereden.gridhunt.core.WorldSelection
+import com.playereden.gridhunt.core.PublishedWorlds
 
 /** Separate durable accomplishments. Existing chapter preference files are read only. */
 internal class CampaignCompletionStore(
@@ -14,6 +15,12 @@ internal class CampaignCompletionStore(
     internal val namespace = if (preview) "gridhunt_campaign_earned_preview_v1" else "gridhunt_campaign_earned_v1"
     private val prefs = context.getSharedPreferences(namespace, Context.MODE_PRIVATE)
     private val chapters = selection.destinations.flatMap { it.world.chapters }
+    // Preview can recognize exact published chapter accomplishments, but never
+    // writes to the published ledger. Candidate-only chapters cannot inherit keys.
+    private val publishedPrefs = if (preview) context.getSharedPreferences(
+        "gridhunt_campaign_earned_v1", Context.MODE_PRIVATE) else null
+    private val sharedPublishedChapters = if (preview) PublishedWorlds.selection.destinations
+        .flatMap { it.world.chapters }.toSet() else emptySet<CampaignChapter>()
     private fun key(item: CampaignChapter) =
         "earned_${item.chapter.id}_r${item.chapter.revision}"
 
@@ -23,7 +30,10 @@ internal class CampaignCompletionStore(
                 .all["step"] as? Int ?: 0)
         }
         val earned = prefs.all
-        return CampaignSnapshot(steps, chapters.filter { earned[key(it)] == true }
+        val publishedEarned = publishedPrefs?.all.orEmpty()
+        return CampaignSnapshot(steps, chapters.filter {
+            earned[key(it)] == true || (it in sharedPublishedChapters && publishedEarned[key(it)] == true)
+        }
             .map { it.chapter.id }.toSet())
     }
 
