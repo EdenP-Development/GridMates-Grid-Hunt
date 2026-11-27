@@ -54,6 +54,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.playereden.gridhunt.core.CoastalExpeditionPreview
+import com.playereden.gridhunt.core.ExplorationMaps
+import com.playereden.gridhunt.core.SurveyMarkerCatalog
+import com.playereden.gridhunt.core.TrailChapterCatalog
+import androidx.compose.runtime.key
 import com.playereden.gridhunt.core.ExpeditionObjective
 import com.playereden.gridhunt.core.ExpeditionVerb
 import com.playereden.gridhunt.core.GridReference
@@ -85,17 +90,35 @@ internal fun WoodlandMixedExpeditionScreen(
     hapticsEnabled: Boolean,
     chapterTwo: Boolean = false,
     onNextChapter: (() -> Unit)? = null,
-    chapterThree: Boolean = false
+    chapterThree: Boolean = false,
+    coastalPreview: ExpeditionPlaythrough? = null
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    val mission = remember(chapterTwo, chapterThree) {
-        if (chapterThree) WoodlandReturnExpedition.run
+    val mission = remember(chapterTwo, chapterThree, coastalPreview) {
+        if (coastalPreview != null) coastalPreview
+        else if (chapterThree) WoodlandReturnExpedition.run
         else if (chapterTwo) WoodlandSupplyExpedition.run
         else ExpeditionPlaythrough(WoodlandExpedition.chapter, WoodlandExpedition.saveName)
     }
-    val clueChapter = chapterTwo || chapterThree
-    val chapterNumber = if (chapterThree) 3 else if (chapterTwo) 2 else 1
+    val coastalNumber = coastalPreview?.let { requireNotNull(CoastalExpeditionPreview.numberOf(it)) }
+    val chapterNumber = coastalNumber ?: if (chapterThree) 3 else if (chapterTwo) 2 else 1
+    key(mission.chapter.id, mission.chapter.revision) {
+        MapExpeditionContent(mission, chapterNumber, onHome, mapLook, onLook, hapticsEnabled, onNextChapter)
+    }
+}
+
+@Composable
+private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: Int, onHome: () -> Unit,
+    mapLook: MapLook, onLook: (MapLook) -> Unit, hapticsEnabled: Boolean, onNextChapter: (() -> Unit)?) {
+    val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
+    val map = mission.chapter.map
+    val woodland = map == ExplorationMaps.woodland
+    val chapterTwo = chapterNumber == 2
+    val chapterThree = chapterNumber == 3
+    val clueChapter = !woodland || chapterTwo || chapterThree
+    val scene = if (woodland) publishedMapScene(map,mapLook) else coastalTerrainDraftScene(map,mapLook)
     val prefs = remember(context, mission.saveName) {
         context.getSharedPreferences(mission.saveName, Context.MODE_PRIVATE)
     }
@@ -104,7 +127,7 @@ internal fun WoodlandMixedExpeditionScreen(
     }
     var selectedCell by rememberSaveable(mission.chapter.id) {
         mutableStateOf(prefs.savedString("selected_cell", null)?.takeIf {
-            runCatching { GridReference.parse(it).digits == 4 }.getOrDefault(false)
+            runCatching { GridReference.parse(it) in map.cells }.getOrDefault(false)
         })
     }
     var enteredCode by rememberSaveable(mission.chapter.id) {
@@ -113,7 +136,7 @@ internal fun WoodlandMixedExpeditionScreen(
     }
     var chosenLandmark by rememberSaveable(mission.chapter.id) {
         mutableStateOf(prefs.savedString("chosen_landmark", null)?.takeIf { id ->
-            WoodlandLandmarks.byId(id) != null
+            map.landmark(id) != null
         })
     }
     var showGuide by rememberSaveable(mission.chapter.id) { mutableStateOf(false) }
@@ -121,7 +144,8 @@ internal fun WoodlandMixedExpeditionScreen(
     var discoveryEarned by rememberSaveable(mission.chapter.id) { mutableStateOf(false) }
     var feedback by rememberSaveable(mission.chapter.id) {
         mutableStateOf(mission.chapter.objectives.getOrNull(step - 1)?.discovery
-            ?.takeIf { it.isNotBlank() } ?: if (chapterThree) "Record the route back to the trailhead."
+            ?.takeIf { it.isNotBlank() } ?: if (!woodland) mission.chapter.story
+            else if (chapterThree) "Record the route back to the trailhead."
             else if (chapterTwo)
             "Follow the journal notes to trace the missing supplies."
             else "Follow the next clue to recover the missing field notes.")
@@ -137,7 +161,7 @@ internal fun WoodlandMixedExpeditionScreen(
             .apply()
     }
 
-    val bounds = WoodlandTrainingMap.bounds
+    val bounds = map.bounds
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
     var centerE by rememberSaveable { mutableStateOf(bounds.center.easting) }
@@ -185,10 +209,8 @@ internal fun WoodlandMixedExpeditionScreen(
     fun moveSelection(dx: Int, dy: Int) {
         val base = selectedCell?.let {
             runCatching { GridReference.parse(it) }.getOrNull()
-        } ?: GridReference.parse("2640")
-        val east = (base.eastIndex + dx).coerceIn(24, 29)
-        val north = (base.northIndex + dy).coerceIn(37, 42)
-        selectedCell = com.playereden.gridhunt.core.GridCell(east, north).reference
+        }
+        selectedCell = requireNotNull(TrailChapterCatalog.forAuthoredMap(map)).moveSelection(base,dx,dy).reference
     }
     val check: () -> Unit = {
         val current = active
@@ -213,7 +235,8 @@ internal fun WoodlandMixedExpeditionScreen(
                 chosenLandmark = null
                 discoveryEarned = true
                 feedback = current.discovery.takeIf { it.isNotBlank() } ?: if (mission.finished(step)) {
-                    if (chapterThree) "Your woodland circuit is complete!"
+                    if (!woodland) "Your coastal chapter is complete!"
+                    else if (chapterThree) "Your woodland circuit is complete!"
                     else if (chapterTwo) "The last stop has been found! The supplies trail is complete."
                     else "Every missing page recovered. Your woodland chapter is complete!"
                 } else if (clueChapter) "A new trail note found! Follow the next clue."
@@ -240,7 +263,8 @@ internal fun WoodlandMixedExpeditionScreen(
         selectedCell = null
         enteredCode = ""
         chosenLandmark = null
-        feedback = if (chapterThree) "The return trail is ready to explore again."
+        feedback = if (!woodland) "The coastal clues are ready to explore again."
+            else if (chapterThree) "The return trail is ready to explore again."
             else if (chapterTwo) "The supply clues are ready to trace again."
             else "All four notes have been hidden again. Enjoy the hunt!"
         fit()
@@ -251,7 +275,7 @@ internal fun WoodlandMixedExpeditionScreen(
         }
     }
     val marker = if (active?.verb == ExpeditionVerb.READ_MARKER) {
-        ReverseTraining.markers.singleOrNull { it.id == active.markerId }?.point
+        SurveyMarkerCatalog.forAuthoredMap(map)?.find(active.markerId ?: "")?.point
     } else null
 
     BoxWithConstraints(
@@ -273,7 +297,7 @@ internal fun WoodlandMixedExpeditionScreen(
                     viewport = viewport, onViewport = onViewport, onCamera = ::setCamera,
                     onSelect = onMapSelect, markerPoint = marker,
                     enableSelect = active?.verb == ExpeditionVerb.FIND_SQUARE,
-                    mapLook = mapLook, onLook = onLook
+                    mapLook = mapLook, onLook = onLook, scene = scene, map = map
                 )
                 Column(
                     Modifier.width(sideWidth).fillMaxHeight()
@@ -282,7 +306,7 @@ internal fun WoodlandMixedExpeditionScreen(
                 ) {
                     MixedExpeditionHeader(mission.chapter.name, clueChapter, step, mission.size,
                         onHome, onGuide = { showGuide = true }, onJournal = { showJournal = true })
-                    if (finished) MixedExpeditionFinish(chapterNumber, mission.size, onHome, replay,
+                    if (finished) MixedExpeditionFinish(chapterNumber, mission.size, onHome, replay, woodland = woodland, chapterName = mission.chapter.name,
                         onJournal = { showJournal = true }, onNextChapter = onNextChapter)
                     else if (active != null) {
                         MixedExpeditionPrompt(active, clueChapter, step + 1, mission.size)
@@ -308,9 +332,9 @@ internal fun WoodlandMixedExpeditionScreen(
                     viewport = viewport, onViewport = onViewport, onCamera = ::setCamera,
                     onSelect = onMapSelect, markerPoint = marker,
                     enableSelect = active?.verb == ExpeditionVerb.FIND_SQUARE,
-                    mapLook = mapLook, onLook = onLook
+                    mapLook = mapLook, onLook = onLook, scene = scene, map = map
                 )
-                if (finished) MixedExpeditionFinish(chapterNumber, mission.size, onHome, replay,
+                if (finished) MixedExpeditionFinish(chapterNumber, mission.size, onHome, replay, woodland = woodland, chapterName = mission.chapter.name,
                         onJournal = { showJournal = true }, onNextChapter = onNextChapter)
                 else if (active != null) {
                     MixedExpeditionControls(
@@ -328,7 +352,8 @@ internal fun WoodlandMixedExpeditionScreen(
         ExpeditionJournalDialog(mission, step, chapterNumber) { showJournal = false }
     }
     if (showGuide) {
-        WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showGuide = false })
+        if (woodland) WoodlandMapGuideDialog(mapLook = mapLook, onDismiss = { showGuide = false })
+        else CoastalMapGuideDialog(mapLook, onDismiss = { showGuide = false })
     }
 }
 
@@ -442,7 +467,8 @@ private fun MixedExpeditionControls(
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 if (active.verb == ExpeditionVerb.LOCATE_LANDMARK) {
-                    WoodlandLandmarkSwatch(active.landmarkId!!, mapLook, symbolSize = 48.dp)
+                    if (active.map == ExplorationMaps.woodland) WoodlandLandmarkSwatch(active.landmarkId!!, mapLook, symbolSize = 48.dp)
+                    else CoastalLandmarkSwatch(requireNotNull(active.map.landmark(active.landmarkId!!)),mapLook,48.dp)
                 }
                 OutlinedTextField(
                     value = enteredCode,
@@ -460,7 +486,7 @@ private fun MixedExpeditionControls(
         }
         ExpeditionVerb.IDENTIFY_LANDMARK -> {
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                WoodlandIdentifyMission.choices.chunked(2).forEach { pair ->
+                active.map.landmarks.chunked(2).forEach { pair ->
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         pair.forEach { landmark ->
@@ -477,9 +503,8 @@ private fun MixedExpeditionControls(
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    WoodlandLandmarkSwatch(
-                                        landmark.id, mapLook, symbolSize = 36.dp
-                                    )
+                                    if (active.map == ExplorationMaps.woodland) WoodlandLandmarkSwatch(landmark.id,mapLook,symbolSize=36.dp)
+                                    else CoastalLandmarkSwatch(landmark,mapLook,36.dp)
                                     Text(landmark.name, fontSize = 10.sp, color = Ink,
                                         maxLines = 2,
                                         modifier = Modifier.weight(1f))
@@ -516,23 +541,24 @@ private fun MixedExpeditionControls(
 @Composable
 private fun MixedExpeditionFinish(
     chapterNumber: Int, total: Int, onHome: () -> Unit, onReplay: () -> Unit,
-    onJournal: () -> Unit, onNextChapter: (() -> Unit)?
+    onJournal: () -> Unit, onNextChapter: (() -> Unit)?, woodland: Boolean, chapterName: String
 ) {
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         PuzzleFinishCard(
-            title = when (chapterNumber) {
+            title = if (!woodland) "$chapterName complete!" else when (chapterNumber) {
                 3 -> "Your woodland circuit is complete!"
                 2 -> "The supply trail is complete!"
                 else -> "The field notes are together!"
             },
-            description = when (chapterNumber) {
+            description = if (!woodland) "Every coastal discovery is recorded in your journal." else when (chapterNumber) {
                 3 -> "You recorded the return route and reached the trailhead."
                 2 -> "You traced the supplies to their last known stop."
                 else -> "Every lost page has been recovered. Your field journal is whole."
             },
-            discoveries = if (chapterNumber > 1) "$total OF $total CLUES SOLVED" else "$total OF $total PAGES RECOVERED",
+            discoveries = if (!woodland || chapterNumber > 1) "$total OF $total CLUES SOLVED" else "$total OF $total PAGES RECOVERED",
             primaryLabel = if (onNextChapter != null) {
-                if (chapterNumber == 1) "Continue · The Lost Supplies" else "Continue · The Return Trail"
+                if (!woodland) "Continue · " + (CoastalExpeditionPreview.nextName(chapterNumber) ?: "Next chapter")
+                else if (chapterNumber == 1) "Continue · The Lost Supplies" else "Continue · The Return Trail"
             } else "Explore again",
             onPrimary = onNextChapter ?: onReplay,
             onHome = onHome,
@@ -559,7 +585,8 @@ private fun ExpeditionJournalDialog(
 ) {
     val earned = mission.discoveries(step)
     val active = mission.objectiveAt(step)
-    val unit = if (chapterNumber > 1) "Clue" else "Page"
+    val woodland = mission.chapter.map == ExplorationMaps.woodland
+    val unit = if (!woodland || chapterNumber > 1) "Clue" else "Page"
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier.testTag("expeditionJournal"),
@@ -578,7 +605,7 @@ private fun ExpeditionJournalDialog(
                         Image(painterResource(R.drawable.gh_tool_notebook), contentDescription = null,
                             modifier = Modifier.size(52.dp))
                         Column(Modifier.weight(1f)) {
-                            Text("LITTLE WOODLAND · CHAPTER $chapterNumber",
+                            Text((if (woodland) "LITTLE WOODLAND" else "WHISPERING COAST") + " · CHAPTER $chapterNumber",
                                 color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                             Text(mission.chapter.name, color = Ink, fontWeight = FontWeight.ExtraBold,
                                 fontSize = 15.sp)
@@ -586,7 +613,7 @@ private fun ExpeditionJournalDialog(
                     }
                 }
                 Text(mission.chapter.story, color = Ink, fontSize = 13.sp, lineHeight = 18.sp)
-                Text(if (chapterNumber > 1) "${earned.size} of ${mission.size} clues solved"
+                Text(if (!woodland || chapterNumber > 1) "${earned.size} of ${mission.size} clues solved"
                     else "${earned.size} of ${mission.size} pages found",
                     color = Forest, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag("journalProgress"))
