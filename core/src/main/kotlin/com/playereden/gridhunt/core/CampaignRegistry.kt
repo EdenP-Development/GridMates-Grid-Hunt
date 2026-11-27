@@ -40,7 +40,11 @@ data class CampaignWorld(
 }
 
 /** Persisted raw objective steps are read by a UI/data adapter, never rewritten. */
-data class CampaignSnapshot(val rawStepsByChapterId: Map<String, Int> = emptyMap())
+data class CampaignSnapshot(
+    val rawStepsByChapterId: Map<String, Int> = emptyMap(),
+    /** Explicit earned completions; legacy snapshots retain their original behavior. */
+    val earnedChapterIds: Set<String> = emptySet()
+)
 
 enum class CampaignChapterStatus { LOCKED, READY, IN_PROGRESS, COMPLETE }
 
@@ -48,7 +52,8 @@ data class CampaignChapterProgress(
     val chapterId: String,
     val status: CampaignChapterStatus,
     val completedObjectives: Int,
-    val totalObjectives: Int
+    val totalObjectives: Int,
+    val everCompleted: Boolean = status == CampaignChapterStatus.COMPLETE
 )
 
 /**
@@ -98,10 +103,10 @@ class CampaignRegistry(val worlds: List<CampaignWorld>) {
         val total = item.chapter.objectives.size
         val raw = snapshot.rawStepsByChapterId[chapterId] ?: 0
         val completed = raw.coerceIn(0, total)
-        val unlocked = item.prerequisiteChapterIds.all { dependency ->
+        val unlocked = chapterId in snapshot.earnedChapterIds || item.prerequisiteChapterIds.all { dependency ->
             val prerequisite = findChapter(dependency)!!
             val n = prerequisite.chapter.objectives.size
-            (snapshot.rawStepsByChapterId[dependency] ?: 0).coerceIn(0, n) == n
+            dependency in snapshot.earnedChapterIds || (snapshot.rawStepsByChapterId[dependency] ?: 0).coerceIn(0, n) == n
         }
         return CampaignChapterProgress(
             chapterId,
@@ -112,7 +117,8 @@ class CampaignRegistry(val worlds: List<CampaignWorld>) {
                 else -> CampaignChapterStatus.READY
             },
             completed,
-            total
+            total,
+            everCompleted = chapterId in snapshot.earnedChapterIds || (unlocked && completed == total)
         )
     }
 
