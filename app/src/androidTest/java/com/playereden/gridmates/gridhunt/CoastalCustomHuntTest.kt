@@ -157,7 +157,13 @@ class CoastalCustomHuntTest {
             assertEquals(0,next.session.step)
             assertEquals("mixed",next.session.mode)
             assertEquals(6,next.restored.objectives.size)
-            assertTrue(first.restored.objectives.map { it.cell }.toSet().intersect(next.restored.objectives.map { it.cell }.toSet()).isEmpty())
+            val previous = first.restored.objectives.map { it.cell }.toSet()
+            val nextCells = next.restored.objectives.map { it.cell }.toSet()
+            val unusedLandmarks = map.landmarks.count { it.cell !in previous }
+            // Two distinct landmark objectives are mandatory. Reuse is only
+            // necessary when fewer than two unused landmark cells remain.
+            assertEquals(6,nextCells.size)
+            assertEquals(maxOf(0,2-unusedLandmarks),previous.intersect(nextCells).size)
             assertEquals(original,legacy.all)
         } finally {
             compose.runOnIdle { visible.value=false }
