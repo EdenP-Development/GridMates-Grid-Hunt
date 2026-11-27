@@ -59,6 +59,7 @@ internal fun RegionGameplayHub(
             Text("This region is unavailable. Return to the Atlas to choose another region.",
                 color = Ink, fontSize = 14.sp, modifier = Modifier.testTag("regionUnavailable"))
         } else {
+            RegionMapPortrait(destination.map,Modifier.fillMaxWidth().height(116.dp))
             Text("${choice.completedChapters} of ${choice.chapters.size} chapters complete",
                 color = Forest, fontWeight = FontWeight.Bold, fontSize = 13.sp,
                 modifier = Modifier.testTag("regionProgress"))
