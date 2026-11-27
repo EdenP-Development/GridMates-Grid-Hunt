@@ -18,13 +18,9 @@ internal class WorldNavigationStore(
         Context.MODE_PRIVATE
     )
 
-    fun snapshot(): CampaignSnapshot = CampaignSnapshot(
-        selection.destinations.flatMap { it.world.chapters }.associate { item ->
-            val raw = context.getSharedPreferences(item.progressKey, Context.MODE_PRIVATE)
-                .all["step"] as? Int ?: 0
-            item.chapter.id to raw
-        }
-    )
+    private val completion = CampaignCompletionStore(context, selection, preview)
+
+    fun snapshot(): CampaignSnapshot = completion.snapshot()
 
     fun choices(): List<WorldChoice> = selection.choices(snapshot())
 
