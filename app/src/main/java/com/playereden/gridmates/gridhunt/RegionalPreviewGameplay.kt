@@ -16,7 +16,7 @@ import com.playereden.gridhunt.core.*
 /** Opt-in internal host only; no new MainActivity entry point. */
 @Composable
 internal fun RegionalPreviewGameplay(onExit: () -> Unit) {
-    AtlasPreviewNavigation(onExit) { destination, mode, chapter, onBack ->
+    AtlasPreviewNavigation(onExit) { destination, mode, chapter, onBack, onNext ->
         val map = destination.map
         val look = MapLook.FIELD_GUIDE
         when (mode) {
@@ -28,12 +28,12 @@ internal fun RegionalPreviewGameplay(onExit: () -> Unit) {
                     } else null
                 if (coastalRun != null) {
                     WoodlandMixedExpeditionScreen(onHome = onBack, mapLook = look,
-                        onLook = {}, hapticsEnabled = false, coastalPreview = coastalRun)
+                        onLook = {}, hapticsEnabled = false, coastalPreview = coastalRun, onNextChapter = onNext)
                 } else if (map == ExplorationMaps.woodland && canonical != null &&
                     canonical.chapter.id in setOf(WoodlandExpedition.chapter.id,
                         WoodlandSupplyExpedition.chapter.id,WoodlandReturnExpedition.chapter.id)) {
                     WoodlandMixedExpeditionScreen(onHome = onBack, mapLook = look,
-                        onLook = {}, hapticsEnabled = false,
+                        onLook = {}, hapticsEnabled = false, onNextChapter = onNext,
                         chapterTwo = canonical.chapter.id == WoodlandSupplyExpedition.chapter.id,
                         chapterThree = canonical.chapter.id == WoodlandReturnExpedition.chapter.id)
                 } else PreviewRouteUnavailable(onBack)
