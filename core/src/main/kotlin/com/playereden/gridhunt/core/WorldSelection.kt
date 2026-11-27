@@ -16,8 +16,8 @@ data class WorldChoice(
     val chapters: List<CampaignChapterProgress>
 ) {
     val unlocked: Boolean get() = chapters.any { it.status != CampaignChapterStatus.LOCKED }
-    val complete: Boolean get() = chapters.isNotEmpty() && chapters.all { it.status == CampaignChapterStatus.COMPLETE }
-    val completedChapters: Int get() = chapters.count { it.status == CampaignChapterStatus.COMPLETE }
+    val complete: Boolean get() = chapters.isNotEmpty() && chapters.all { it.everCompleted }
+    val completedChapters: Int get() = chapters.count { it.everCompleted }
 }
 
 /** Read-only navigation policy. Unpublished destinations are never selectable. */
