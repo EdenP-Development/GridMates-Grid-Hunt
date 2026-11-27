@@ -60,10 +60,11 @@ internal fun ExplorerDeskHome(
     onAcademy: () -> Unit,
     onSettings: () -> Unit
 ) {
-    val completedChapters = worldProgress.count { it.status == CampaignChapterStatus.COMPLETE }
+    val completedChapters = worldProgress.count { it.everCompleted }
     val nextChapter = worldProgress.firstOrNull {
-        it.status == CampaignChapterStatus.READY || it.status == CampaignChapterStatus.IN_PROGRESS
+        !it.everCompleted && (it.status == CampaignChapterStatus.READY || it.status == CampaignChapterStatus.IN_PROGRESS)
     }
+    val replayChapter = worldProgress.firstOrNull { it.everCompleted && it.status == CampaignChapterStatus.IN_PROGRESS }
     val nextName = nextChapter?.let { GridHuntCampaign.registry.findChapter(it.chapterId)?.chapter?.name }
     val worldComplete = worldProgress.isNotEmpty() && completedChapters == worldProgress.size
     Column(
@@ -124,6 +125,10 @@ internal fun ExplorerDeskHome(
                             Text("${nextChapter.completedObjectives} of ${nextChapter.totalObjectives} objectives solved",
                                 color = Muted, fontSize = 11.sp,
                                 modifier = Modifier.testTag("homeChapterProgress"))
+                        }
+                        if (replayChapter != null) {
+                            Text("Replaying: ${replayChapter.completedObjectives} of ${replayChapter.totalObjectives} objectives solved",
+                                color = Muted, fontSize = 11.sp, modifier = Modifier.testTag("homeReplayProgress"))
                         }
                     }
                     Text("✦", color = Gold, fontSize = 27.sp)
