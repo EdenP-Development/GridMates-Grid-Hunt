@@ -35,3 +35,16 @@ Current Woodland and Coast are each 6 × 6 km and remain unchanged. These sizes 
 5. Expand to atlas/sheet navigation and persistent discovery only after the prior gates pass.
 
 No new map assets, map sizes, unlock policy or production behavior changed by this document. Final size and region theme require iterative gameplay validation.
+
+
+## Persistent long-form hunts — owner clarification, 2026-11-27
+
+The intended experience is analogous to a 1,000+ piece jigsaw puzzle left in a family game room and assembled in short sessions throughout days or weeks. Large maps are not merely larger arenas for short missions: they should themselves support a satisfying, persistent exploration project.
+
+Proposed working mode name: Grand Expeditions (not finalized). A single expedition can contain hundreds or 1,000+ meaningful discoveries, grouped into regions and manageable clue clusters. The map remains stable across sessions; progress is cumulative, visible and resumable. No forced daily reset, expiring clues, streak penalty, time pressure or mandatory daily attendance. A player can solve one clue or many and return later exactly where they stopped. Do not require every empty grid cell to be clicked. Use authored or deterministically generated meaningful objectives, distinct from map-cell count.
+
+Potential features: persistent solved overlays, regional completion, journal and clue bookmarking, optional hints, resume viewport/zoom/active objective, discovery history, milestones and an overall completion keepsake. Nonlinear exploration where dependencies allow; players may choose another clue when stuck. Family-room analogy describes pacing and shared appeal, not a confirmed multiplayer requirement; cooperative/shared expedition support is a possible later design decision.
+
+Persistence requirements: stable expedition ID, map ID/revision, generation seed or explicit objective manifest with version, stable objective IDs, solved set, clue dependencies, per-objective state, safe checkpoint writes and migration/version handling. Never regenerate unfinished content on reopen. Use bounded storage and incremental updates; validate restart, process death, upgrade, corruption handling and long-duration completion. Store elapsed play time only if useful, never use it to penalize breaks. Preserve standalone modes and Adventure saves. Larger atlas rendering, long-form session storage and content quality need separate performance and accessibility tests.
+
+Prioritize current coastal integration and existing save gates, then prototype a smaller persistent expedition before scaling to 1,000+ objectives. No new gameplay implemented by this design amendment; counts, labels, progression rules and family features require gameplay validation.
