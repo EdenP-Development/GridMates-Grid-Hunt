@@ -26,6 +26,8 @@ internal object CoastalCampaignDraft {
 
 /** Authored preview entry points, not publication or navigation authorization. */
 object CoastalExpeditionPreview {
+    /** Explicitly opt-in candidate navigation; not part of PublishedWorlds. */
+    val selection: WorldSelection get() = CoastalCampaignDraft.selection
     private val runs = listOf(CoastalBeaconExpedition.run, CoastalTideExpedition.run, CoastalLightExpedition.run)
     fun chapter(number: Int): ExpeditionPlaythrough = runs[number - 1]
     fun numberOf(mission: ExpeditionPlaythrough): Int? =
