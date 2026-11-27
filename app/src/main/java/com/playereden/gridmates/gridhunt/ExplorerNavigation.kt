@@ -265,7 +265,10 @@ internal fun WoodlandAdventureJourney(
     onSecondChapter: () -> Unit = {},
     thirdStatus: CampaignChapterStatus = CampaignChapterStatus.LOCKED,
     thirdProgress: Int = 0,
-    onThirdChapter: () -> Unit = {}
+    onThirdChapter: () -> Unit = {},
+    firstEarned: Boolean = progress == WoodlandExpedition.size,
+    secondEarned: Boolean = secondStatus == CampaignChapterStatus.COMPLETE,
+    thirdEarned: Boolean = thirdStatus == CampaignChapterStatus.COMPLETE
 ) {
     val oakArt = ImageBitmap.imageResource(R.drawable.gh_wood_oak_sm)
     val pineArt = ImageBitmap.imageResource(R.drawable.gh_wood_pine_sm)
@@ -380,10 +383,11 @@ internal fun WoodlandAdventureJourney(
                     val nodeSize = 48.dp
                     val firstLabel = when {
                         progress == WoodlandExpedition.size -> "Chapter 1, The Missing Field Notes, complete"
+                        firstEarned -> "Chapter 1, The Missing Field Notes, previously completed, replay available"
                         progress > 0 -> "Chapter 1, The Missing Field Notes, in progress"
                         else -> "Chapter 1, The Missing Field Notes, ready"
                     }
-                    val secondLabel = "Chapter 2, The Lost Supplies, " + when (secondStatus) {
+                    val secondLabel = "Chapter 2, The Lost Supplies, " + if (secondEarned && secondStatus != CampaignChapterStatus.COMPLETE) "previously completed, replay available" else when (secondStatus) {
                         CampaignChapterStatus.LOCKED -> "locked"
                         CampaignChapterStatus.COMPLETE -> "complete"
                         CampaignChapterStatus.IN_PROGRESS -> "in progress"
@@ -391,14 +395,14 @@ internal fun WoodlandAdventureJourney(
                     }
                     AdventureRouteNode(
                         number = 1, label = firstLabel,
-                        complete = progress == WoodlandExpedition.size,
+                        complete = firstEarned,
                         enabled = true, tag = "openAdventureChapter", onClick = onChapter,
                         modifier = Modifier.offset(x = (maxWidth * .47f - nodeSize / 2).coerceAtLeast(0.dp),
                             y = maxHeight * .49f - nodeSize / 2).size(nodeSize)
                     )
                     AdventureRouteNode(
                         number = 2, label = secondLabel,
-                        complete = secondStatus == CampaignChapterStatus.COMPLETE,
+                        complete = secondEarned,
                         enabled = secondStatus != CampaignChapterStatus.LOCKED,
                         tag = "openSecondChapter", onClick = onSecondChapter,
                         modifier = Modifier.offset(x = (maxWidth * .85f - nodeSize / 2)
@@ -407,8 +411,8 @@ internal fun WoodlandAdventureJourney(
                     )
                     AdventureRouteNode(
                         number = 3, label = "Chapter 3, The Return Trail, " +
-                            thirdStatus.name.lowercase().replace('_', ' '),
-                        complete = thirdStatus == CampaignChapterStatus.COMPLETE,
+                            (if (thirdEarned && thirdStatus != CampaignChapterStatus.COMPLETE) "previously completed, replay available" else thirdStatus.name.lowercase().replace('_', ' ')),
+                        complete = thirdEarned,
                         enabled = thirdStatus != CampaignChapterStatus.LOCKED,
                         tag = "openThirdChapter", onClick = onThirdChapter,
                         modifier = Modifier.offset(
@@ -421,21 +425,21 @@ internal fun WoodlandAdventureJourney(
         AdventureChapterCard(1, "The Missing Field Notes", "Four kinds of clues. Recover every missing page.",
             if (progress == WoodlandExpedition.size) CampaignChapterStatus.COMPLETE
             else if (progress > 0) CampaignChapterStatus.IN_PROGRESS else CampaignChapterStatus.READY,
-            "$progress of 4 pages recovered", "adventureProgress", onChapter)
+            "$progress of 4 pages recovered", "adventureProgress", onChapter, firstEarned)
         AdventureChapterCard(2, "The Lost Supplies", "Four new clues across Little Woodland.",
             secondStatus, when (secondStatus) {
                 CampaignChapterStatus.LOCKED -> "Locked — finish Chapter 1 to follow the supply trail"
                 CampaignChapterStatus.READY -> "Ready for a new adventure"
                 CampaignChapterStatus.IN_PROGRESS -> "$secondProgress of 4 clues solved"
                 CampaignChapterStatus.COMPLETE -> "4 of 4 clues solved · Complete"
-            }, "secondChapterStatus", onSecondChapter)
+            }, "secondChapterStatus", onSecondChapter, secondEarned)
         AdventureChapterCard(3, "The Return Trail", "Make a final circuit and return to the trailhead.",
             thirdStatus, when (thirdStatus) {
                 CampaignChapterStatus.LOCKED -> "Locked — finish Chapters 1 and 2"
                 CampaignChapterStatus.READY -> "Ready for a new adventure"
                 CampaignChapterStatus.IN_PROGRESS -> "$thirdProgress of 4 clues solved"
                 CampaignChapterStatus.COMPLETE -> "4 of 4 clues solved · Complete"
-            }, "thirdChapterStatus", onThirdChapter)
+            }, "thirdChapterStatus", onThirdChapter, thirdEarned)
         Text("Choose a chapter or a numbered destination to explore.",
             color = Muted, fontSize = 12.sp)
     }
@@ -444,7 +448,8 @@ internal fun WoodlandAdventureJourney(
 @Composable
 private fun AdventureChapterCard(
     number: Int, title: String, description: String, status: CampaignChapterStatus,
-    progress: String, progressTag: String, onOpen: () -> Unit
+    progress: String, progressTag: String, onOpen: () -> Unit,
+    earned: Boolean = status == CampaignChapterStatus.COMPLETE
 ) {
     val locked = status == CampaignChapterStatus.LOCKED
     Surface(shape = RoundedCornerShape(18.dp), border = JournalPanelBorder,
@@ -460,14 +465,18 @@ private fun AdventureChapterCard(
             Text(description, color = Muted, fontSize = 12.sp)
             Text(progress, color = Forest, fontSize = 12.sp, modifier = Modifier.testTag(progressTag))
             if (number == 1 && status == CampaignChapterStatus.COMPLETE) Text("✓ Complete", color = Forest, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            if (earned && status != CampaignChapterStatus.COMPLETE) {
+                Text("✓ Previously completed · Replay", color = Forest, fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold, modifier = Modifier.testTag("chapterEarned_$number"))
+            }
             Button(onClick = onOpen, enabled = !locked,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("chapterCardAction_$number"),
                 shape = RoundedCornerShape(13.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Forest)) {
                 Text(when (status) {
                     CampaignChapterStatus.LOCKED -> "Locked"
-                    CampaignChapterStatus.READY -> "Start chapter"
-                    CampaignChapterStatus.IN_PROGRESS -> "Continue chapter"
+                    CampaignChapterStatus.READY -> if (earned) "Revisit chapter" else "Start chapter"
+                    CampaignChapterStatus.IN_PROGRESS -> if (earned) "Continue replay" else "Continue chapter"
                     CampaignChapterStatus.COMPLETE -> "Revisit chapter"
                 }, fontWeight = FontWeight.Bold)
             }
