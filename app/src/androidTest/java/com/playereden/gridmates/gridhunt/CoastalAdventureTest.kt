@@ -19,11 +19,36 @@ class CoastalAdventureTest {
         val coastal = runs.map { context.getSharedPreferences(it.saveName,Context.MODE_PRIVATE) }
         val woodland = listOf(WoodlandExpedition.saveName,WoodlandSupplyExpedition.saveName,WoodlandReturnExpedition.saveName)
             .map { context.getSharedPreferences(it,Context.MODE_PRIVATE) }
-        val original = woodland.map { it.all.toMap() }
-        coastal.forEach { check(it.edit().clear().commit()) }
+        val previewEarned = context.getSharedPreferences("gridhunt_campaign_earned_preview_v1",Context.MODE_PRIVATE)
+        val publishedEarned = context.getSharedPreferences("gridhunt_campaign_earned_v1",Context.MODE_PRIVATE)
+        val stores = coastal + woodland + listOf(previewEarned,publishedEarned)
+        val originals = stores.map { it.all.toMap() }
+        fun restore(prefs: android.content.SharedPreferences, values: Map<String, *>) {
+            val editor = prefs.edit().clear()
+            values.forEach { (key,value) ->
+                when(value) {
+                    is Boolean -> editor.putBoolean(key,value)
+                    is String -> editor.putString(key,value)
+                    is Int -> editor.putInt(key,value)
+                    is Long -> editor.putLong(key,value)
+                    is Float -> editor.putFloat(key,value)
+                    is Set<*> -> editor.putStringSet(key,value.filterIsInstance<String>().toSet())
+                }
+            }
+            check(editor.commit())
+        }
         val number = mutableStateOf(1)
         val visible = mutableStateOf(true)
         val look = mutableStateOf(MapLook.SURVEY_TABLE)
+        try {
+            coastal.forEach { check(it.edit().clear().commit()) }
+            check(previewEarned.edit().clear().commit())
+            val woodlandChapters = GridHuntCampaign.registry.worlds.single().chapters.sortedBy { it.order }
+            woodland.zip(woodlandChapters).forEach { (prefs,chapter) ->
+                check(prefs.edit().putInt("step",chapter.chapter.objectives.size).commit())
+            }
+            val seededWoodland = woodland.map { it.all.toMap() }
+            val originalPublished = publishedEarned.all.toMap()
         compose.setContent {
             if (visible.value) WoodlandMixedExpeditionScreen(
                 onHome = { visible.value=false },
@@ -51,7 +76,6 @@ class CoastalAdventureTest {
             compose.waitForIdle()
             compose.runOnIdle { visible.value=true }
         }
-        try {
             progress(1,0)
             compose.onNodeWithTag("mixedGuide").performClick()
             compose.onNodeWithTag("coastalMapGuide").assertExists()
@@ -97,10 +121,18 @@ class CoastalAdventureTest {
             progress(3,0)
             assertEquals(4,coastal[0].getInt("step",-1))
             assertEquals(4,coastal[1].getInt("step",-1))
-            assertEquals(original,woodland.map { it.all })
+            assertEquals(seededWoodland,woodland.map { it.all })
+            assertEquals(originalPublished,publishedEarned.all)
+            val ledger = CampaignCompletionStore(context,CoastalExpeditionPreview.selection,true)
+            assertTrue(ledger.snapshot().earnedChapterIds.containsAll(runs.map { it.chapter.id }))
+            val coast = CoastalExpeditionPreview.selection.choices(ledger.snapshot())
+                .first { it.destination.map == runs.last().chapter.map }
+            assertTrue(coast.complete)
+            assertEquals(3,coast.completedChapters)
+            assertEquals(0,coast.chapters.last().completedObjectives)
         } finally {
             compose.runOnIdle { visible.value=false }
-            coastal.forEach { check(it.edit().clear().commit()) }
+            stores.zip(originals).forEach { (prefs,values) -> restore(prefs,values) }
         }
     }
 }
