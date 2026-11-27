@@ -15,7 +15,7 @@ internal enum class RegionalMode { ADVENTURE, QUICK_PLAY, CUSTOM_PLAY }
 @Composable
 internal fun AtlasPreviewNavigation(
     onExit: () -> Unit,
-    gameplay: @Composable (WorldDestination, RegionalMode, CampaignChapter?, () -> Unit) -> Unit
+    gameplay: @Composable (WorldDestination, RegionalMode, CampaignChapter?, () -> Unit, (() -> Unit)?) -> Unit
 ) {
     val context = LocalContext.current
     val navigation = remember(context) {
@@ -80,7 +80,26 @@ internal fun AtlasPreviewNavigation(
             LaunchedEffect(modeName,chapterId) { returnToRegion() }
         }
         else -> key(choice.destination.world.id,mode,chapter?.chapter?.id) {
-            gameplay(choice.destination,mode,chapter,{ returnToRegion() })
+            val current = chapter
+            val next = current?.let { active ->
+                choice.destination.world.chapters.sortedBy { it.order }
+                    .dropWhile { it != active }.drop(1).firstOrNull()
+            }
+            val advance: (() -> Unit)? = if (mode == RegionalMode.ADVENTURE &&
+                current != null && next != null) ({
+                val fresh = navigation.choices().firstOrNull {
+                    it.destination == choice.destination && it.unlocked
+                }
+                val finished = fresh?.chapters?.firstOrNull { it.chapterId == current.chapter.id }
+                if (regionId == choice.destination.world.id &&
+                    modeName == RegionalMode.ADVENTURE.name &&
+                    chapterId == current.chapter.id &&
+                    finished?.status == CampaignChapterStatus.COMPLETE &&
+                    navigation.openChapter(choice.destination.world.id,next.chapter.id) == next) {
+                    chapterId = next.chapter.id
+                }
+            }) else null
+            gameplay(choice.destination,mode,chapter,{ returnToRegion() },advance)
         }
     }
 }
