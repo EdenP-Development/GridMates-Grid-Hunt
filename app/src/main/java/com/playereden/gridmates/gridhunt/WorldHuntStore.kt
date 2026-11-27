@@ -37,9 +37,20 @@ internal class WorldHuntStore(context: Context, private val map: ExplorationMap)
         return ReadResult.Ready(session, restored)
     }
 
+    /** UI path: validate then update the complete envelope atomically in memory; disk flush is asynchronous. */
+    fun apply(session: MapHuntSession): Boolean {
+        val editor = editorFor(session) ?: return false
+        editor.apply()
+        return true
+    }
+
     /** Explicit replacement only, with validation before a single atomic editor commit. */
     fun write(session: MapHuntSession): Boolean {
-        if (MapHuntSessions.restore(session, map) == null) return false
+        return editorFor(session)?.commit() ?: false
+    }
+
+    private fun editorFor(session: MapHuntSession): android.content.SharedPreferences.Editor? {
+        if (MapHuntSessions.restore(session, map) == null) return null
         return prefs.edit()
             .putInt("schema", 1)
             .putString("map_id", session.mapId)
@@ -48,6 +59,5 @@ internal class WorldHuntStore(context: Context, private val map: ExplorationMap)
             .putString("codes", session.codes)
             .putString("kinds", session.kinds)
             .putInt("step", session.step)
-            .commit()
     }
 }
