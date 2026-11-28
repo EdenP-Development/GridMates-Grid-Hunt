@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-AC — all 72 Adventure objectives implemented in isolated previews.**
+Updated 2026-11-28. **Current checkpoint: GH-V46-G — QA596 consolidated automated acceptance passed.**
 
-## Authoritative current checkpoint — GH-V45-AC
+## Authoritative current checkpoint — GH-V46-G
+
+- Source c05fc5a3a23c1a7e32d661352fcc02b39cd8c7bc, workflow 46125591896: all three primary jobs passed. JVM/build 140919429385, Android instrumentation 140919429592, signed upgrade 140920369931. Coastal artwork 46125591869 passed. QA596 is new consolidated green baseline.
+- Android artifact 15256445662 downloaded and inspected: XML reports 73 tests, 0 failures, 0 errors; 42 PNGs in vision-screenshots including mandatory numbered 01–35. Four new expanded Field Survey captures 32–35 inspected visually: 12-cell journal fits three rows, final entry scrolls into view, completed map and replay presentation visible. Minor future physical-device readability check for small header links. Other 38 captures not individually visually reviewed in this checkpoint.
+- QA APK artifact 15255871253; signed upgrade evidence 15255761917. Upgrade logs confirm QA345 to QA596 actual install-over without uninstall/data clear, 11 exact preference maps preserved before/after cold launch, restored Adventure progress visible. This does not test future live migration.
+- All 72 objectives authored and implemented in isolated previews. Next GH46H: locate existing navigation source and design/implement opt-in development-only expanded campaign selector; all six chapters independently accessible for hands-on testing, classic campaign unchanged. Prior direct lookup of CoastalExpeditionPreview.kt returned 404; locate actual definition rather than assuming filename. Audit save migration separately; no live migration, public coastal publication, merge, release, signing or networking authorized. Preserve existing saves, branding, package/signer and draft PR #12. Larger maps, persistent Grand Expeditions and local Wi-Fi co-op remain planned.
+
+## Historical checkpoint — GH-V45-AC
 
 - GH45AC 91594284c9b9d469bb247e2145a0d0117352be67 adds ExpandedLightSurveyPreview, exact third coastal candidate allowlist and completion-ledger bypass, separate candidate preferences, verification-specific journal, completion and replay labels. No live registry or Home navigation changes.
 - GH45AC f18b7d8ccd62c059c57198db7005d5060ede713e adds full twelve-objective Last Light Android playthrough, resume at 4 and 8, guide, journal, replay, preservation of eleven other chapter namespaces and both earned ledgers. Candidate preferences restored. All six expanded chapters now have authored content, core regression tests and internal Android implementation/tests. This is implementation coverage, not completed QA.
