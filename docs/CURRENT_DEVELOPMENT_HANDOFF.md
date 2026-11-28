@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-X — first expanded coastal chapter authored.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-Y — first expanded coastal gameplay preview.**
 
-## Authoritative current checkpoint — GH-V45-X
+## Authoritative current checkpoint — GH-V45-Y
+
+- GH45X head ba35c840e2a6cec823a4f5a9392119457edd9bc3 run 46123070934: JVM/build and emulator running at inspection; artwork 46123070932 passed. GH45R run 46117766835 remains last confirmed fully green. Mandatory 35-image capture and actual pixel review pending; no gate waived.
+- GH45Y 1be21f3a5b4a2e5d8887536e14bfe3c2da485c25 adds internal ExpandedBeaconSurveyPreview, exact CoastalBeaconSurveyCandidate.run only, separate candidate preferences, no MainActivity route or next chapter. Exact identity bypasses completion ledger construction/capture, shared coastal renderer, discovery counts, chart-specific journal/finish/replay labels. Original four-objective coastal previews retain existing terminology; published registry unchanged.
+- GH45Y 8da372152b5fe9af8b838f24e12d904ff47df602 adds complete twelve-objective coastal Android test, coastal guide access, resume at 4 and 8, final journal entry and replay, exact preservation checks for three Woodland original saves, three Woodland candidate saves, three original coastal preview saves and both completion ledgers. Candidate preferences restored. Execution pending.
+- Total Adventure authorship and isolated gameplay implementation 56/72; Woodland 36/36, Coast 20/36. Next verify source-matched QA; author Along the Tide Trail and The Last Light candidate expansions; note Tide Trail original prefix repeats a cell and must remain exact, ensure distinct new answers rather than requiring all twelve unique. No live migration, publication, merge, release, signing or networking changes authorized. Preserve existing saves and approved branding. Avoid unnecessary superseding commits while consolidated QA runs.
+
+## Historical checkpoint — GH-V45-X
 
 - GH45W head 31e54dcddbadd409a63fdcfa45d3983696fbc25b run 46122734411: JVM/build passed, emulator and signed upgrade running at inspection. Artwork 46122734346 passed. GH45R run 46117766835 remains last confirmed fully green; 35 screenshot gate and pixel review pending.
 - GH45X CoastalBeaconSurveyCandidate.kt 8b571ae3e99981e83cdb7ded15a8a8f5f8fe3bf6 authors eight chart appendix objectives after exact original four Beacon's Message objectives, revision 2, same canonical draft map, twelve distinct answer cells; uses coastal markers C/D/E and existing Driftwood Cove/Shell Beach. Independent namespace gridhunt_candidate_beacon_survey_r2. No registry or Android route changes.
