@@ -614,14 +614,15 @@ private fun MixedExpeditionFinish(
 
 /** Only earned entries and the active prompt are rendered; no future answers. */
 @Composable
-private fun ExpeditionJournalDialog(
+internal fun ExpeditionJournalDialog(
     mission: ExpeditionPlaythrough, step: Int, chapterNumber: Int,
     onDismiss: () -> Unit
 ) {
     val earned = mission.discoveries(step)
     val active = mission.objectiveAt(step)
     val woodland = mission.chapter.map == ExplorationMaps.woodland
-    val unit = if (!woodland || chapterNumber > 1) "Clue" else "Page"
+    val expanded = mission.size > 4 && woodland && chapterNumber == 1
+    val unit = if (expanded) "Discovery" else if (!woodland || chapterNumber > 1) "Clue" else "Page"
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier.testTag("expeditionJournal"),
@@ -648,13 +649,16 @@ private fun ExpeditionJournalDialog(
                     }
                 }
                 Text(mission.chapter.story, color = Ink, fontSize = 13.sp, lineHeight = 18.sp)
-                Text(if (!woodland || chapterNumber > 1) "${earned.size} of ${mission.size} clues solved"
+                Text(if (expanded) "${earned.size} of ${mission.size} discoveries recorded"
+                    else if (!woodland || chapterNumber > 1) "${earned.size} of ${mission.size} clues solved"
                     else "${earned.size} of ${mission.size} pages found",
                     color = Forest, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag("journalProgress"))
-                Row(Modifier.fillMaxWidth().testTag("journalPageCollection"),
-                    horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                    repeat(mission.size) { index ->
+                Column(Modifier.fillMaxWidth().testTag("journalPageCollection"),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    (0 until mission.size).chunked(4).forEach { indices ->
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                    indices.forEach { index ->
                         val recovered = index < earned.size
                         Surface(modifier = Modifier.weight(1f).heightIn(min = 40.dp)
                             .semantics { contentDescription = "$unit ${index + 1}, " +
@@ -673,6 +677,8 @@ private fun ExpeditionJournalDialog(
                         }
                     }
                 }
+                        }
+                    }
                 if (earned.isEmpty()) {
                     Text("Your discoveries will appear here as you explore.",
                         color = Muted, modifier = Modifier.testTag("journalEmpty"))
@@ -683,7 +689,7 @@ private fun ExpeditionJournalDialog(
                         modifier = Modifier.fillMaxWidth().testTag("journalEntry_${objective.id}")
                     ) {
                         Column(Modifier.padding(10.dp)) {
-                            Text("RECOVERED · $unit ${index + 1}", color = Forest, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                            Text(if (expanded && index >= 4) "SURVEY · ENTRY ${index - 3}" else "RECOVERED · $unit ${index + 1}", color = Forest, fontWeight = FontWeight.Bold, fontSize = 10.sp)
                             Text(objective.title, color = Ink,
                                 fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             Text(objective.discovery.ifBlank { "Discovery recorded." },
