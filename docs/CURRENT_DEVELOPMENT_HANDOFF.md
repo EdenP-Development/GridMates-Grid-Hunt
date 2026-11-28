@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-T — second twelve-objective chapter candidate.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-U — shared expanded Woodland gameplay.**
 
-## Authoritative current checkpoint — GH-V45-T
+## Authoritative current checkpoint — GH-V45-U
+
+- GH45S run 46121060679 and GH45T run 46121447452 both passed JVM/build; emulator and signed upgrade jobs cancelled by subsequent changes. Artwork 46121060668 and 46121447446 passed. GH45R run 46117766835 remains latest fully green baseline. Mandatory 35-image archive and pixel review still pending.
+- GH45U 185c62b0be6d2080a3d5a68a5be7f18b64ac8215 generalizes internal ExpandedWoodlandPreview with exact two-candidate allowlist, retains ExpandedFieldSurveyPreview and adds ExpandedSupplySurveyPreview. Each exact candidate bypasses completion ledger construction/capture, keeps its own preferences, no next chapter or MainActivity route. Shared expanded journal counts and route-specific entries, completion and replay copy. Published registry unchanged.
+- GH45U 6a7102b09ad0b53803eafce38d610fac6a25267f adds full twelve-objective supply Android test, close/reopen at 4 and 8, journal progress and final route entry, replay, exact preservation of original three Woodland saves, field candidate save and both completion ledgers. Candidate preferences restored after test. Execution pending.
+- Next allow source-matched full QA to complete before further commits where practical (including 35 screenshot gate); inspect real screenshots when accessible. Add Return Trail isolated candidate and tests only after QA status reviewed. No live migration, publication, merge, release, signing or network changes authorized. Preserve approved branding and existing saves. Authored Adventure count 40/72.
+
+## Historical checkpoint — GH-V45-T
 
 - GH45S head bcacd62b31965f23aa49b986b20fc6a5ef49a235 run 46121060679: JVM/build passed, emulator and signed upgrade running at inspection before subsequent commits; artwork 46121060668 passed. New 35-image capture acceptance and pixel review remain pending. GH45R run 46117766835 remains last confirmed fully green baseline.
 - GH45T WoodlandSupplySurveyCandidate.kt 3c8a642d6fb64c2d6f3334aa7ddbe8b9c169743e authors eight route verification objectives after exact four-objective Lost Supplies prefix. Same map, revision 2, twelve distinct answer cells; candidate namespace gridhunt_candidate_supply_survey_r2; no live registration or UI route. Story records route checks, does not invent a physical supply cache.
