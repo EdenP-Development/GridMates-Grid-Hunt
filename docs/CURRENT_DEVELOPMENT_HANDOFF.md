@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-AA — fifth expanded chapter playable implementation.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-AB — initial 72-objective authorship complete.**
 
-## Authoritative current checkpoint — GH-V45-AA
+## Authoritative current checkpoint — GH-V45-AB
+
+- GH45AA head 2d57bc324b5eaa3cf748a075519ac30d0fafb66e run 46124009194: JVM/build passed, emulator and signed upgrade running at inspection; artwork 46124009133 passed. GH45R run 46117766835 remains last confirmed fully green baseline. Mandatory 35-image capture gate and actual pixel review remain pending.
+- GH45AB CoastalLightSurveyCandidate.kt 3ce0b2612a9e30d8e800b8e376e7b0f25a295064 adds eight independent chart verification objectives after the exact four-objective original finale, revision 2, canonical coastal map, twelve distinct answer cells, separate gridhunt_candidate_light_survey_r2 preferences namespace, no published registry or Android route changes.
+- GH45AB CoastalLightSurveyCandidateTest.kt 6695a380992147b0964e7d392ebb5a254d29be67 verifies exact legacy prefix, distinct cells, canonical map, literal answer references, four directional offsets, correct/wrong progression, separate namespace, legacy projection and historical entitlement. Execution pending.
+- Initial Adventure authorship 72/72 (24 original, 48 additional candidates), internal gameplay implementation 64/72 including original chapters. Next GH45AC integrate exact Last Light candidate into shared coastal preview and add full Android regression test with independent saves and ledger protection. Then consolidate QA, inspect actual screenshot archive, audit migration and historical unlocks before any live integration. No publication, live migration, merge, release, signing or network changes authorized. Preserve existing saves, approved branding and draft PR #12. Avoid unnecessary commits while consolidated QA runs.
+
+## Historical checkpoint — GH-V45-AA
 
 - GH45Z head 2334b76f6ee1b5196e4856501b493440b0e15607 run 46123650555: JVM/build passed, emulator and signed upgrade running at inspection before subsequent commits. Artwork 46123650531 passed. GH45R run 46117766835 remains last confirmed fully green baseline; 35-image capture gate and actual pixel review remain pending.
 - GH45AA 3ac7089251fd62bac177e09b2c1c59628c16de7b adds exact two-candidate ExpandedCoastalSurveyPreview allowlist, retains Beacon wrapper and adds Tide wrapper. Exact candidate identity bypasses completion ledger creation/capture; separate preferences, no published route, no next chapter. Tide-specific journal, finish and replay labels. Original four-objective previews and registry unchanged.
