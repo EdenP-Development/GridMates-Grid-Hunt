@@ -163,6 +163,7 @@ class VisualCaptureTest {
             check(edit.commit())
         }
         compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("classicAdventure").performClick()
         compose.onNodeWithTag("adventureRouteMap").assertExists()
         compose.onNodeWithTag("openAdventureChapter").assertExists()
         capture("17_adventure_journey.png")
@@ -182,6 +183,7 @@ class VisualCaptureTest {
             .edit().putInt("step", 4).commit())
         compose.activityRule.scenario.recreate()
         compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("classicAdventure").performClick()
         compose.onNodeWithTag("openSecondChapter").assertIsEnabled()
         capture("21_chapter_two_unlocked.png")
         compose.onNodeWithTag("openSecondChapter").performClick()
@@ -263,6 +265,7 @@ class VisualCaptureTest {
         compose.onNodeWithTag("mixedHome").performClick()
         compose.onNodeWithTag("quickBack").performClick()
         compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("classicAdventure").performClick()
         compose.onNodeWithTag("openAdventureChapter").performClick()
         compose.onNodeWithTag("finishReplay").assertExists()
         compose.onNodeWithTag("nextExpedition").performClick()
