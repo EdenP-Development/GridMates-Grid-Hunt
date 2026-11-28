@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-U — shared expanded Woodland gameplay.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-V — complete Woodland chapter candidate authorship.**
 
-## Authoritative current checkpoint — GH-V45-U
+## Authoritative current checkpoint — GH-V45-V
+
+- GH45U run 46121732847 at 3f4a660ed50a12df8fff8531f04f1ad583a603f6: JVM/build passed, artwork 46121732775 passed. Android job 140907537746 failed before executing tests due to Maven Central HTTP 429 resolving UTP dependencies (Kotlin stdlib, auto-service, dagger and others). Upgrade job 140908277897 failed baseline restored Home visibility check. Neither gate waived; GH45R run 46117766835 remains last confirmed all-green baseline. New 35 screenshot archive and actual pixel review remain unverified.
+- GH45V WoodlandReturnSurveyCandidate.kt 8b13ccae9b553201bec075694a5f18148d65ad1d authors eight navigation circuit objectives after exact original four Return Trail objectives, same map, revision 2, 12 distinct answer cells. Isolated namespace gridhunt_candidate_return_survey_r2, no live registry or Android preview route yet.
+- GH45V WoodlandReturnSurveyCandidateTest.kt 93d3387be98e669c7802c0c5094c2cff449217b4 verifies legacy prefix, distinct cells, five offset relationships, literal answers, full progression, incorrect answers, independent namespaces, legacy step projection and historical entitlement. Execution pending.
+- Woodland authorship 36/36, total Adventure authorship 48/72 (24 original and 24 candidate). Next check full QA, investigate recurring baseline Home visibility failure and dependency rate limiting without weakening gates. Extend internal exact candidate allowlist to Return Trail and add full Android playthrough with cross-candidate and original save isolation. Then coastal authorship. No live migration, publication, merge, release, signing or networking changes authorized. Preserve approved branding and existing saves. Avoid unnecessary successive commits while full QA runs.
+
+## Historical checkpoint — GH-V45-U
 
 - GH45S run 46121060679 and GH45T run 46121447452 both passed JVM/build; emulator and signed upgrade jobs cancelled by subsequent changes. Artwork 46121060668 and 46121447446 passed. GH45R run 46117766835 remains latest fully green baseline. Mandatory 35-image archive and pixel review still pending.
 - GH45U 185c62b0be6d2080a3d5a68a5be7f18b64ac8215 generalizes internal ExpandedWoodlandPreview with exact two-candidate allowlist, retains ExpandedFieldSurveyPreview and adds ExpandedSupplySurveyPreview. Each exact candidate bypasses completion ledger construction/capture, keeps its own preferences, no next chapter or MainActivity route. Shared expanded journal counts and route-specific entries, completion and replay copy. Published registry unchanged.
