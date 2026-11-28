@@ -181,7 +181,7 @@ jobs:
             # Pull genuine on-emulator screenshots created by VisualCaptureTest.
             mkdir -p vision-screenshots
             # MediaStore captures persist through Gradle's test-APK teardown.
-            adb pull /sdcard/Pictures/GridHuntVisualQA/. vision-screenshots/
+            adb pull /sdcard/Pictures/GridHuntVisualQA/. vision-screenshots/ || (sleep 5 && adb wait-for-device && adb pull /sdcard/Pictures/GridHuntVisualQA/. vision-screenshots/)
             # The runner executes each script line separately: use standalone commands.
             test -s vision-screenshots/01_home.png
             test -s vision-screenshots/02_trail_treasures.png
