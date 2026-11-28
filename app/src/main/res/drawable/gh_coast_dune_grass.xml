@@ -1,0 +1,6 @@
+<!-- Derived from artwork/worlds/whispering-coast/masters/dune-grass.svg. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="128dp" android:height="128dp" android:viewportWidth="128" android:viewportHeight="128">
+    <path android:pathData="M20,99 A44,11 0,1 0 108,99 A44,11 0,1 0 20,99 Z" android:fillColor="#b0a37b" android:fillAlpha=".25" android:strokeAlpha=".25" />
+    <path android:pathData="M64 100Q39 54 21 45Q45 48 64 82Q59 37 69 20Q77 54 70 87Q90 49 111 40Q88 70 76 100Z" android:fillColor="#8f9e6c" />
+    <path android:pathData="M65 99Q48 62 39 39M68 98Q73 58 85 35" android:fillColor="#00000000" android:strokeColor="#d5c28a" android:strokeWidth="4" android:strokeLineCap="round" />
+</vector>

@@ -1,0 +1,7 @@
+<!-- Derived from artwork/worlds/whispering-coast/masters/coastal-rocks.svg. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="128dp" android:height="128dp" android:viewportWidth="128" android:viewportHeight="128">
+    <path android:pathData="M11,101 A53,10 0,1 0 117,101 A53,10 0,1 0 11,101 Z" android:fillColor="#536c63" android:fillAlpha=".2" android:strokeAlpha=".2" />
+    <path android:pathData="M10 96L21 66L43 59L57 88L63 100Z" android:fillColor="#a1aaa0" android:strokeColor="#65776d" android:strokeWidth="3" />
+    <path android:pathData="M47 100L60 47L87 34L110 60L119 98Z" android:fillColor="#87988f" android:strokeColor="#65776d" android:strokeWidth="3" />
+    <path android:pathData="M60 47L87 34L81 73L47 100Z" android:fillColor="#b9c1ae" />
+</vector>

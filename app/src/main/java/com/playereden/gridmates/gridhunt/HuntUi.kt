@@ -6,6 +6,7 @@ import android.graphics.Paint
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -93,6 +94,28 @@ import com.playereden.gridhunt.core.WoodlandTrainingMap
 import com.playereden.gridhunt.core.WorldBounds
 import com.playereden.gridhunt.core.WorldPoint
 
+/**
+ * Compact A/B control in the header, deliberately leaving map height untouched.
+ * Theme changes are purely visual: grid math, selection and camera are retained.
+ */
+@Composable
+internal fun QuickMapLookButton(mapLook: MapLook, onLook: (MapLook) -> Unit) {
+    val next = if (mapLook == MapLook.FIELD_GUIDE) MapLook.SURVEY_TABLE else MapLook.FIELD_GUIDE
+    TextButton(
+        onClick = { onLook(next) },
+        modifier = Modifier.testTag("mapLookToggle").semantics {
+            contentDescription = "Switch map look from ${mapLook.label} to ${next.label}"
+        },
+        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 2.dp)
+    ) {
+        Text(
+            if (mapLook == MapLook.FIELD_GUIDE) "Warm" else "Cool",
+            color = Forest, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+            maxLines = 1
+        )
+    }
+}
+
 @Composable
 internal fun HuntHeader(
     compact: Boolean,
@@ -102,36 +125,41 @@ internal fun HuntHeader(
     onGuide: () -> Unit,
     onHome: () -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text("GRIDMATES / GRID HUNT", color = Forest, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-            Text(
-                "First Bearings", color = Ink,
-                fontSize = if (compact) 19.sp else 21.sp,
-                fontWeight = FontWeight.Bold, lineHeight = 24.sp
-            )
-            Text(
-                "HUNT $huntNumber / $huntTotal  ·  $huntName",
-                fontSize = 10.sp, color = Muted, maxLines = 1
-            )
-        }
-        Text("N ↑", color = Forest, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        TextButton(
-            onClick = onHome,
-            modifier = Modifier.testTag("chapterHome"),
-            contentPadding = PaddingValues(horizontal = 3.dp, vertical = 2.dp)
-        ) { Text("Home", color = Forest, fontSize = 11.sp) }
-        TextButton(
-            onClick = onGuide,
-            modifier = Modifier.semantics { contentDescription = "Show or hide grid reading guide" },
-            contentPadding = PaddingValues(horizontal = 5.dp, vertical = 2.dp)
+    // Dedicated full-width trail caption: don't make a story title compete with
+    // three navigation buttons. Map appearance now lives on the map surface.
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("?", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Forest)
+            Text(
+                "Trail Treasures", color = Ink,
+                modifier = Modifier.weight(1f).testTag("trailModeTitle"),
+                fontSize = if (compact) 18.sp else 20.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
+            TextButton(
+                onClick = onHome,
+                modifier = Modifier.testTag("chapterHome"),
+                contentPadding = PaddingValues(horizontal = 3.dp, vertical = 2.dp)
+            ) { Text("Home", color = Forest, fontSize = 12.sp) }
+            TextButton(
+                onClick = onGuide,
+                modifier = Modifier.semantics {
+                    contentDescription = "Show or hide grid reading guide"
+                },
+                contentPadding = PaddingValues(horizontal = 5.dp, vertical = 2.dp)
+            ) {
+                Text("?", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Forest)
+            }
         }
+        Text(
+            "Trail $huntNumber/$huntTotal  ·  $huntName",
+            modifier = Modifier.fillMaxWidth().testTag("trailLocation"),
+            fontSize = 11.sp, color = Muted, maxLines = 1
+        )
     }
 }
 
@@ -142,7 +170,8 @@ internal fun ObjectiveRibbon(
 ) {
     val done = active == null
     Surface(
-        color = Color(0xFFFFFBF1), shape = RoundedCornerShape(14.dp),
+        color = Color(0xFFFFF7E0), shape = RoundedCornerShape(18.dp),
+        border = BorderStroke(1.dp, Color(0xFFE7CF9D)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -153,48 +182,59 @@ internal fun ObjectiveRibbon(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     when {
-                        chapterFinished -> "CHAPTER COMPLETE"
-                        done -> "HUNT COMPLETE"
-                        else -> "FIND SQUARE  " + (step + 1) + " / " + total
+                        chapterFinished -> "ALL CLUES FOUND!"
+                        done -> "TRAIL COMPLETE"
+                        else -> "CLUE " + (step + 1) + " OF " + total
                     },
                     fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Forest
                 )
                 Text(
-                    if (done) "Nice work. Survey recorded."
-                    else "East first, then north  ·  $huntName",
+                    if (done) "Every square found. Nice exploring!"
+                    else "Find this square on the map",
                     fontSize = 11.sp, maxLines = 2, color = Muted
                 )
             }
-            Text(
-                if (done) "✓" else active.reference,
-                fontSize = if (done) 32.sp else 33.sp,
-                color = Ink, fontWeight = FontWeight.ExtraBold
-            )
+            Surface(
+                shape = RoundedCornerShape(13.dp),
+                color = Color(0xFFF6DFA9)
+            ) {
+                Text(
+                    if (done) "✓" else active.reference,
+                    fontSize = if (done) 29.sp else 31.sp,
+                    color = Ink, fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
         }
     }
 }
 
 @Composable
 internal fun GridReadingGuide(onDismiss: () -> Unit) {
-    Surface(
-        color = Color(0xFFE8EEDC),
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+    // A dialog keeps the map at its actual play size while instructions are open.
+    // Once dismissed, tapping the ? button in the header opens it again.
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("A little map-reading trick", color = Ink, fontWeight = FontWeight.Bold) },
+        text = {
             Text(
-                "HOW TO PLAY · Read 24 on the bottom, then 37 on the side. " +
-                    "For 2437, tap the square above-right of their crossing. " +
-                    "Preview and Check; hints are free.",
-                fontSize = 11.sp, lineHeight = 14.sp, color = Ink,
-                modifier = Modifier.weight(1f)
+                "Every square has a four-digit address. First, follow the first two " +
+                    "numbers along the bottom. Then, follow the last two numbers " +
+                    "up the left side. For 2437, find the crossing of 24 and 37, " +
+                    "then tap the square just above and to the right. " +
+                    "Try a guess — you can change it anytime! Hints are free.",
+                color = Ink
             )
-            TextButton(onClick = onDismiss) { Text("Got it", fontSize = 11.sp) }
-        }
-    }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss, modifier = Modifier.testTag("dismissGridGuide")) {
+                Text("Got it", color = Forest, fontWeight = FontWeight.Bold)
+            }
+        },
+        containerColor = Color(0xFFFFFBF1),
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier.testTag("gridReadingGuide")
+    )
 }
 
 
@@ -225,12 +265,12 @@ internal fun HuntControlPanel(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            if (finished) "COMPLETE  " + total + " / " + total
-            else "FOUND  " + step + " / " + total,
+            if (finished) "FOUND ALL " + total
+            else "FOUND " + step + " OF " + total,
             color = Forest, fontWeight = FontWeight.Bold, fontSize = 12.sp
         )
         Text(
-            if (finished) "✓ ALL SITES" else "SELECTED  " + (selected ?: "—"),
+            if (finished) "✦ WELL DONE" else "YOUR PICK  " + (selected ?: "—"),
             color = Forest, fontSize = 12.sp, fontWeight = FontWeight.SemiBold
         )
     }
@@ -247,48 +287,55 @@ internal fun HuntControlPanel(
         maxLines = 3,
         modifier = Modifier.fillMaxWidth().heightIn(min = 30.dp)
     )
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text("SELECT SQUARE", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
-        Text("ZOOM", fontSize = 9.sp, color = Muted, fontWeight = FontWeight.Bold)
+    val context = LocalContext.current
+    val controls = remember(context) { context.getSharedPreferences("gridhunt_ui_preferences", Context.MODE_PRIVATE) }
+    var precise by remember { mutableStateOf(controls.savedBoolean("precise_selection", false)) }
+    var options by rememberSaveable { mutableStateOf(false) }
+    if (precise) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        GridStepButton("←", "Move selected square west", Modifier.weight(1f)) { onMove(-1, 0) }
+        GridStepButton("→", "Move selected square east", Modifier.weight(1f)) { onMove(1, 0) }
+        GridStepButton("↑", "Move selected square north", Modifier.weight(1f)) { onMove(0, 1) }
+        GridStepButton("↓", "Move selected square south", Modifier.weight(1f)) { onMove(0, -1) }
     }
-    Row(
-        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        GridStepButton("←", "Move selected square west") { onMove(-1, 0) }
-        GridStepButton("→", "Move selected square east") { onMove(1, 0) }
-        GridStepButton("↑", "Move selected square north") { onMove(0, 1) }
-        GridStepButton("↓", "Move selected square south") { onMove(0, -1) }
-        Spacer(Modifier.width(6.dp))
-        GridStepButton("+", "Zoom in") { onZoom(1.6) }
-        GridStepButton("−", "Zoom out") { onZoom(1.0 / 1.6) }
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val compactTools = maxWidth < 308.dp
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        HuntToolButton(ExplorerTool.ZOOM_IN, Modifier.weight(1f), { onZoom(1.6) })
+        HuntToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f), { onZoom(1.0 / 1.6) })
+        HuntToolButton(ExplorerTool.FIT, Modifier.weight(1f), onFit)
+        if (compactTools) { Spacer(Modifier.weight(1f)) }
+        if (!compactTools) {
+        HuntToolButton(ExplorerTool.CLEAR, Modifier.weight(1f), onUndo, enabled = !finished)
+        HuntToolButton(ExplorerTool.HINT, Modifier.weight(1f), onHint, enabled = !finished)
+        HuntToolButton(ExplorerTool.MORE, Modifier.weight(1f).testTag("huntToolOptions"), { options = true })
+        }
+        }
+        if (compactTools) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            HuntToolButton(ExplorerTool.CLEAR, Modifier.weight(1f), onUndo, enabled = !finished)
+            HuntToolButton(ExplorerTool.HINT, Modifier.weight(1f), onHint, enabled = !finished)
+            HuntToolButton(ExplorerTool.MORE, Modifier.weight(1f).testTag("huntToolOptions"), { options = true })
+        }
+        }
     }
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        OutlinedButton(
-            onClick = onUndo, enabled = !finished,
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("Undo", fontSize = 12.sp) }
-        OutlinedButton(
-            onClick = onHint, enabled = !finished,
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("Hint", fontSize = 12.sp) }
-        OutlinedButton(
-            onClick = onFit,
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("Fit map", fontSize = 12.sp) }
-    }
+    if (options) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { options = false },
+        title = { Text("Map tools") },
+        text = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Precise selection arrows", modifier = Modifier.weight(1f))
+                androidx.compose.material3.Switch(checked = precise, onCheckedChange = {
+                    precise = it
+                    controls.edit().putBoolean("precise_selection", it).apply()
+                }, modifier = Modifier.testTag("huntPreciseSelection"))
+            }
+        },
+        confirmButton = { TextButton(onClick = { options = false },
+            modifier = Modifier.testTag("huntCloseTools")) { Text("Done") } }
+    )
     Button(
-        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
+        shape = JournalActionShape,
+        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("checkChapter"),
         enabled = finished || selected != null,
         onClick = onCheck,
         colors = ButtonDefaults.buttonColors(containerColor = Forest)
@@ -298,10 +345,10 @@ internal fun HuntControlPanel(
 }
 
 @Composable
-private fun GridStepButton(label: String, description: String, onClick: () -> Unit) {
+private fun GridStepButton(label: String, description: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
-        modifier = Modifier.size(48.dp).semantics { contentDescription = description },
+        modifier = modifier.heightIn(min = 48.dp).semantics { contentDescription = description },
         contentPadding = PaddingValues(0.dp),
         shape = RoundedCornerShape(9.dp)
     ) {
@@ -309,3 +356,11 @@ private fun GridStepButton(label: String, description: String, onClick: () -> Un
     }
 }
 
+
+@Composable
+internal fun HuntToolButton(tool: ExplorerTool, modifier: Modifier, action: () -> Unit, enabled: Boolean = true) {
+    OutlinedButton(onClick = action, enabled = enabled, modifier = modifier.heightIn(min = 48.dp)
+        .semantics { contentDescription = tool.label }, contentPadding = PaddingValues(0.dp)) {
+        ExplorerToolIcon(tool)
+    }
+}

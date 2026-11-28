@@ -1,0 +1,47 @@
+{
+  "milestone": "GH-V25-B",
+  "source": "Owner-approved illustrated Explorer's Toolkit concept; extracted transparent PNGs, not procedural redraws",
+  "dimensions_px": [
+    256,
+    256
+  ],
+  "assets": [
+    {
+      "file": "app/src/main/res/drawable-nodpi/gh_tool_checklist.png",
+      "git_blob_sha": "2bbebab539c1872422caa4709428e3142dd734e5"
+    },
+    {
+      "file": "app/src/main/res/drawable-nodpi/gh_tool_compass.png",
+      "git_blob_sha": "05d0e5c032e591b97c91873483a2da40ab90ab7e"
+    },
+    {
+      "file": "app/src/main/res/drawable-nodpi/gh_tool_magnifier.png",
+      "git_blob_sha": "3ac6411ccc4eda221b11be71f5098382e479ca09"
+    },
+    {
+      "file": "app/src/main/res/drawable-nodpi/gh_tool_map.png",
+      "git_blob_sha": "895ca8aa2f172daf87ba107656d90b6830aae069"
+    },
+    {
+      "file": "app/src/main/res/drawable-nodpi/gh_tool_marker.png",
+      "git_blob_sha": "5b19dff8bb56bf123c93baa484648d4ccde27036"
+    },
+    {
+      "file": "app/src/main/res/drawable-nodpi/gh_tool_notebook.png",
+      "git_blob_sha": "3a8a6f8cebeb65c26eea67650f5c0d83d67b760b"
+    }
+  ],
+  "status": "byte-verified and integrated; QA307 passed; physical visual acceptance pending",
+  "launcher_icon": "deferred; not included",
+  "last_verified": {
+    "source": "312701abdcc2086d9771fb80d024ef804bc11a88",
+    "qa_run": 45510779210,
+    "status": "automated tested; physical visual acceptance pending"
+  },
+  "reuse": [
+    "Home",
+    "Quick Play",
+    "Custom Play",
+    "Academy overview"
+  ]
+}

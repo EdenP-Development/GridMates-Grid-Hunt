@@ -1,0 +1,7 @@
+<!-- Derived from artwork/worlds/whispering-coast/masters/tidepool-bend.svg. Draft, not final approval. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="128dp" android:height="128dp" android:viewportWidth="128" android:viewportHeight="128">
+    <path android:pathData="M10 64Q19 35 51 35T105 50Q124 71 108 91Q93 114 56 108Q14 107 10 64Z" android:fillColor="#9baba1" android:strokeColor="#62776d" android:strokeWidth="3" />
+    <path android:pathData="M27 67Q37 44 62 50Q90 45 99 68Q107 88 78 94Q39 101 27 67Z" android:fillColor="#83b3b9" android:strokeColor="#e0d2b0" android:strokeWidth="5" />
+    <path android:pathData="M40 73Q52 65 65 73T88 72" android:fillColor="#00000000" android:strokeColor="#e6f1dd" android:strokeWidth="3" />
+    <path android:pathData="M66 63L70 74L82 74L73 81L77 92L66 85L56 92L59 81L50 74H62Z" android:fillColor="#d28e73" />
+</vector>

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.content.Context
 import android.graphics.Paint
 import androidx.activity.ComponentActivity
+import androidx.core.view.WindowCompat
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
@@ -19,6 +20,7 @@ import androidx.compose.foundation.gestures.calculateCentroid
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -83,6 +85,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.ChapterPosition
 import com.playereden.gridhunt.core.FirstBearingsChapter
+import com.playereden.gridhunt.core.ExplorationMaps
+import com.playereden.gridhunt.core.MapTrailChapter
+import com.playereden.gridhunt.core.TrailChapterCatalog
+import com.playereden.gridhunt.core.TreasureChecklistMission
+import com.playereden.gridhunt.core.WoodlandIdentifyMission
+import com.playereden.gridhunt.core.WoodlandExpedition
+import com.playereden.gridhunt.core.GridHuntCampaign
+import com.playereden.gridhunt.core.WoodlandSupplyExpedition
+import com.playereden.gridhunt.core.WoodlandReturnExpedition
+import com.playereden.gridhunt.core.CampaignChapterStatus
 import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.GridCell
 import com.playereden.gridhunt.core.GridReference
@@ -96,17 +108,32 @@ import com.playereden.gridhunt.core.WorldPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Parchment UI and cream startup both require dark system-bar icons.
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = true
+            isAppearanceLightNavigationBars = true
+        }
         setContent {
             MaterialTheme(
+                typography = JournalTypography,
                 colorScheme = lightColorScheme(
                     primary = Forest,
                     onPrimary = Color.White,
                     background = Paper,
                     onBackground = Ink,
-                    surface = Color(0xFFFFFBF1)
+                    surface = Color(0xFFFFFBF1),
+                    onSurface = Ink,
+                    onSurfaceVariant = Muted,
+                    outline = Color(0xFF8D907D),
+                    outlineVariant = JournalEdge,
+                    secondary = Pine,
+                    onSecondary = Color.White
                 )
             ) {
-                GridHuntScreen()
+                StartupBranding(showInitially = savedInstanceState == null,
+                    seriesDrawable = R.drawable.gridmates_v1_runtime_transparent) {
+                    GridHuntScreen()
+                }
             }
         }
     }
@@ -119,50 +146,199 @@ private fun GridHuntScreen() {
         context.getSharedPreferences("gridhunt_visual_lab_v1", Context.MODE_PRIVATE)
     }
     var screen by rememberSaveable { mutableStateOf("home") }
-    var lookName by rememberSaveable {
-        mutableStateOf(MapLook.restore(prefs.getString("map_look", null)).name)
-    }
     var hapticsEnabled by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("haptics", true))
+        mutableStateOf(prefs.savedBoolean("haptics", true))
     }
-    val mapLook = MapLook.restore(lookName)
-    LaunchedEffect(lookName, hapticsEnabled) {
-        prefs.edit().putString("map_look", lookName)
+    // Alpha: one illustrated map per world.
+    val mapLook = MapLook.FIELD_GUIDE
+    LaunchedEffect(hapticsEnabled) {
+        prefs.edit().putString("map_look", mapLook.name)
             .putBoolean("haptics", hapticsEnabled).apply()
     }
-    BackHandler(enabled = screen != "home") { screen = "home" }
+    // Preserve the originating hub when returning from a puzzle.
+    var returnHub by rememberSaveable { mutableStateOf("quick") }
+    var settingsOrigin by rememberSaveable { mutableStateOf("home") }
+    val expandedPlaytestEnabled = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0 && context.packageName == "com.playereden.gridmates.gridhunt.qa"
+    val goBack = {
+        screen = when (screen) {
+            "settings" -> settingsOrigin
+            "expandedAdventure" -> "adventureChoice"
+            "adventureChoice" -> "home"
+            "quick", "adventure", "custom", "academy", "atlas" -> "home"
+            else -> returnHub
+        }
+    }
+    BackHandler(enabled = screen != "home") { goBack() }
+    // Read active chapter progress and permanent accomplishments separately.
+    val completion = remember(context) {
+        CampaignCompletionStore(context, com.playereden.gridhunt.core.PublishedWorlds.selection, false)
+    }
+    fun currentCampaignSnapshot() = completion.snapshot()
+    val campaignSnapshot = currentCampaignSnapshot()
+    val campaignState = requireNotNull(GridHuntCampaign.registry.state(
+        WoodlandExpedition.chapter.id, campaignSnapshot
+    ))
+    val supplyState = requireNotNull(GridHuntCampaign.registry.state(
+        WoodlandSupplyExpedition.chapter.id, campaignSnapshot
+    ))
+    val returnState = requireNotNull(GridHuntCampaign.registry.state(
+        WoodlandReturnExpedition.chapter.id, campaignSnapshot
+    ))
+    val expeditionProgress = campaignState.completedObjectives
 
     when (screen) {
+        "home" -> ExplorerDeskHome(
+            worldProgress = GridHuntCampaign.registry.worldProgress(GridHuntCampaign.littleWoodlandId, campaignSnapshot),
+            onAdventure = { screen = if (expandedPlaytestEnabled) "adventureChoice" else "adventure" },
+            onQuickPlay = { screen = "quick" },
+            onCustom = { screen = "custom" },
+            onAcademy = { screen = "academy" },
+            onSettings = { settingsOrigin = "home"; screen = "settings" },
+            onAtlas = { screen = "atlas" }
+        )
+        "atlas" -> PublishedRegionalGameplay(hapticsEnabled = hapticsEnabled,
+            onExit = { screen = "home" })
+        "settings" -> GridHuntSettings(hapticsEnabled, { hapticsEnabled = it }, mapLook,
+            onBack = { screen = settingsOrigin })
+        "academy" -> ExplorerAcademyScreen(onHome = { screen = "home" }, mapLook = mapLook, onLook = { _ -> })
+        "adventureChoice" -> if (expandedPlaytestEnabled) ExpandedAdventureChoice(
+            onClassic = { screen = "adventure" }, onExpanded = { screen = "expandedAdventure" },
+            onBack = { screen = "home" }) else LaunchedEffect(Unit) { screen = "adventure" }
+        "expandedAdventure" -> if (expandedPlaytestEnabled) ExpandedAdventureSelector(
+            onExit = { screen = "adventureChoice" }) else LaunchedEffect(Unit) { screen = "adventure" }
+        "adventure" -> WoodlandAdventureJourney(
+            progress = expeditionProgress,
+            secondStatus = supplyState.status,
+            secondProgress = supplyState.completedObjectives,
+            thirdStatus = returnState.status,
+            thirdProgress = returnState.completedObjectives,
+            firstEarned = campaignState.everCompleted,
+            secondEarned = supplyState.everCompleted,
+            thirdEarned = returnState.everCompleted,
+            onThirdChapter = {
+                if (returnState.status != CampaignChapterStatus.LOCKED) {
+                    returnHub = "adventure"
+                    screen = "returnTrail"
+                }
+            },
+            onSecondChapter = {
+                if (supplyState.status != CampaignChapterStatus.LOCKED) {
+                    returnHub = "adventure"
+                    screen = "supplies"
+                }
+            },
+            onChapter = {
+                returnHub = "adventure"
+                screen = "expedition"
+            },
+            onBack = { screen = "home" }
+        )
+        "custom" -> CustomHuntScreen(mapLook = mapLook, onLook = { _ -> }, onHome = { screen = "home" })
         "chapter" -> FirstBearingsScreen(
-            onHome = { screen = "home" },
+            onHome = { screen = returnHub },
             mapLook = mapLook,
+            onLook = { _ -> },
             hapticsEnabled = hapticsEnabled
         )
         "reverse" -> ReversePracticeScreen(
-            onBack = { screen = "home" },
+            onBack = { screen = returnHub },
             mapLook = mapLook,
+            onLook = { _ -> },
             hapticsEnabled = hapticsEnabled
         )
-        else -> GridHuntHome(
+        "treasure" -> TreasureChecklistScreen(
+            onHome = { screen = returnHub },
             mapLook = mapLook,
-            onLook = { lookName = it.name },
+            onLook = { _ -> },
+            hapticsEnabled = hapticsEnabled
+        )
+        "identify" -> WoodlandIdentifyScreen(
+            onHome = { screen = returnHub },
+            mapLook = mapLook,
+            onLook = { _ -> },
+            hapticsEnabled = hapticsEnabled
+        )
+        "expedition" -> WoodlandMixedExpeditionScreen(
+            onHome = { screen = returnHub },
+            mapLook = mapLook,
+            onLook = { _ -> },
             hapticsEnabled = hapticsEnabled,
-            onHaptics = { hapticsEnabled = it },
-            onChapter = { screen = "chapter" },
-            onReverse = { screen = "reverse" }
+            onNextChapter = if (returnHub == "adventure") ({
+                // Read current persisted progress, not the snapshot from before the final clue.
+                val snapshot = currentCampaignSnapshot()
+                val next = GridHuntCampaign.registry.state(
+                    WoodlandSupplyExpedition.chapter.id, snapshot
+                )
+                if (next != null && next.status != CampaignChapterStatus.LOCKED) {
+                    returnHub = "adventure"
+                    screen = "supplies"
+                }
+            }) else null
+        )
+        "supplies", "returnTrail" -> {
+            val isReturn = screen == "returnTrail"
+            val status = if (isReturn) returnState.status else supplyState.status
+            if (status == CampaignChapterStatus.LOCKED) {
+                LaunchedEffect(screen) { screen = "adventure" }
+            } else WoodlandMixedExpeditionScreen(
+                onHome = { screen = "adventure" },
+                mapLook = mapLook,
+                onLook = { _ -> },
+                hapticsEnabled = hapticsEnabled,
+                chapterTwo = !isReturn,
+                chapterThree = isReturn,
+                onNextChapter = if (!isReturn) ({
+                    val next = GridHuntCampaign.registry.state(
+                        WoodlandReturnExpedition.chapter.id, currentCampaignSnapshot()
+                    )
+                    if (next?.status != CampaignChapterStatus.LOCKED && next != null) {
+                        returnHub = "adventure"
+                        screen = "returnTrail"
+                    }
+                }) else null
+            )
+        }
+        "quick" -> GridHuntHome(
+            mapLook = mapLook,
+            onLook = { _ -> },
+            onSettings = { settingsOrigin = "quick"; screen = "settings" },
+            onChapter = {
+                returnHub = "quick"
+                screen = "chapter"
+            },
+            onReverse = {
+                returnHub = "quick"
+                screen = "reverse"
+            },
+            onTreasure = {
+                returnHub = "quick"
+                screen = "treasure"
+            },
+            onIdentify = {
+                returnHub = "quick"
+                screen = "identify"
+            },
+            onExpedition = {
+                returnHub = "quick"
+                screen = "expedition"
+            },
+            onReturnHome = { screen = "home" }
         )
     }
 }
 
-/** A small playtest hub, not a promise of all future modes. */
+/** GH-V14 Quick Play: existing modes and settings moved out of the main Home hub. */
 @Composable
 private fun GridHuntHome(
     mapLook: MapLook,
     onLook: (MapLook) -> Unit,
-    hapticsEnabled: Boolean,
-    onHaptics: (Boolean) -> Unit,
+    onSettings: () -> Unit,
     onChapter: () -> Unit,
-    onReverse: () -> Unit
+    onReverse: () -> Unit,
+    onTreasure: () -> Unit,
+    onIdentify: () -> Unit,
+    onExpedition: () -> Unit,
+    onReturnHome: () -> Unit
 ) {
     val context = LocalContext.current
     val chapterPrefs = remember(context) {
@@ -171,144 +347,188 @@ private fun GridHuntHome(
     val reversePrefs = remember(context) {
         context.getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
     }
+    val treasurePrefs = remember(context) {
+        context.getSharedPreferences("gridhunt_treasure_checklist_v1", Context.MODE_PRIVATE)
+    }
+    val identifyPrefs = remember(context) {
+        context.getSharedPreferences(WoodlandIdentifyMission.saveName, Context.MODE_PRIVATE)
+    }
+    val expeditionPrefs = remember(context) {
+        context.getSharedPreferences(WoodlandExpedition.saveName, Context.MODE_PRIVATE)
+    }
+    val expeditionCount = WoodlandExpedition.restoreStep(expeditionPrefs.savedInt("step", 0))
+    val identifyCount = WoodlandIdentifyMission.restoreStep(
+        identifyPrefs.savedInt("step", 0)
+    )
+    val treasureCount = TreasureChecklistMission.restoreCompleted(
+        (treasurePrefs.savedString("completed_ids", "") ?: "")
+            .split(',').filter { it.isNotBlank() }.toSet()
+    ).size
     val chapterState = FirstBearingsChapter.restore(
-        chapterPrefs.getInt("hunt_index", 0), chapterPrefs.getInt("objective_index", 0)
+        chapterPrefs.savedInt("hunt_index", 0), chapterPrefs.savedInt("objective_index", 0)
     )
     val chapterCompleted = FirstBearingsChapter.hunts.take(chapterState.huntIndex)
         .sumOf { it.objectives.size } + chapterState.objectiveIndex
-    val reverseCompleted = reversePrefs.getInt("step", 0).coerceIn(0, ReverseTraining.markers.size)
+    val reverseCompleted = reversePrefs.savedInt("step", 0).coerceIn(0, ReverseTraining.markers.size)
+    val allTrailsFinished = chapterState.huntIndex == FirstBearingsChapter.hunts.lastIndex &&
+        chapterState.objectiveIndex == FirstBearingsChapter.hunts.last().objectives.size
+    val allGoldenSpotsFinished = reverseCompleted == ReverseTraining.markers.size
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Paper)
+        modifier = Modifier.fillMaxSize().journalPaper()
             .statusBarsPadding().navigationBarsPadding()
-            .verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .journalScroll()
+            .padding(horizontal = 18.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(7.dp)
     ) {
-        Text("GRIDMATES  /  FIELD NOTES", fontWeight = FontWeight.Bold,
-            color = Forest, fontSize = 11.sp)
-        Text("Grid Hunt", fontWeight = FontWeight.ExtraBold,
-            color = Ink, fontSize = 34.sp)
-        Text("Good puzzles. Good company.", color = Muted, fontSize = 13.sp)
-        Surface(shape = RoundedCornerShape(18.dp), color = Color(0xFFDFE7D7)) {
-            Column(Modifier.fillMaxWidth().padding(16.dp)) {
-                Text("YOUR FIELD JOURNAL", fontWeight = FontWeight.Bold,
-                    color = Forest, fontSize = 10.sp)
-                Spacer(Modifier.height(5.dp))
-                Text("The woodland survey", fontWeight = FontWeight.SemiBold,
-                    color = Ink, fontSize = 20.sp)
-                Text("Find landmarks by reading the grid — no timer, no pressure.",
-                    fontSize = 12.sp, color = Muted)
-                Spacer(Modifier.height(9.dp))
-                Text("$chapterCompleted / 9 chapter squares  ·  $reverseCompleted / 5 reverse markers",
-                    fontSize = 12.sp, color = Forest, fontWeight = FontWeight.Medium)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("Quick Play", fontWeight = FontWeight.ExtraBold,
+                    color = Ink, fontSize = 26.sp)
+                Text("Pick a favorite puzzle.", color = Muted, fontSize = 12.sp)
+            }
+            TextButton(onClick = onReturnHome, modifier = Modifier.testTag("quickBack")) {
+                Text("Home", color = Forest)
             }
         }
-        Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFFBF1)) {
-            Column(Modifier.fillMaxWidth().padding(14.dp)) {
-                Text("01   FIRST BEARINGS", color = Forest, fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold)
-                Text("Three short woodland hunts · 9 grid squares",
-                    fontSize = 12.sp, color = Muted)
-                Spacer(Modifier.height(7.dp))
+        Surface(shape = RoundedCornerShape(17.dp), color = Color(0xFFDFEAD4), border = JournalPanelBorder) {
+            Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp)) {
+                Text("✦  YOUR LITTLE DISCOVERIES", color = Forest,
+                    fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                Spacer(Modifier.height(4.dp))
+                Text("$chapterCompleted of 9 squares found", color = Ink, fontSize = 12.sp)
+                Text("$reverseCompleted of 5 golden spots", color = Ink, fontSize = 12.sp)
+            }
+        }
+        Text("Choose your puzzle", color = Ink, fontSize = 17.sp,
+            fontWeight = FontWeight.Bold)
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+            QuickPlayModeTile(
+                label = "Trail Treasures", glyph = "◇", instruction = "Find the square",
+                progress = "$chapterCompleted of 9 found",
+                tag = "openChapter", color = Color(0xFFE2EBD8),
+                onClick = onChapter, modifier = Modifier.weight(1f).fillMaxHeight()
+            )
+            QuickPlayModeTile(
+                label = "Golden Spots", glyph = "✦", instruction = "Read the marker",
+                progress = "$reverseCompleted of 5 found",
+                tag = "openReverse", color = Color(0xFFF5E7C7),
+                onClick = onReverse, modifier = Modifier.weight(1f).fillMaxHeight()
+            )
+        }
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+            QuickPlayModeTile(
+                label = "Treasure Checklist", glyph = "☑",
+                instruction = "Locate the landmarks",
+                progress = "$treasureCount of 4 found",
+                tag = "openTreasure", color = Color(0xFFFFF4D8),
+                onClick = onTreasure, modifier = Modifier.weight(1f).fillMaxHeight()
+            )
+            QuickPlayModeTile(
+                label = "What's at This Grid?", glyph = "⌖",
+                instruction = "Identify the object",
+                progress = "$identifyCount of 4 identified",
+                tag = "openIdentify", color = Color(0xFFE1ECE7),
+                onClick = onIdentify, modifier = Modifier.weight(1f).fillMaxHeight()
+            )
+        }
+        Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFE8CA), border = JournalPanelBorder) {
+            Row(
+                Modifier.fillMaxWidth().padding(11.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(9.dp)
+            ) {
+                PuzzleModeIllustration("mixed", "", Modifier.size(38.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("The Missing Field Notes", color = Ink,
+                        fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text("Mixed expedition  ·  $expeditionCount of 4 pages",
+                        color = Muted, fontSize = 11.sp)
+                }
                 Button(
-                    onClick = onChapter,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("openChapter"),
+                    onClick = onExpedition,
+                    modifier = Modifier.heightIn(min = 48.dp).testTag("openExpedition"),
                     colors = ButtonDefaults.buttonColors(containerColor = Forest)
-                ) { Text(if (chapterCompleted > 0) "Continue chapter" else "Start chapter") }
-            }
-        }
-        Surface(shape = RoundedCornerShape(16.dp), color = Color(0xFFFFFBF1)) {
-            Column(Modifier.fillMaxWidth().padding(14.dp)) {
-                Text("02   LOOK AGAIN", color = Forest, fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold)
-                Text("Reverse practice · 5 marked locations, read the reference",
-                    fontSize = 12.sp, color = Muted)
-                Spacer(Modifier.height(7.dp))
-                OutlinedButton(onClick = onReverse,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("openReverse")) {
-                    Text(if (reverseCompleted > 0) "Continue reverse practice" else "Try reverse practice")
-                }
-            }
-        }
-        Text("VISUAL PLAYTEST", color = Forest, fontSize = 11.sp,
-            fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
-        Text("Compare two map treatments using the same real puzzle rules.",
-            fontSize = 12.sp, color = Muted)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            MapLook.entries.forEach { look ->
-                val chosen = mapLook == look
-                OutlinedButton(
-                    onClick = { onLook(look) },
-                    modifier = Modifier.weight(1f).heightIn(min = 64.dp).testTag("style_" + look.name),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = if (chosen) Color(0xFFDDE7D6) else Color(0xFFFFFBF1)
-                    ),
-                    contentPadding = PaddingValues(6.dp)
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(if (chosen) "✓  "+look.label else look.label,
-                            fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                        Text(if (look == MapLook.FIELD_GUIDE) "Warm" else "Cool",
-                            fontSize = 10.sp)
-                    }
+                    Text("Play", fontWeight = FontWeight.Bold)
                 }
             }
         }
-        OutlinedButton(
-            onClick = { onHaptics(!hapticsEnabled) },
-            modifier = Modifier.fillMaxWidth().heightIn(min = 46.dp)
-        ) {
-            Text("Completion vibration: " + if (hapticsEnabled) "On" else "Off")
+        OutlinedButton(onClick = onSettings,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("quickSettings")) {
+            Text("Settings")
         }
-        Text("Design preview · Offline · Fictional grid · Progress saves on this device",
-            fontSize = 10.sp, color = Muted)
+        Text("Play offline. Your puzzle progress stays on this device.",
+            fontSize = 11.sp, color = Muted)
     }
 }
 
 @Composable
-private fun FirstBearingsScreen(
+internal fun FirstBearingsScreen(
     onHome: () -> Unit,
     mapLook: MapLook,
-    hapticsEnabled: Boolean
+    onLook: (MapLook) -> Unit,
+    hapticsEnabled: Boolean,
+    chapter: MapTrailChapter = TrailChapterCatalog.woodland
 ) {
+    require(TrailChapterCatalog.forAuthoredMap(chapter.map) === chapter)
+    androidx.compose.runtime.key(chapter.map.id, chapter.map.revision) {
+        MapTrailContent(onHome, mapLook, onLook, hapticsEnabled, chapter)
+    }
+}
+
+@Composable
+private fun MapTrailContent(onHome: () -> Unit, mapLook: MapLook, onLook: (MapLook) -> Unit,
+    hapticsEnabled: Boolean, chapter: MapTrailChapter) {
+    val map = chapter.map
+    val woodland = map == ExplorationMaps.woodland
+    val scene = if (woodland) publishedMapScene(map, mapLook) else coastalTerrainDraftScene(map, mapLook)
+    val region = if (woodland) "woodland" else "coastal"
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
-    val prefs = remember(context) {
-        context.getSharedPreferences("gridhunt_first_bearings_v1", Context.MODE_PRIVATE)
+    val prefs = remember(context, map) {
+        context.getSharedPreferences(chapter.saveName, Context.MODE_PRIVATE)
     }
     val initial = remember(prefs) {
-        FirstBearingsChapter.restore(
-            prefs.getInt("hunt_index", 0),
-            prefs.getInt("objective_index", 0)
+        chapter.restore(
+            prefs.savedInt("hunt_index", 0),
+            prefs.savedInt("objective_index", 0)
         )
     }
     var huntIndex by rememberSaveable { mutableIntStateOf(initial.huntIndex) }
     var step by rememberSaveable { mutableIntStateOf(initial.objectiveIndex) }
     var selected by rememberSaveable {
-        mutableStateOf(prefs.getString("selected", null)?.takeIf { ref ->
+        mutableStateOf(prefs.savedString("selected", null)?.takeIf { ref ->
             runCatching {
                 val cell = GridReference.parse(ref)
-                cell.digits == 4 && WoodlandTrainingMap.bounds.contains(
-                    WorldPoint(cell.westMeters.toDouble(), cell.southMeters.toDouble())
-                )
+                cell.digits == 4 && cell in map.cells
             }.getOrDefault(false)
         })
     }
-    var hintStage by rememberSaveable { mutableIntStateOf(prefs.getInt("hint_stage", 0).coerceIn(0, 2)) }
+    var hintStage by rememberSaveable { mutableIntStateOf(prefs.savedInt("hint_stage", 0).coerceIn(0, 2)) }
     var feedback by rememberSaveable {
-        mutableStateOf("Read eastings first, then northings. Your chapter saves automatically.")
+        mutableStateOf("Ready for your first clue? Pick a square, then check your guess.")
     }
     var showGuide by rememberSaveable {
-        mutableStateOf(!prefs.getBoolean("guide_seen", false))
+        mutableStateOf(!prefs.savedBoolean("guide_seen", false))
+    }
+    // A discovery is a brief celebration, not persisted reward currency.
+    var discoveryMessage by remember { mutableStateOf<String?>(null) }
+    var discoverySequence by remember { mutableIntStateOf(0) }
+    LaunchedEffect(discoverySequence) {
+        if (discoverySequence > 0) {
+            kotlinx.coroutines.delay(1700L)
+            discoveryMessage = null
+        }
     }
 
-    val hunt = FirstBearingsChapter.hunts[huntIndex]
+    val hunt = chapter.hunts[huntIndex]
     val targets = hunt.objectives
     val finished = step >= targets.size
-    val chapterFinished = finished && huntIndex == FirstBearingsChapter.hunts.lastIndex
+    val chapterFinished = finished && huntIndex == chapter.hunts.lastIndex
     val active = targets.getOrNull(step)
     val selectedCell = selected?.let(GridReference::parse)
-    val bounds = WoodlandTrainingMap.bounds
+    val bounds = map.bounds
 
     // Save objective/hunt progress promptly, including hints and pending selection,
     // so returning after Android closes the activity resumes the same authored task.
@@ -354,12 +574,8 @@ private fun FirstBearingsScreen(
 
     fun moveSelected(eastDelta: Int, northDelta: Int) {
         if (finished) return
-        val origin = selectedCell ?: GridCell(26, 40)
-        selected = GridCell(
-            (origin.eastIndex + eastDelta).coerceIn(24, 29),
-            (origin.northIndex + northDelta).coerceIn(37, 42)
-        ).reference
-        feedback = "Selected " + selected + ". Check or adjust the square."
+        selected = chapter.moveSelection(selectedCell, eastDelta, northDelta).reference
+        feedback = "Square " + selected + " is your pick. Check it or choose another!"
     }
 
     val mapSizeChanged: (IntSize) -> Unit = { size ->
@@ -381,41 +597,46 @@ private fun FirstBearingsScreen(
     val onMapSelect: (String) -> Unit = { ref ->
         if (!finished) {
             selected = ref
-            feedback = "Selected " + ref + ". Check or choose another square."
+            feedback = "Square " + ref + " is your pick. Ready to try it?"
         }
     }
 
     val onCheck: () -> Unit = {
         if (finished) {
-            val next = FirstBearingsChapter.nextHuntOrReplay(ChapterPosition(huntIndex, step))
+            val next = chapter.nextHuntOrReplay(ChapterPosition(huntIndex, step))
             val replayed = next.huntIndex == 0
             huntIndex = next.huntIndex
             step = next.objectiveIndex
             selected = null
             hintStage = 0
-            feedback = if (replayed) "Chapter restarted. Find the first grid square."
-            else "Next hunt ready. New references, same woodland map."
+            feedback = if (replayed) "A fresh walk! Your first clue is waiting."
+            else "A new stretch of trail! Find the next hiding spot."
             resetView()
+            discoveryMessage = null
         } else {
             val expected = active!!
             val attempt = selectedCell
             if (attempt != null) {
                 if (HuntRules.isCorrect(expected, attempt)) {
                     if (hapticsEnabled) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    step = FirstBearingsChapter.acceptCorrect(
+                    step = chapter.acceptCorrect(
                         ChapterPosition(huntIndex, step)
                     ).objectiveIndex
                     selected = null
                     hintStage = 0
+                    discoveryMessage = if (step >= targets.size) "Trail complete!"
+                        else "A new discovery!"
+                    discoverySequence += 1
                     feedback = when {
-                        step >= targets.size && huntIndex == FirstBearingsChapter.hunts.lastIndex ->
-                            "Chapter complete! The woodland survey is finished."
+                        step >= targets.size && huntIndex == chapter.hunts.lastIndex ->
+                            "What a trail! You found all nine $region squares."
                         step >= targets.size ->
-                            "Hunt complete! Your next survey is ready."
-                        else -> "Correct: " + expected.reference + ". Find the next square."
+                            "Beautifully done! Your next trail is ready."
+                        else -> "Nice find! ✦ " + expected.reference + " was the spot. Another clue awaits."
                     }
                 } else {
-                    feedback = HuntRules.errorText(expected, attempt)
+                    discoveryMessage = null
+                    feedback = "Not quite! " + HuntRules.errorText(expected, attempt)
                 }
             }
         }
@@ -445,22 +666,24 @@ private fun FirstBearingsScreen(
                     viewport = viewport,
                     onViewport = mapSizeChanged,
                     onCamera = ::updateCamera,
-                    onSelect = onMapSelect, mapLook = mapLook
+                    onSelect = onMapSelect, mapLook = mapLook,
+                    discoveryMessage = discoveryMessage,
+                    onLook = onLook, scene = scene, map = map
                 )
                 Column(
                     modifier = Modifier
                         .width(sidePanelWidth)
                         .fillMaxHeight()
-                        .verticalScroll(rememberScrollState()),
+                        .journalScroll(),
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     HuntHeader(
                         compact = true, huntName = hunt.name,
-                        huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
+                        huntNumber = huntIndex + 1, huntTotal = chapter.hunts.size,
                         onGuide = { showGuide = !showGuide },
                         onHome = onHome
                     )
-                    ObjectiveRibbon(
+                    if (!finished) ObjectiveRibbon(
                         step = step, total = targets.size, active = active,
                         huntName = hunt.name, chapterFinished = chapterFinished
                     )
@@ -468,21 +691,33 @@ private fun FirstBearingsScreen(
                         showGuide = false
                         prefs.edit().putBoolean("guide_seen", true).apply()
                     }
-                    HuntControlPanel(
+                    if (finished) {
+                        PuzzleFinishCard(
+                            title = if (chapterFinished) (if (woodland) "Woodland adventure complete!" else "Coastal adventure complete!") else "Trail complete!",
+                            description = if (chapterFinished)
+                                if (woodland) "Nine clues found across three trails. The whole little woodland is yours to revisit." else "Nine clues found across three trails. The coast is yours to revisit."
+                            else "You found every square on this trail. There's another path to explore!",
+                            discoveries = if (chapterFinished) "9 OF 9 LITTLE DISCOVERIES"
+                                else "${targets.size} OF ${targets.size} SQUARES FOUND",
+                            primaryLabel = if (chapterFinished) "Explore again" else "Next trail",
+                            onPrimary = onCheck,
+                            onHome = onHome
+                        )
+                    } else HuntControlPanel(
                         step = step, total = targets.size, selected = selected,
                         feedback = feedback, hintStage = hintStage, finished = finished,
                         onMove = ::moveSelected, onZoom = ::zoomBy,
                         onUndo = {
                             selected = null
-                            feedback = "Selection cleared. Choose another square."
+                            feedback = "All clear! Pick a new square whenever you are ready."
                         },
                         onHint = { hintStage = (hintStage + 1).coerceAtMost(2) },
                         onFit = ::resetView,
                         onCheck = onCheck,
                         actionLabel = when {
-                            chapterFinished -> "Replay chapter  ↻"
-                            finished -> "Next hunt  →"
-                            else -> "Check square"
+                            chapterFinished -> "Explore again  ↻"
+                            finished -> "Next trail  →"
+                            else -> "Try this square"
                         }
                     )
                 }
@@ -491,12 +726,12 @@ private fun FirstBearingsScreen(
             Column(modifier = Modifier.fillMaxSize()) {
                 HuntHeader(
                     compact = false, huntName = hunt.name,
-                    huntNumber = huntIndex + 1, huntTotal = FirstBearingsChapter.hunts.size,
+                    huntNumber = huntIndex + 1, huntTotal = chapter.hunts.size,
                     onGuide = { showGuide = !showGuide },
                     onHome = onHome
                 )
                 Spacer(Modifier.height(5.dp))
-                ObjectiveRibbon(
+                if (!finished) ObjectiveRibbon(
                     step = step, total = targets.size, active = active,
                     huntName = hunt.name, chapterFinished = chapterFinished
                 )
@@ -514,24 +749,38 @@ private fun FirstBearingsScreen(
                     viewport = viewport,
                     onViewport = mapSizeChanged,
                     onCamera = ::updateCamera,
-                    onSelect = onMapSelect, mapLook = mapLook
+                    onSelect = onMapSelect, mapLook = mapLook,
+                    discoveryMessage = discoveryMessage,
+                    onLook = onLook, scene = scene, map = map
                 )
                 Spacer(Modifier.height(4.dp))
-                HuntControlPanel(
+                if (finished) {
+                    PuzzleFinishCard(
+                        title = if (chapterFinished) (if (woodland) "Woodland adventure complete!" else "Coastal adventure complete!") else "Trail complete!",
+                        description = if (chapterFinished)
+                            if (woodland) "Nine clues found across three trails. The whole little woodland is yours to revisit." else "Nine clues found across three trails. The coast is yours to revisit."
+                        else "You found every square on this trail. There's another path to explore!",
+                        discoveries = if (chapterFinished) "9 OF 9 LITTLE DISCOVERIES"
+                            else "${targets.size} OF ${targets.size} SQUARES FOUND",
+                        primaryLabel = if (chapterFinished) "Explore again" else "Next trail",
+                        onPrimary = onCheck,
+                        onHome = onHome
+                    )
+                } else HuntControlPanel(
                     step = step, total = targets.size, selected = selected,
                     feedback = feedback, hintStage = hintStage, finished = finished,
                     onMove = ::moveSelected, onZoom = ::zoomBy,
                     onUndo = {
                         selected = null
-                        feedback = "Selection cleared. Choose another square."
+                        feedback = "All clear! Pick a new square whenever you are ready."
                     },
                     onHint = { hintStage = (hintStage + 1).coerceAtMost(2) },
                     onFit = ::resetView,
                     onCheck = onCheck,
                     actionLabel = when {
-                        chapterFinished -> "Replay chapter  ↻"
-                        finished -> "Next hunt  →"
-                        else -> "Check square"
+                        chapterFinished -> "Explore again  ↻"
+                        finished -> "Next trail  →"
+                        else -> "Try this square"
                     }
                 )
             }

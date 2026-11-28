@@ -7,11 +7,11 @@ data class SurveyMarker(val id: String, val title: String, val point: WorldPoint
 
 object ReverseTraining {
     val markers = listOf(
-        SurveyMarker("A", "Survey marker A", WorldPoint(24650.0, 40620.0)),
-        SurveyMarker("B", "Survey marker B", WorldPoint(27620.0, 42130.0)),
-        SurveyMarker("C", "Survey marker C", WorldPoint(28680.0, 38250.0)),
-        SurveyMarker("D", "Survey marker D", WorldPoint(25870.0, 41220.0)),
-        SurveyMarker("E", "Survey marker E", WorldPoint(29660.0, 42840.0))
+        SurveyMarker("A", "Golden spot A", WorldPoint(24650.0, 40620.0)),
+        SurveyMarker("B", "Golden spot B", WorldPoint(27620.0, 42130.0)),
+        SurveyMarker("C", "Golden spot C", WorldPoint(28680.0, 38250.0)),
+        SurveyMarker("D", "Golden spot D", WorldPoint(25870.0, 41220.0)),
+        SurveyMarker("E", "Golden spot E", WorldPoint(29660.0, 42840.0))
     )
     init {
         require(markers.map { it.id }.distinct().size == markers.size)

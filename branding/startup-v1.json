@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "assets": [
+    {
+      "file": "spudacus_v1_full_transparent.png",
+      "url": "https://raw.githubusercontent.com/EdenP-Development/Eden-Development-Standards/015645bffb612e0f4311ec5a2d29e9c8bad91289/branding/spudacus/v1.0/full-transparent.png",
+      "sha256": "74773dbda822161f73a639f959e8bce5c6e0b333a94ebeb8ee27f620d4995d25",
+      "bytes": 739499
+    },
+    {
+      "file": "gridmates_v1_runtime_transparent.png",
+      "url": "https://raw.githubusercontent.com/EdenP-Development/Eden-Development-Standards/9affedc94ca5a6b896d36148f46f14a4e8218c3a/branding/gridmates/v1.0/runtime-transparent.png",
+      "sha256": "eef6d631cac0b9523f7e0dbebac229f9a2458d36fe2e73e111d251704d9ff292",
+      "bytes": 69221
+    }
+  ]
+}

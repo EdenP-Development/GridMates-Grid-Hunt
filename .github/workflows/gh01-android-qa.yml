@@ -1,6 +1,12 @@
 name: Grid Hunt Vision Lab QA
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'core/**'
+      - '.github/workflows/gh01-android-qa.yml'
   push:
     branches: [main]
     paths:
@@ -50,11 +56,61 @@ jobs:
       - name: Compile, execute core tests and build debug APK
         run: |
           chmod +x gradlew
-          ./gradlew :core:test :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon --max-workers=2 --stacktrace --console=plain
+          ./gradlew :core:test :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon --max-workers=2 --stacktrace --console=plain
+      - name: Assemble unsigned beta and verify separate package
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./gradlew :app:assembleBeta --no-daemon --max-workers=2 --console=plain
+          apk=app/build/outputs/apk/beta/app-beta-unsigned.apk
+          test -s "$apk"
+          tools="$ANDROID_HOME/build-tools/35.0.0"
+          badging=$("$tools/aapt" dump badging "$apk")
+          line=$(printf '%s\n' "$badging" | sed -n '1p')
+          [[ "$line" == *"name='com.playereden.gridmates.gridhunt.beta'"* ]]
+          [[ "$line" == *"versionCode='$((10000 + GITHUB_RUN_NUMBER))'"* ]]
+          [[ "$line" == *"versionName='0.3.0-gh02c-beta.$GITHUB_RUN_NUMBER'"* ]]
+          if "$tools/apksigner" verify "$apk" >/dev/null 2>&1; then
+            echo 'Unexpected signed staging APK'; exit 1
+          fi
+          echo 'PASS: isolated unsigned beta APK verified; no private secrets used.'
+      - name: Verify exact startup artwork in APKs
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, re, subprocess, zipfile
+          assets = json.loads(pathlib.Path('branding/startup-v1.json').read_text())['assets']
+          aapt2 = pathlib.Path(os.environ['ANDROID_HOME']) / 'build-tools/35.0.0/aapt2'
+          for asset in assets:
+              path = pathlib.Path('app/build/generated/startupBranding/res/drawable-nodpi') / asset['file']
+              assert hashlib.sha256(path.read_bytes()).hexdigest() == asset['sha256'], path
+          for apk in ['app/build/outputs/apk/debug/app-debug.apk','app/build/outputs/apk/beta/app-beta-unsigned.apk']:
+              # AAPT2 can shorten release archive filenames. Resolve each named
+              # drawable through the compiled resource table instead.
+              table = subprocess.check_output([str(aapt2), 'dump', 'resources', apk], text=True)
+              with zipfile.ZipFile(apk) as z:
+                  for asset in assets:
+                      name = pathlib.Path(asset['file']).stem
+                      entry = re.search(r'(?m)^\s*resource\s+0x[0-9a-fA-F]+\s+(?:[\w.]+:)?drawable/' + re.escape(name) + r'(?=\s|$)[^\n]*\n(.*?)(?=^\s*resource\s+0x|^\s*type\s+|^\s*Package\s+|\Z)', table, re.S | re.M)
+                      assert entry, (apk, name, 'missing compiled drawable')
+                      paths = re.findall(r'\b(res/[^\s()]+)', entry.group(1))
+                      assert paths, (apk, name, 'no resource file mapping', entry.group(0))
+                      for path in paths:
+                          assert path in z.namelist(), (apk, name, path)
+                          assert z.read(path).startswith(b'\x89PNG\r\n\x1a\n'), (apk, name, path, 'not PNG')
+                      print('PASS:', apk, name, paths)
+          print('PASS: exact source hashes and compiled drawable mappings')
+          PY
+      - name: Verify original and compiled launcher icon
+        run: |
+          python3 -m pip install --user Pillow==11.3.0
+          python3 scripts/verify_launcher_icon.py "$ANDROID_HOME/build-tools/35.0.0" \
+            app/build/outputs/apk/debug/app-debug.apk \
+            app/build/outputs/apk/beta/app-beta-unsigned.apk
       - name: Capture exact source, signer and APK checksum
         run: |
           mkdir -p vision-qa-output
           cp app/build/outputs/apk/debug/app-debug.apk vision-qa-output/GridHunt-VisionLab-QA.apk
+          cp -r launcher-review vision-qa-output/
           cd vision-qa-output
           sha256sum GridHunt-VisionLab-QA.apk > APK_SHA256.txt
           git -C .. rev-parse HEAD > SOURCE_SHA.txt
@@ -66,7 +122,7 @@ jobs:
             echo 'Signer: PUBLIC, fixed test-only QA certificate (NOT a production signing key).'
             echo 'Future QA builds should install over this package when signed with the same key and a greater versionCode.'
             echo 'This is not a release-signed or phone-tested APK.'
-            echo 'Uninstall older ephemeral-key QA10 and previous versions ONCE before this fixed-key QA build.'
+            echo 'Older ephemeral-key QA10 and earlier may be incompatible. Preserve existing installs; do NOT uninstall or clear data to bypass a signature mismatch.'
             echo 'DO NOT install QA packages from unknown or untrusted sources.'
           } > INSTALL_NOTES.txt
           "${ANDROID_HOME}/build-tools/35.0.0/apksigner" verify --print-certs GridHunt-VisionLab-QA.apk > SIGNER.txt
@@ -90,4 +146,146 @@ jobs:
           name: gridhunt-visionlab-${{ github.run_number }}
           path: vision-qa-output/
           if-no-files-found: error
+          retention-days: 14
+
+  android-instrumented-ui:
+    name: Execute Compose navigation tests on Android emulator
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Allow KVM acceleration on hosted Linux runner
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Execute real Android UI instrumentation
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_5
+          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
+          disable-animations: true
+          script: |
+            chmod +x gradlew
+            ./gradlew :app:connectedDebugAndroidTest --no-daemon --max-workers=2 --console=plain
+            # Pull genuine on-emulator screenshots created by VisualCaptureTest.
+            mkdir -p vision-screenshots
+            # MediaStore captures persist through Gradle's test-APK teardown.
+            adb pull /sdcard/Pictures/GridHuntVisualQA/. vision-screenshots/ || (sleep 5 && adb wait-for-device && adb pull /sdcard/Pictures/GridHuntVisualQA/. vision-screenshots/)
+            # The runner executes each script line separately: use standalone commands.
+            test -s vision-screenshots/01_home.png
+            test -s vision-screenshots/02_trail_treasures.png
+            test -s vision-screenshots/03_trail_unobstructed_map.png
+            test -s vision-screenshots/04_golden_spots.png
+            test -s vision-screenshots/05_treasure_finish.png
+            test -s vision-screenshots/06_golden_finish.png
+            test -s vision-screenshots/07_trail_landscape.png
+            test -s vision-screenshots/08_golden_landscape.png
+            test -s vision-screenshots/09_woodland_checklist.png
+            test -s vision-screenshots/10_woodland_checklist_finish.png
+            test -s vision-screenshots/11_woodland_map_guide.png
+            test -s vision-screenshots/12_identify_woodland.png
+            test -s vision-screenshots/13_identify_finish.png
+            test -s vision-screenshots/14_mixed_expedition.png
+            test -s vision-screenshots/15_mixed_expedition_finish.png
+            test -s vision-screenshots/16_explorer_desk_home.png
+            test -s vision-screenshots/17_adventure_journey.png
+            test -s vision-screenshots/18_custom_play_setup.png
+            test -s vision-screenshots/19_compact_quick_play.png
+            test -s vision-screenshots/20_chapter_two_locked.png
+            test -s vision-screenshots/21_chapter_two_unlocked.png
+            test -s vision-screenshots/22_lost_supplies_opening.png
+            test -s vision-screenshots/23_coastal_survey_fit.png
+            test -s vision-screenshots/24_coastal_field_fit.png
+            test -s vision-screenshots/25_coastal_field_zoom.png
+            test -s vision-screenshots/26_atlas_woodland.png
+            test -s vision-screenshots/27_woodland_region_hub.png
+            test -s vision-screenshots/28_atlas_coast_unlocked.png
+            test -s vision-screenshots/29_coastal_region_hub.png
+            test -s vision-screenshots/30_published_atlas.png
+            test -s vision-screenshots/31_published_region.png
+            test -s vision-screenshots/32_expanded_survey_opening.png
+            test -s vision-screenshots/33_expanded_journal_progress.png
+            test -s vision-screenshots/34_expanded_survey_finish.png
+            test -s vision-screenshots/35_expanded_journal_final_entry.png
+            test -s vision-screenshots/36_adventure_choice.png
+            test -s vision-screenshots/37_expanded_adventure_selector.png
+            test -s vision-screenshots/38_expanded_selector_progress.png
+            test -s vision-screenshots/39_expanded_selector_coast.png
+      - name: Publish Android instrumentation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gridhunt-android-ui-test-results
+          path: |
+            app/build/outputs/androidTest-results/connected/
+            app/build/reports/androidTests/connected/
+            vision-screenshots/
+          if-no-files-found: warn
+          retention-days: 14
+
+  android-save-upgrade:
+    name: Rehearse QA345 to candidate APK save upgrade
+    if: github.event_name == 'pull_request'
+    needs: android-qa
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: android-actions/setup-android@v4
+      - name: Download exact earlier QA artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: gridhunt-visionlab-345
+          run-id: 45562420181
+          github-token: ${{ github.token }}
+          path: upgrade-baseline
+      - name: Download this run's candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: gridhunt-visionlab-${{ github.run_number }}
+          path: upgrade-candidate
+      - name: Verify APK checksums and fixed signer
+        run: |
+          set -euo pipefail
+          for folder in upgrade-baseline upgrade-candidate; do
+            (cd "$folder" && sha256sum -c APK_SHA256.txt)
+            "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$folder/GridHunt-VisionLab-QA.apk" | grep -F 'Signer #1 certificate SHA-256 digest: 0ff2e763e5667bdfda45aab662639ea6c1c7efa813f82cd4a5cdba8225febd52'
+          done
+          test "$(cat upgrade-candidate/SOURCE_SHA.txt)" = "$GITHUB_SHA"
+      - name: Allow KVM acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Actual install-over without clearing data
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_5
+          emulator-options: -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
+          disable-animations: true
+          script: bash -o pipefail -c 'python3 scripts/verify_save_upgrade.py upgrade-baseline/GridHunt-VisionLab-QA.apk upgrade-candidate/GridHunt-VisionLab-QA.apk 2>&1 | tee save-upgrade-result.txt'
+      - name: Preserve upgrade evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gridhunt-save-upgrade-evidence
+          path: save-upgrade-result.txt
+          if-no-files-found: warn
           retention-days: 14

@@ -1,8 +1,6 @@
 # START HERE — GridMates: Grid Hunt
 
-**As of:** 2026-11-21  
-**Status:** DESIGN ONLY. The initial repo has been organized; there is no implemented app or APK.  
-**Source of truth:** this document + [master design](MASTER_GAME_DESIGN.md) + [roadmap](ROADMAP.md).
+**Current checkpoint: GH-V32-A — active alpha.** Read [CURRENT_DEVELOPMENT_HANDOFF.md](CURRENT_DEVELOPMENT_HANDOFF.md) first. QA324 last confirmed full pass; Chapter 3 and central Settings integrated pending combined CI. Owner wants one consolidated physical playtest after interface, icon and save checks. No merge/public beta without approval. Continue [draft PR #12](https://github.com/EdenP-Development/GridMates-Grid-Hunt/pull/12).
 
 ## Product in one sentence
 
@@ -38,7 +36,13 @@ A casual grid-map puzzle hunt that quietly teaches real eastings/northings, grid
 
 Do not claim a feature is built because it appears in design documentation.
 
-## Current prioritized steps
+## Historical GH-01 prototype priorities (2026-11-21; completed or superseded)
+
+**Current next steps (2026-11-23):** review QA98 Treasure Checklist and existing mode usability on a real phone; build one What's at This Grid? identification pilot using the four now-canonical woodland landmarks, each with native UI and real QA. See [expansion blueprint](GAMEPLAY_CAMPAIGN_AND_UI_BLUEPRINT.md) for phase gates and the asset policy.
+
+The following older checklist is retained as a record of the initial prototype scope.
+
+
 
 1. Implement and unit-test [grid rules](MAP_READING_ACCURACY.md) in a pure Kotlin module.
 2. Show a compact, smooth map viewport with correct transforms and north-up labeling.
@@ -145,7 +149,7 @@ The [GH-01 status](GH01_IMPLEMENTATION_STATUS.md) now links to [verified Android
 
 ## First owner QA feedback and QA6 candidate fix (2026-11-22)
 
-Owner actually installed QA4 and completed three grid objectives but found dragging and pinch zoom unreliable, and screenshots showed small map/overlapping labels. [Issue #10](https://github.com/PlayerEden/GridMates-Grid-Hunt/issues/10) remains open. [QA6 Android receipt](qa/GH01_QA_RUN_6_GESTURE_FIX.md) documents fresh touch-input arbitration, camera-state fixes, axis label improvements, passing CI and checksum-verified debug APK. **Owner QA6 phone retest is next, not story mode or content expansion.** Note different debug signature may require uninstall of QA4.
+Owner actually installed QA4 and completed three grid objectives but found dragging and pinch zoom unreliable, and screenshots showed small map/overlapping labels. [Issue #10](https://github.com/EdenP-Development/GridMates-Grid-Hunt/issues/10) remains open. [QA6 Android receipt](qa/GH01_QA_RUN_6_GESTURE_FIX.md) documents fresh touch-input arbitration, camera-state fixes, axis label improvements, passing CI and checksum-verified debug APK. **Owner QA6 phone retest is next, not story mode or content expansion.** Note different debug signature may require uninstall of QA4.
 
 
 ## GH-02A — Map-first Android layout QA8 ready (2026-11-22)
@@ -155,7 +159,7 @@ Owner actually installed QA4 and completed three grid objectives but found dragg
 
 ## GH-02B chapter QA10 awaiting phone test (2026-11-22)
 
-[QA10 build/verification report](qa/GH02B_FIRST_BEARINGS_CHAPTER_QA10.md): three short authored hunts (nine distinct coordinates), explicit Next Hunt/Replay Chapter and optional first-use guide, with saved hunt/objective/selection/hint state. [GH-02B QA10 GitHub artifact](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45059027122/artifacts/14768283897); core JVM tests and APK assembly passed, hash/version/signer verified. **Owner test not yet run**; install likely requires uninstall of QA8 owing to differing debug signer.
+[QA10 build/verification report](qa/GH02B_FIRST_BEARINGS_CHAPTER_QA10.md): three short authored hunts (nine distinct coordinates), explicit Next Hunt/Replay Chapter and optional first-use guide, with saved hunt/objective/selection/hint state. [GH-02B QA10 GitHub artifact](https://github.com/EdenP-Development/GridMates-Grid-Hunt/actions/runs/45059027122/artifacts/14768283897); core JVM tests and APK assembly passed, hash/version/signer verified. **Owner test not yet run**; install likely requires uninstall of QA8 owing to differing debug signer.
 
 
 ## GH-02C: new Reverse mode + repeatable QA update chain (2026-11-22)

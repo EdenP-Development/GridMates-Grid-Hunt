@@ -1,3 +1,7 @@
+import java.net.URI
+import java.security.MessageDigest
+import groovy.json.JsonSlurper
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -34,6 +38,14 @@ android {
             signingConfig = signingConfigs.getByName("publicQa")
         }
         release { isMinifyEnabled = false }
+        create("beta") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".beta"
+            versionNameSuffix = "-beta.${System.getenv("GITHUB_RUN_NUMBER") ?: "local"}"
+            matchingFallbacks += listOf("release")
+            // Intentionally unsigned: sign the reviewed APK in a separate trusted workflow.
+            signingConfig = null
+        }
     }
     buildFeatures { compose = true }
     compileOptions {
@@ -60,3 +72,45 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")
 }
+
+
+// Reproducible shared startup assets: pinned upstream commits, exact SHA-256.
+// Runtime is entirely offline. Cached verified files permit subsequent offline builds.
+val startupManifest = rootProject.file("branding/startup-v1.json")
+val startupRes = layout.buildDirectory.dir("generated/startupBranding/res")
+val prepareStartupBranding by tasks.registering {
+    inputs.file(startupManifest)
+    outputs.dir(startupRes)
+    doLast {
+        val manifest = JsonSlurper().parse(startupManifest) as Map<*, *>
+        val assets = manifest["assets"] as List<*>
+        val dest = startupRes.get().dir("drawable-nodpi").asFile
+        dest.mkdirs()
+        fun digest(bytes: ByteArray) = MessageDigest.getInstance("SHA-256")
+            .digest(bytes).joinToString("") { "%02x".format(it.toInt() and 0xff) }
+        assets.forEach { item ->
+            val asset = item as Map<*, *>
+            val name = asset["file"] as String
+            val hash = asset["sha256"] as String
+            val count = (asset["bytes"] as Number).toInt()
+            require(name.matches(Regex("[a-z0-9_]+\\.png")))
+            val target = dest.resolve(name)
+            fun valid(bytes: ByteArray) = bytes.size == count && digest(bytes) == hash
+            if (!target.isFile || !valid(target.readBytes())) {
+                check(!gradle.startParameter.isOffline) { "Missing verified startup asset: $name" }
+                val connection = URI(asset["url"] as String).toURL().openConnection().apply {
+                    connectTimeout = 15000
+                    readTimeout = 30000
+                }
+                val bytes = connection.getInputStream().use { it.readNBytes(count + 1) }
+                check(valid(bytes)) { "Startup asset checksum mismatch: $name" }
+                target.writeBytes(bytes)
+            }
+            check(valid(target.readBytes())) { "Startup asset verification failed: $name" }
+            println("Verified startup artwork: $name $hash")
+        }
+    }
+}
+// Register generated resources with the normal Android resource merge.
+android.sourceSets.getByName("main").res.srcDir(startupRes)
+tasks.named("preBuild").configure { dependsOn(prepareStartupBranding) }

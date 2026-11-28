@@ -1,8 +1,35 @@
 # Roadmap — GridMates: Grid Hunt
 
-**Baseline date:** 2026-11-21  
-**All milestones currently PLANNED.** No game source, APK or passing CI evidence exists yet.  
-**Method:** small vertical slices, evidence-gated. Reorder after owner phone feedback.
+## Current roadmap — GH-V45-N (2026-11-28)
+
+See [current development handoff](CURRENT_DEVELOPMENT_HANDOFF.md) for exact source and QA receipts. This supersedes historical status below.
+
+| Workstream | Current state |
+| --- | --- |
+| Little Woodland | Existing three Adventure chapters, five Quick modes, Academy and Custom preserved |
+| Multi-world foundation | Exact map/campaign identity, scoped selection, terrain scenes and isolated sessions implemented |
+| Whispering Coast | Six landmarks, three four-objective chapters, four Quick modes and five Custom modes; tested preview only |
+| Regional navigation | Shared controller, guarded next chapter, published/preview separation; QA533 verified |
+| Regional presentation | Illustrated Atlas portraits and compact hubs; 31 screenshot gate passed QA539; nine owner phone screens reviewed; new emulator pixels and full device interaction acceptance open |
+| Published Atlas | Published-only host and tests verified QA533; normal Home entry verified QA537/539 |
+| MainActivity acceptance | QA537 and QA539 fully green; actual Home route and recreation verified |
+| Save preservation | QA537/539 signed install-over passed; dedicated earned-ledger and legacy replay migration still open |
+| Chapter expansion | 12 meaningful levels target, minimum 10 mature; read-only objective projection and audited entitlement proposal passed core QA547; explicit non-destructive migration required |
+| Large-scale exploration | Synthetic scaling fixture, camera/clipping, larger authored map, persistent multi-session expedition; eventual 1,000+ discoveries |
+| Expedition save foundations | Content identity, union and hardened schema1 codec core verified; isolated atomic file storage JVM verified QA550; Android storage test added, execution pending; no live integration |
+| Local cooperative expeditions | Long-term offline-first replicated saves, local Wi-Fi pairing and deterministic deduplication; [design specification](vision/LOCAL_COOP_GRAND_EXPEDITIONS.md); no networking implemented |
+| Release | No merge/publication/release; actual device review, production signing and store readiness pending |
+
+Last fully green QA539 run 46101196381 at b3b5be9; artwork #119 passed. Owner phone evidence recorded in [GH45 review](vision/GH_V45_PHONE_REVIEW_AND_CONTENT_TRANSITION.md). Documentation commits may cause a new run; verify newest source. Preserve existing saves, approved branding and QA signer.
+
+Next: verify Android storage test, historical gate and typed preference audit; explicit coast publication decision; authored chapter content, scalable journal and large-map infrastructure. Further persistence gates: project discovery, backup, lifecycle, concurrency and power-loss durability. Retain remaining visual/device checks. See [chapter standard](ADVENTURE_CHAPTER_LEVEL_STANDARD.md) and [large-scale vision](LARGE_SCALE_EXPLORATION_VISION.md).
+
+## Historical roadmap and milestones
+
+
+**Latest actual milestone:** **GH-V14-A three-pillar Explorer Desk navigation BUILT and QA157 CI green.** QA157 game SHA `17a95c84e2a6d6105f740ecdd3db25ae3c44d645`, **both** Android/core/signing and executed emulator jobs passed, with **18** required screenshots. [QA157 APK ZIP](https://github.com/PlayerEden/GridMates-Grid-Hunt/actions/runs/45303371335/artifacts/14878854515). Physical QA157 phone approval/install-over remain open. [Draft PR #12](https://github.com/PlayerEden/GridMates-Grid-Hunt/pull/12) remains unmerged/not production.\n**Existing play:** Four standalone puzzle modes and one four-step Mixed Expedition remain accessible with their independent saved progress; Adventure gives that story a Little Woodland chapter path. The Custom screen is an honest future-feature preview, not a generator.\n**Specification:** [Explorer Desk design Bible](GH_V14_EXPLORER_DESK_AND_NAVIGATION_BIBLE.md) and [QA157 handoff](vision/GH_V14_NAVIGATION_SHELL_QA157.md). No art library expansion yet.\n\n## Near-term milestones\n\n1. **GH-V14-A COMPLETE / PHONE PENDING:** new Home / Adventure / Quick / Custom routes, real chapter launch, native navigation tests and 18 emulator screenshots.\n2. **GH-V14-B NEXT:** owner phone QA157; refine chapter path visuals, Quick Play density and menu touch/scroll ergonomics. Only create essential art when it fixes an observed problem.\n3. **GH-V15:** stable multi-chapter/world registry, prerequisites and progress preservation.\n4. **GH-V16+:** thoughtful new authored puzzles/landmarks, difficulty progression, deterministic Custom Play; later Journal, cohesion art pass and store signing.\n\n**Explicit owner rule:** organize systems and content first; make individual assets when needed for legibility/fairness, with a fuller cohesive art pass after the core modes prove fun.
+
+---
 
 ## GH-00 — Documentation and design foundation
 

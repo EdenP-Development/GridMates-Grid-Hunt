@@ -1,0 +1,35 @@
+{
+  "milestone": "GH-V26-A",
+  "dimensions_px": [
+    256,
+    256
+  ],
+  "source": "Original illustrated GH-V26 woodland environment sheet; cropped and background masked",
+  "assets": [
+    {
+      "file": "app/src/main/res/drawable-nodpi/gh_env_rocks.png",
+      "git_blob_sha": "3cb09363feb29f1e8a1dbcb6091a2c97bb55f15d"
+    },
+    {
+      "file": "app/src/main/res/drawable-nodpi/gh_env_ferns.png",
+      "git_blob_sha": "bd85e12d45b0c0780a313ac1f5cb5e441a54c6cf"
+    },
+    {
+      "file": "app/src/main/res/drawable-nodpi/gh_env_log.png",
+      "git_blob_sha": "a80dbbc0d0b0887c820d33af8acb783fe1269676"
+    },
+    {
+      "file": "app/src/main/res/drawable-nodpi/gh_env_pond.png",
+      "git_blob_sha": "76f2b10f3c24c652ce7c26ed8b1625144c6e570c"
+    }
+  ],
+  "status": "GH-V26-C integrated; QA309 import passed; latest visual acceptance pending",
+  "usage": "decorative only; preserve playable map geometry and answer-bearing landmarks",
+  "reuse": [
+    "Home postcard",
+    "Custom Play postcard",
+    "Adventure journey",
+    "warm gameplay map decorative layer"
+  ],
+  "map_policy": "World-anchored, low opacity, bounded size, excluded near canonical landmarks, underneath creek/trail/grid/objectives; survey unchanged"
+}

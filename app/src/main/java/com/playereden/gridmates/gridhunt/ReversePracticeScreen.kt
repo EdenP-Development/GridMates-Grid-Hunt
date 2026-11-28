@@ -6,6 +6,7 @@ import android.graphics.Paint
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +14,9 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroid
@@ -84,6 +88,11 @@ import androidx.compose.ui.unit.sp
 import com.playereden.gridhunt.core.ChapterPosition
 import com.playereden.gridhunt.core.FirstBearingsChapter
 import com.playereden.gridhunt.core.ReverseTraining
+import com.playereden.gridhunt.core.ExplorationMaps
+import com.playereden.gridhunt.core.MapSurveyMarkers
+import com.playereden.gridhunt.core.SurveyMarkerCatalog
+import com.playereden.gridhunt.core.WhisperingCoastDraft
+import androidx.compose.runtime.key
 import com.playereden.gridhunt.core.GridCell
 import com.playereden.gridhunt.core.GridReference
 import com.playereden.gridhunt.core.HuntRules
@@ -97,23 +106,50 @@ import com.playereden.gridhunt.core.WorldPoint
 internal fun ReversePracticeScreen(
     onBack: () -> Unit,
     mapLook: MapLook,
-    hapticsEnabled: Boolean
+    onLook: (MapLook) -> Unit,
+    hapticsEnabled: Boolean,
+    catalog: MapSurveyMarkers = SurveyMarkerCatalog.woodland
 ) {
+    require(SurveyMarkerCatalog.forAuthoredMap(catalog.map) === catalog)
+    key(catalog.map.id, catalog.map.revision) {
+        MapReversePracticeContent(onBack, mapLook, onLook, hapticsEnabled, catalog)
+    }
+}
+
+@Composable
+private fun MapReversePracticeContent(
+    onBack: () -> Unit, mapLook: MapLook, onLook: (MapLook) -> Unit,
+    hapticsEnabled: Boolean, catalog: MapSurveyMarkers
+) {
+    val map = catalog.map
+    val isWoodland = map == ExplorationMaps.woodland
+    val scene = if (isWoodland) publishedMapScene(map, mapLook)
+        else coastalTerrainDraftScene(map, mapLook)
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
-    val prefs = remember(context) {
-        context.getSharedPreferences("gridhunt_reverse_v1", Context.MODE_PRIVATE)
+    val prefs = remember(context, map) {
+        val namespace = if (isWoodland) "gridhunt_reverse_v1"
+            else "gridhunt_reverse_${map.id}_r${map.revision}_v1"
+        context.getSharedPreferences(namespace, Context.MODE_PRIVATE)
     }
-    val targets = ReverseTraining.markers
+    val targets = catalog.markers
     var step by rememberSaveable {
-        mutableIntStateOf(prefs.getInt("step", 0).coerceIn(0, targets.size))
+        mutableIntStateOf(prefs.savedInt("step", 0).coerceIn(0, targets.size))
     }
     var answer by rememberSaveable {
-        mutableStateOf(prefs.getString("answer", "")?.take(4)?.filter { it in '0'..'9' } ?: "")
+        mutableStateOf(prefs.savedString("answer", "")?.take(4)?.filter { it in '0'..'9' } ?: "")
     }
-    var hint by rememberSaveable { mutableIntStateOf(prefs.getInt("hint", 0).coerceIn(0, 2)) }
+    var hint by rememberSaveable { mutableIntStateOf(prefs.savedInt("hint", 0).coerceIn(0, 2)) }
     var feedback by rememberSaveable {
-        mutableStateOf("Read the gold survey marker's grid square. Enter its four digits.")
+        mutableStateOf("Find the golden dot! What four-digit square is it hiding in?")
+    }
+    var discoveryMessage by remember { mutableStateOf<String?>(null) }
+    var discoverySequence by remember { mutableIntStateOf(0) }
+    LaunchedEffect(discoverySequence) {
+        if (discoverySequence > 0) {
+            kotlinx.coroutines.delay(1700L)
+            discoveryMessage = null
+        }
     }
     LaunchedEffect(step, answer, hint) {
         prefs.edit().putInt("step", step).putString("answer", answer)
@@ -121,7 +157,7 @@ internal fun ReversePracticeScreen(
     }
     val active = targets.getOrNull(step)
     val finished = active == null
-    val bounds = WoodlandTrainingMap.bounds
+    val bounds = map.bounds
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     var camera by remember { mutableStateOf<MapCamera?>(null) }
     var centerE by rememberSaveable { mutableStateOf(bounds.center.easting) }
@@ -162,7 +198,8 @@ internal fun ReversePracticeScreen(
     val check: () -> Unit = {
         if (finished) {
             step = 0; answer = ""; hint = 0
-            feedback = "Reverse practice restarted. Read the gold survey point."
+            feedback = "Another adventure! Find the first golden spot again."
+            discoveryMessage = null
             fit()
         } else {
             val target = active!!
@@ -171,11 +208,15 @@ internal fun ReversePracticeScreen(
                 step += 1
                 answer = ""
                 hint = 0
+                discoveryMessage = if (step == targets.size) "All golden spots found!"
+                    else "Golden spot discovered!"
+                discoverySequence += 1
                 feedback = if (step == targets.size)
-                    "All five survey points recorded. Nice work!"
-                else "Correct! Now read the next marked point."
+                    "Golden explorer! You found all five hiding spots."
+                else "Next golden spot! Find its dot and read the square."
             } else {
-                feedback = ReverseTraining.feedback(target, answer)
+                discoveryMessage = null
+                feedback = "Not quite! " + ReverseTraining.feedback(target, answer)
             }
         }
     }
@@ -190,20 +231,31 @@ internal fun ReversePracticeScreen(
             Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 HuntMapPanel(
                     modifier = Modifier.weight(1f).fillMaxHeight(), bounds = bounds,
-                    camera = camera, selectedCell = null, completed = emptyList(),
+                    camera = camera, selectedCell = null, completed = targets.take(step).map { it.cell },
                     viewport = viewport, onViewport = resized, onCamera = ::setCamera,
                     onSelect = {}, markerPoint = active?.point, enableSelect = false,
-                    mapLook = mapLook
+                    mapLook = mapLook, discoveryMessage = discoveryMessage,
+                    onLook = onLook, scene = scene, map = map
                 )
                 Column(
-                    Modifier.width(controlsWidth).fillMaxHeight().verticalScroll(rememberScrollState()),
+                    Modifier.width(controlsWidth).fillMaxHeight().journalScroll(),
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     ReverseHeader(onBack)
-                    ReverseGoal(step, targets.size, active?.title)
-                    ReverseControls(
+                    if (!finished) ReverseGoal(step, targets.size, active?.title)
+                    if (finished) {
+                        PuzzleFinishCard(
+                            title = "Every golden spot found!",
+                            description = "Five little mysteries solved. Your discoveries will be here when you return.",
+                            discoveries = "${targets.size} OF ${targets.size} GOLDEN SPOTS",
+                            primaryLabel = "Find them again",
+                            onPrimary = check,
+                            onHome = onBack
+                        )
+                    } else ReverseControls(
                         answer, { answer = it.filter { c -> c in '0'..'9' }.take(4) },
-                        feedback, hint, finished, { hint = (hint + 1).coerceAtMost(2) },
+                        feedback, hint, finished, step, targets.size,
+                        { hint = (hint + 1).coerceAtMost(2) },
                         ::fit, ::zoomBy, check
                     )
                 }
@@ -212,19 +264,30 @@ internal fun ReversePracticeScreen(
             Column(Modifier.fillMaxSize()) {
                 ReverseHeader(onBack)
                 Spacer(Modifier.height(5.dp))
-                ReverseGoal(step, targets.size, active?.title)
+                if (!finished) ReverseGoal(step, targets.size, active?.title)
                 Spacer(Modifier.height(6.dp))
                 HuntMapPanel(
                     modifier = Modifier.fillMaxWidth().weight(1f), bounds = bounds,
-                    camera = camera, selectedCell = null, completed = emptyList(),
+                    camera = camera, selectedCell = null, completed = targets.take(step).map { it.cell },
                     viewport = viewport, onViewport = resized, onCamera = ::setCamera,
                     onSelect = {}, markerPoint = active?.point, enableSelect = false,
-                    mapLook = mapLook
+                    mapLook = mapLook, discoveryMessage = discoveryMessage,
+                    onLook = onLook, scene = scene, map = map
                 )
                 Spacer(Modifier.height(5.dp))
-                ReverseControls(
+                if (finished) {
+                    PuzzleFinishCard(
+                        title = "Every golden spot found!",
+                        description = "Five little mysteries solved. Your discoveries will be here when you return.",
+                        discoveries = "${targets.size} OF ${targets.size} GOLDEN SPOTS",
+                        primaryLabel = "Find them again",
+                        onPrimary = check,
+                        onHome = onBack
+                    )
+                } else ReverseControls(
                     answer, { answer = it.filter { c -> c in '0'..'9' }.take(4) },
-                    feedback, hint, finished, { hint = (hint + 1).coerceAtMost(2) },
+                    feedback, hint, finished, step, targets.size,
+                    { hint = (hint + 1).coerceAtMost(2) },
                     ::fit, ::zoomBy, check
                 )
             }
@@ -234,35 +297,47 @@ internal fun ReversePracticeScreen(
 
 @Composable
 private fun ReverseHeader(onBack: () -> Unit) {
-    Row(
-        Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text("GRIDMATES / GRID HUNT", fontSize = 10.sp, color = Forest, fontWeight = FontWeight.Bold)
-            Text("Look Again", fontSize = 21.sp, color = Ink, fontWeight = FontWeight.Bold)
-            Text("REVERSE SURVEY · PRACTICE", fontSize = 10.sp, color = Muted)
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                "Golden Spots", fontSize = 21.sp, color = Ink,
+                fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f),
+                maxLines = 1
+            )
+            TextButton(onClick = onBack, modifier = Modifier.testTag("reverseHome")) {
+                Text("Home", fontSize = 12.sp)
+            }
         }
-        Text("N ↑", fontSize = 16.sp, color = Forest)
-        TextButton(onClick = onBack, modifier = Modifier.testTag("reverseHome")) {
-            Text("Home", fontSize = 12.sp)
-        }
+        Text(
+            "Find its four-digit map code", fontSize = 11.sp,
+            color = Muted, maxLines = 1
+        )
     }
 }
 
 @Composable
 private fun ReverseGoal(step: Int, total: Int, title: String?) {
-    Surface(color = Color(0xFFFFFBF1), shape = RoundedCornerShape(14.dp)) {
+    Surface(color = Color(0xFFFFF7E0), shape = RoundedCornerShape(18.dp),
+        border = BorderStroke(1.dp, Color(0xFFE7CF9D))) {
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 13.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f)) {
-                Text(if (title == null) "PRACTICE COMPLETE" else "READ THE MARKER · " + (step + 1) + "/" + total,
+                Text(if (title == null) "ALL SPOTS FOUND!" else "GOLDEN SPOT " + (step + 1) + " OF " + total,
                     fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Forest)
-                Text(title ?: "All five points recorded", fontSize = 12.sp, color = Muted)
+                Text(if (title == null) "Five golden discoveries, all yours!"
+                    else "Find the gold dot on the map", fontSize = 12.sp, color = Muted)
             }
-            Text(if (title == null) "✓" else "?", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Ink)
+            Surface(color = Color(0xFFF6DFA9), shape = RoundedCornerShape(13.dp)) {
+                Text(if (title == null) "✓" else "✦",
+                    fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Ink,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp))
+            }
         }
     }
 }
@@ -270,60 +345,64 @@ private fun ReverseGoal(step: Int, total: Int, title: String?) {
 @Composable
 private fun ReverseControls(
     answer: String, onAnswer: (String) -> Unit,
-    feedback: String, hint: Int, finished: Boolean, onHint: () -> Unit,
+    feedback: String, hint: Int, finished: Boolean,
+    completed: Int, total: Int, onHint: () -> Unit,
     onFit: () -> Unit, onZoom: (Double) -> Unit, onCheck: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+    val submitCode: () -> Unit = {
+        if (answer.length == 4) {
+            focusManager.clearFocus()
+            onCheck()
+        }
+    }
     Text(
-        if (finished) "Reverse practice complete" else "Find the gold point · Read west line, then south line",
+        if (finished) "Every golden spot found!" else "Find the gold dot. Which square is it in?",
         color = Forest, fontWeight = FontWeight.SemiBold, fontSize = 12.sp
     )
     LinearProgressIndicator(
-        progress = { if (finished) 1f else answer.length.coerceIn(0, 4) / 4f },
-        modifier = Modifier.fillMaxWidth().height(5.dp),
+        // Actual chapter progress, not the number of digits typed in this answer.
+        progress = { completed.toFloat() / total.coerceAtLeast(1).toFloat() },
+        modifier = Modifier.fillMaxWidth().height(5.dp).testTag("reverseChapterProgress"),
         color = Forest, trackColor = Color(0xFFE0E5D8)
     )
     if (!finished) {
         OutlinedTextField(
             value = answer, onValueChange = onAnswer,
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true, label = { Text("Four-digit grid reference") },
-            placeholder = { Text("0000") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            modifier = Modifier.fillMaxWidth().testTag("reverseCodeInput"),
+            singleLine = true, label = { Text("Four-digit map code") },
+            placeholder = { Text("Enter 4 digits") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { submitCode() })
         )
     }
     Text(
-        if (hint == 1 && !finished) "Hint: Read the easting line LEFT of the gold point."
-        else if (hint >= 2 && !finished) "Hint: Then read the northing line BELOW the gold point; keep 4 digits."
+        if (hint == 1 && !finished) "Clue: Read the easting line to the left of the gold dot."
+        else if (hint >= 2 && !finished) "Clue: Then read the northing line below it. Four digits!"
         else feedback,
         fontSize = 11.sp, color = Ink, lineHeight = 15.sp,
         maxLines = 3, modifier = Modifier.fillMaxWidth().heightIn(min = 26.dp)
     )
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        OutlinedButton(
-            onClick = onHint, enabled = !finished,
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("Hint") }
-        OutlinedButton(
-            onClick = { onZoom(1.6) },
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("+") }
-        OutlinedButton(
-            onClick = { onZoom(1.0 / 1.6) },
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("−") }
-        OutlinedButton(
-            onClick = onFit,
-            modifier = Modifier.weight(1f).heightIn(min = 46.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) { Text("Fit") }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        ReverseToolButton(ExplorerTool.HINT, Modifier.weight(1f), onHint, !finished)
+        ReverseToolButton(ExplorerTool.ZOOM_IN, Modifier.weight(1f), { onZoom(1.6) })
+        ReverseToolButton(ExplorerTool.ZOOM_OUT, Modifier.weight(1f), { onZoom(1.0 / 1.6) })
+        ReverseToolButton(ExplorerTool.FIT, Modifier.weight(1f), onFit)
     }
     Button(
-        onClick = onCheck, enabled = finished || answer.length == 4,
-        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp),
+        shape = JournalActionShape,
+        onClick = { if (finished) onCheck() else submitCode() }, enabled = finished || answer.length == 4,
+        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("checkReverse"),
         colors = ButtonDefaults.buttonColors(containerColor = Forest)
-    ) { Text(if (finished) "Replay Reverse Practice" else "Check reference", fontWeight = FontWeight.Bold) }
+    ) { Text(if (finished) "Find them again" else "Try this code", fontWeight = FontWeight.Bold) }
 }
 
+
+@Composable
+private fun ReverseToolButton(tool: ExplorerTool, modifier: Modifier, action: () -> Unit, enabled: Boolean = true) {
+    OutlinedButton(onClick = action, enabled = enabled,
+        modifier = modifier.heightIn(min = 48.dp).semantics { contentDescription = tool.label },
+        contentPadding = PaddingValues(0.dp)) {
+        ExplorerToolIcon(tool)
+    }
+}
