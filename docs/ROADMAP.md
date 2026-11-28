@@ -1,6 +1,6 @@
 # Roadmap — GridMates: Grid Hunt
 
-## Current roadmap — GH-V45-E (2026-11-27)
+## Current roadmap — GH-V45-F (2026-11-27)
 
 See [current development handoff](CURRENT_DEVELOPMENT_HANDOFF.md) for exact source and QA receipts. This supersedes historical status below.
 
@@ -14,8 +14,9 @@ See [current development handoff](CURRENT_DEVELOPMENT_HANDOFF.md) for exact sour
 | Published Atlas | Published-only host and tests verified QA533; normal Home entry verified QA537/539 |
 | MainActivity acceptance | QA537 and QA539 fully green; actual Home route and recreation verified |
 | Save preservation | QA537/539 signed install-over passed; dedicated earned-ledger and legacy replay migration still open |
-| Chapter expansion | 12 meaningful levels target, minimum 10 mature; explicit non-destructive migration required |
+| Chapter expansion | 12 meaningful levels target, minimum 10 mature; read-only revision-scoped objective projection implemented GH45F; tests pending; explicit non-destructive migration required |
 | Large-scale exploration | Synthetic scaling fixture, camera/clipping, larger authored map, persistent multi-session expedition; eventual 1,000+ discoveries |
+| Local cooperative expeditions | Long-term offline-first replicated saves, local Wi-Fi pairing and deterministic deduplication; [design specification](vision/LOCAL_COOP_GRAND_EXPEDITIONS.md); no networking implemented |
 | Release | No merge/publication/release; actual device review, production signing and store readiness pending |
 
 Last fully green QA539 run 46101196381 at b3b5be9; artwork #119 passed. Owner phone evidence recorded in [GH45 review](vision/GH_V45_PHONE_REVIEW_AND_CONTENT_TRANSITION.md). Documentation commits may cause a new run; verify newest source. Preserve existing saves, approved branding and QA signer.
