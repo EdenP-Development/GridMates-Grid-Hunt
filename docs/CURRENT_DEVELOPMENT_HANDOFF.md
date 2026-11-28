@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-AB — initial 72-objective authorship complete.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-AC — all 72 Adventure objectives implemented in isolated previews.**
 
-## Authoritative current checkpoint — GH-V45-AB
+## Authoritative current checkpoint — GH-V45-AC
+
+- GH45AC 91594284c9b9d469bb247e2145a0d0117352be67 adds ExpandedLightSurveyPreview, exact third coastal candidate allowlist and completion-ledger bypass, separate candidate preferences, verification-specific journal, completion and replay labels. No live registry or Home navigation changes.
+- GH45AC f18b7d8ccd62c059c57198db7005d5060ede713e adds full twelve-objective Last Light Android playthrough, resume at 4 and 8, guide, journal, replay, preservation of eleven other chapter namespaces and both earned ledgers. Candidate preferences restored. All six expanded chapters now have authored content, core regression tests and internal Android implementation/tests. This is implementation coverage, not completed QA.
+- GH45AB run 46124329967 cancelled after JVM/build and signed upgrade had passed at prior inspection; artwork 46124330474 passed. GH45AC source head f18b7d8ccd62c059c57198db7005d5060ede713e run 46125449504 in progress at inspection; artwork 46125449547 passed. GH45R run 46117766835 remains last confirmed all-green baseline. 35 screenshot acceptance and actual pixel review pending.
+- GH45AD consolidation: this handoff closes the missing documentation checkpoint. Freeze gameplay changes while source-matched consolidated QA runs where practical; investigate any failed jobs using logs, do not waive gates. Then inspect actual screenshots, audit historical entitlement and migration policy, design safe opt-in playtest entry before any live integration. Initial authorship and isolated gameplay implementation 72/72 (24 original, 48 added candidates). No publication, live migration, merge, release, signing or networking authorized. Preserve existing saves, branding, package/signer and draft PR #12. Larger maps, durable Grand Expeditions and local Wi-Fi co-op remain planned.
+
+## Historical checkpoint — GH-V45-AB
 
 - GH45AA head 2d57bc324b5eaa3cf748a075519ac30d0fafb66e run 46124009194: JVM/build passed, emulator and signed upgrade running at inspection; artwork 46124009133 passed. GH45R run 46117766835 remains last confirmed fully green baseline. Mandatory 35-image capture gate and actual pixel review remain pending.
 - GH45AB CoastalLightSurveyCandidate.kt 3ce0b2612a9e30d8e800b8e376e7b0f25a295064 adds eight independent chart verification objectives after the exact four-objective original finale, revision 2, canonical coastal map, twelve distinct answer cells, separate gridhunt_candidate_light_survey_r2 preferences namespace, no published registry or Android route changes.
