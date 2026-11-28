@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-Z — fifth expanded Adventure chapter authored.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-AA — fifth expanded chapter playable implementation.**
 
-## Authoritative current checkpoint — GH-V45-Z
+## Authoritative current checkpoint — GH-V45-AA
+
+- GH45Z head 2334b76f6ee1b5196e4856501b493440b0e15607 run 46123650555: JVM/build passed, emulator and signed upgrade running at inspection before subsequent commits. Artwork 46123650531 passed. GH45R run 46117766835 remains last confirmed fully green baseline; 35-image capture gate and actual pixel review remain pending.
+- GH45AA 3ac7089251fd62bac177e09b2c1c59628c16de7b adds exact two-candidate ExpandedCoastalSurveyPreview allowlist, retains Beacon wrapper and adds Tide wrapper. Exact candidate identity bypasses completion ledger creation/capture; separate preferences, no published route, no next chapter. Tide-specific journal, finish and replay labels. Original four-objective previews and registry unchanged.
+- GH45AA dcc995da5ac885f87a5e291980ec3aabd1d4ebe8 adds twelve-objective Tide Android playthrough, map guide, resume at four/eight, final journal entry, replay and exact preservation of ten other chapter namespaces and both ledgers; candidate preferences restored. Execution pending.
+- Adventure authorship and internal gameplay implementation 64/72 (Woodland 36/36, Coast 28/36). Next author Last Light using exact legacy prefix and canonical map, test offsets and historical entitlements; integrate final preview. Consolidate QA before release or migration, avoid unnecessary commits while runs execute. Preserve existing saves, approved branding, package/signer and draft PR #12. No live migration, publication, merge, release or networking authorized.
+
+## Historical checkpoint — GH-V45-Z
 
 - GH45Y head 50c9cf782419d3d5ccdf39d64b466060eb62c139 run 46123311800: JVM/build passed, emulator and signed upgrade running at inspection; artwork 46123311900 passed. GH45R run 46117766835 remains last confirmed fully green baseline. Mandatory 35-image capture acceptance and pixel review pending.
 - GH45Z CoastalTideSurveyCandidate.kt ef57ab48f785a56a27b9787ba02baa214ea22851 authors eight route cross-checks after exact original four Tide Trail objectives, revision 2, canonical coastal map, separate namespace gridhunt_candidate_tide_survey_r2. Original repeated 4654 answer retained intentionally; all eight new cells distinct and disjoint from original answers. No live registry or Android route changes.
