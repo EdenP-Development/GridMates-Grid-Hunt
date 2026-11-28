@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-P — first isolated twelve-objective chapter candidate.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-Q — scalable Explorer's Journal.**
 
-## Authoritative current checkpoint — GH-V45-P
+## Authoritative current checkpoint — GH-V45-Q
+
+- GH45P source-matched run 46115979786 JVM tests and Android compilation passed, artwork 46115979758 passed; emulator and signed upgrade in progress at inspection before subsequent commits. QA539 remains last confirmed full green.
+- GH45Q fb12552e61fedf311ca2f78867b415347e4a0542 updates shared ExpeditionJournalDialog to wrap indicators in groups of four, retains original four-objective labels, uses discovery count and survey entry labels for expanded Woodland first chapter. Existing journal scroll rail retained. Dialog exposed internally for direct isolated Compose test only.
+- ExpandedJournalTest.kt a23cc822599d187ffbfa09fac238d4054dbfbf99 verifies four-of-twelve progress, current/future indicators, no unearned final discovery, scrolling to completed last entry and closing. No preference access or live candidate route. Test execution and visual review pending.
+- Next verify CI, inspect upgrade baseline visibility failure, and introduce isolated expanded chapter preview with explicit no-live-ledger policy and correct discovery labels throughout gameplay. No candidate publication, live migration, signing changes or networking. Preserve existing saves and draft PR #12. See GH45P and earlier checkpoints below.
+
+## Historical checkpoint — GH-V45-P
 
 - Repository EdenP-Development/GridMates-Grid-Hunt, draft PR #12, branch feature/gh-v02-in-puzzle-map-look. Preserve existing saves, approved fox/startup, package and QA signer. No merge, release, live migration, Coast publication or networking authorized.
 - GH45O audit commit 654e210f3e5d08b3cfc3dd34d2454cadb7b25097: six four-objective Adventure chapters (24 existing, target 72); continuation concepts and acceptance gates in docs/vision/GH_V45_O_CHAPTER_EXPANSION_AUDIT.md.
