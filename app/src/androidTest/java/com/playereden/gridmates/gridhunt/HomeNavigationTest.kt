@@ -61,6 +61,40 @@ class HomeNavigationTest {
         }
     }
 
+    @Test fun homeAtlasUsesPublishedCatalogAndReturnsThroughRegion() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val prefs = context.getSharedPreferences("gridhunt_world_selection_v1",Context.MODE_PRIVATE)
+        val previous = prefs.all["world_id"]
+        val woodland = com.playereden.gridhunt.core.PublishedWorlds.selection.destinations.single()
+        val coast = com.playereden.gridhunt.core.CoastalExpeditionPreview.selection.destinations
+            .single { it.map == com.playereden.gridhunt.core.WhisperingCoastDraft.map }
+        try {
+            compose.onNodeWithTag("openAtlas").performScrollTo().performClick()
+            compose.onNodeWithTag("explorerAtlas").assertExists()
+            compose.onNodeWithTag("atlasWorld_"+coast.world.id).assertDoesNotExist()
+            compose.onNodeWithTag("atlasOpen_"+woodland.world.id).performScrollTo().performClick()
+            compose.onNodeWithTag("regionGameplayHub").assertExists()
+            compose.activityRule.scenario.recreate()
+            compose.onNodeWithTag("regionGameplayHub").assertExists()
+            compose.onNodeWithTag("regionBack").performScrollTo().performClick()
+            compose.onNodeWithTag("atlasBack").performScrollTo().performClick()
+            listOf("openAtlas","openAdventure","openAcademy","openQuickPlay","openCustomPlay","openSettings")
+                .forEach { compose.onNodeWithTag(it).assertExists() }
+        } finally {
+            val edit = prefs.edit()
+            when(previous) {
+                is String -> edit.putString("world_id",previous)
+                is Int -> edit.putInt("world_id",previous)
+                is Boolean -> edit.putBoolean("world_id",previous)
+                is Long -> edit.putLong("world_id",previous)
+                is Float -> edit.putFloat("world_id",previous)
+                is Set<*> -> edit.putStringSet("world_id",previous.filterIsInstance<String>().toSet())
+                else -> edit.remove("world_id")
+            }
+            check(edit.commit())
+        }
+    }
+
     @Test fun hubOffersBothPlayableModes() {
         compose.onNodeWithText("Grid Hunt").assertExists()
         compose.onNodeWithTag("openAdventure").assertExists()
