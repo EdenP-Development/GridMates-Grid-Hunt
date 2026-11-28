@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-Q — scalable Explorer's Journal.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-R — isolated playable expanded field survey.**
 
-## Authoritative current checkpoint — GH-V45-Q
+## Authoritative current checkpoint — GH-V45-R
+
+- GH45Q source-matched head b50695e7be1274f688af95629b03b0de43f9e1af, run 46116458759: all three jobs passed (JVM/build, emulator gameplay, signed upgrade); artwork 46116458840 passed. This supersedes QA539 as last confirmed fully green baseline. Exact individual test logs and screenshot pixels not reviewed here.
+- GH45R 2a5174a4964453f69f81bbe2ca1a26dffadefd6f introduces internal ExpandedFieldSurveyPreview, exact candidate run only, no MainActivity route, no next chapter, no live completion ledger construction/capture on candidate replay, isolated gridhunt_candidate_field_survey_r2 preferences. Shared gameplay header/prompt/finish/replay labels support twelve discoveries. Original chapter registry remains revision 1.
+- GH45R 17d3c861702a400e1bfd745f8c54b8ec89b785c1 instrumentation covers all twelve real objective interactions, close/reopen at four and eight, completed journal scrolling, replay, exact unchanged three Woodland chapter preference maps and both earned ledgers. Test restores original candidate preferences. Execution pending.
+- Next verify source-matched CI and individual tests; review actual candidate screenshots (add dedicated capture gate), audit resume/replay and historical unlock routes, then choose next chapter candidate. No live migration, Coast publication, merge, release, signer or network permission changes authorized. Preserve approved launcher/startup and existing saves. Persistent atomic expedition store remains separate from preview integer preferences; no claim of process-death or power-loss durability.
+
+## Historical checkpoint — GH-V45-Q
 
 - GH45P source-matched run 46115979786 JVM tests and Android compilation passed, artwork 46115979758 passed; emulator and signed upgrade in progress at inspection before subsequent commits. QA539 remains last confirmed full green.
 - GH45Q fb12552e61fedf311ca2f78867b415347e4a0542 updates shared ExpeditionJournalDialog to wrap indicators in groups of four, retains original four-objective labels, uses discovery count and survey entry labels for expanded Woodland first chapter. Existing journal scroll rail retained. Dialog exposed internally for direct isolated Compose test only.
