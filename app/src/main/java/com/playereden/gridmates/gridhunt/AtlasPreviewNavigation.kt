@@ -21,6 +21,27 @@ internal fun AtlasPreviewNavigation(
     val navigation = remember(context) {
         WorldNavigationStore(context, CoastalExpeditionPreview.selection, true)
     }
+    AtlasNavigation(navigation,onExit,gameplay)
+}
+
+/** Published-only entry point. The default store cannot select a draft world. */
+@Composable
+internal fun PublishedAtlasNavigation(
+    onExit: () -> Unit,
+    gameplay: @Composable (WorldDestination, RegionalMode, CampaignChapter?, () -> Unit, (() -> Unit)?) -> Unit
+) {
+    val context = LocalContext.current
+    val navigation = remember(context) { WorldNavigationStore(context) }
+    AtlasNavigation(navigation,onExit,gameplay)
+}
+
+/** Shared route controller. Its validated store owns all availability decisions. */
+@Composable
+private fun AtlasNavigation(
+    navigation: WorldNavigationStore,
+    onExit: () -> Unit,
+    gameplay: @Composable (WorldDestination, RegionalMode, CampaignChapter?, () -> Unit, (() -> Unit)?) -> Unit
+) {
     var regionId by rememberSaveable { mutableStateOf<String?>(null) }
     var modeName by rememberSaveable { mutableStateOf<String?>(null) }
     var chapterId by rememberSaveable { mutableStateOf<String?>(null) }
