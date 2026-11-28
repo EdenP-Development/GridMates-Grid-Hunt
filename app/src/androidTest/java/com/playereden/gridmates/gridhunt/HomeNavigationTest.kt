@@ -157,6 +157,7 @@ class HomeNavigationTest {
 
     @Test fun threePillarNavigationAndAdventureChapterAreReal() {
         compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("classicAdventure").performClick()
         compose.onNodeWithText("The Missing Field Notes").assertExists()
         compose.onNodeWithTag("adventureProgress").assertExists()
         compose.onNodeWithTag("adventureRouteMap").assertExists()
@@ -453,6 +454,7 @@ class HomeNavigationTest {
         check(second.edit().clear().commit())
         compose.activityRule.scenario.recreate()
         compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("classicAdventure").performClick()
         compose.onNodeWithTag("openAdventureChapter").performClick()
         playFirstMixedSquare()
         compose.onNodeWithTag("mixedHome").performClick()
@@ -515,6 +517,7 @@ class HomeNavigationTest {
             .edit().clear().commit()
         compose.activityRule.scenario.recreate()
         compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("classicAdventure").performClick()
         compose.onNodeWithTag("openSecondChapter").assertExists()
         compose.onNodeWithTag("openSecondChapter").assertIsNotEnabled()
         compose.onNodeWithTag("adventureBack").performClick()
@@ -523,6 +526,7 @@ class HomeNavigationTest {
             .edit().putInt("step", 4).commit()
         compose.activityRule.scenario.recreate()
         compose.onNodeWithTag("openAdventure").performClick()
+        compose.onNodeWithTag("classicAdventure").performClick()
         compose.onNodeWithTag("openSecondChapter").assertIsEnabled().performClick()
         compose.onNodeWithText("The Lost Supplies").assertExists()
 
@@ -558,6 +562,7 @@ class HomeNavigationTest {
             check(third.edit().clear().commit())
             compose.activityRule.scenario.recreate()
             compose.onNodeWithTag("openAdventure").performClick()
+            compose.onNodeWithTag("classicAdventure").performClick()
             compose.onNodeWithTag("openThirdChapter").assertIsNotEnabled()
             compose.onNodeWithTag("openSecondChapter").assertIsEnabled().performClick()
             compose.onNodeWithTag("mixedCodeInput").performTextReplacement("2941")
