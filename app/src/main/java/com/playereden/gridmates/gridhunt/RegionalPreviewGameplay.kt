@@ -17,12 +17,39 @@ import com.playereden.gridhunt.core.*
 @Composable
 internal fun RegionalPreviewGameplay(hapticsEnabled: Boolean = false, onExit: () -> Unit) {
     AtlasPreviewNavigation(onExit) { destination, mode, chapter, onBack, onNext ->
+        RegionalGameplay(destination,mode,chapter,onBack,onNext,hapticsEnabled,preview=true)
+    }
+}
+
+/** Published host uses only the canonical published catalog and ledger. */
+@Composable
+internal fun PublishedRegionalGameplay(hapticsEnabled: Boolean, onExit: () -> Unit) {
+    PublishedAtlasNavigation(onExit) { destination, mode, chapter, onBack, onNext ->
+        RegionalGameplay(destination,mode,chapter,onBack,onNext,hapticsEnabled,preview=false)
+    }
+}
+
+@Composable
+private fun RegionalGameplay(
+    destination: WorldDestination,
+    mode: RegionalMode,
+    chapter: CampaignChapter?,
+    onBack: () -> Unit,
+    onNext: (() -> Unit)?,
+    hapticsEnabled: Boolean,
+    preview: Boolean
+) {
+    val allowed = if (preview) CoastalExpeditionPreview.selection else PublishedWorlds.selection
+    if (destination !in allowed.destinations) {
+        PreviewRouteUnavailable(onBack)
+        return
+    }
         val map = destination.map
         val look = MapLook.FIELD_GUIDE
         when (mode) {
             RegionalMode.ADVENTURE -> {
                 val canonical = destination.world.chapters.firstOrNull { it == chapter }
-                val coastalRun = if (map == WhisperingCoastDraft.map && canonical != null)
+                val coastalRun = if (preview && map == WhisperingCoastDraft.map && canonical != null)
                     (1..3).map(CoastalExpeditionPreview::chapter).firstOrNull {
                         it.chapter == canonical.chapter && it.saveName == canonical.progressKey
                     } else null
@@ -41,7 +68,6 @@ internal fun RegionalPreviewGameplay(hapticsEnabled: Boolean = false, onExit: ()
             RegionalMode.CUSTOM_PLAY -> CustomHuntScreen(look, {}, onBack, map)
             RegionalMode.QUICK_PLAY -> RegionalQuickPlayPreview(map, hapticsEnabled, onBack)
         }
-    }
 }
 
 @Composable
