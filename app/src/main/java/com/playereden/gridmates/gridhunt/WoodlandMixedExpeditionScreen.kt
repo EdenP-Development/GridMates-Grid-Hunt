@@ -72,6 +72,7 @@ import com.playereden.gridhunt.core.PixelPoint
 import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.WoodlandExpedition
 import com.playereden.gridhunt.core.WoodlandFieldSurveyCandidate
+import com.playereden.gridhunt.core.WoodlandSupplySurveyCandidate
 import com.playereden.gridhunt.core.WoodlandSupplyExpedition
 import com.playereden.gridhunt.core.WoodlandReturnExpedition
 import com.playereden.gridhunt.core.ExpeditionPlaythrough
@@ -116,10 +117,23 @@ internal fun WoodlandMixedExpeditionScreen(
 
 /** Internal preview only. Never exposed from the published navigation or ledger. */
 @Composable
-internal fun ExpandedFieldSurveyPreview(onExit: () -> Unit) {
-    val mission = WoodlandFieldSurveyCandidate.run
+internal fun ExpandedFieldSurveyPreview(onExit: () -> Unit) =
+    ExpandedWoodlandPreview(1, onExit)
+
+@Composable
+internal fun ExpandedSupplySurveyPreview(onExit: () -> Unit) =
+    ExpandedWoodlandPreview(2, onExit)
+
+/** Exact internal candidate allowlist; no arbitrary run or live navigation entry. */
+@Composable
+private fun ExpandedWoodlandPreview(chapterNumber: Int, onExit: () -> Unit) {
+    val mission = when (chapterNumber) {
+        1 -> WoodlandFieldSurveyCandidate.run
+        2 -> WoodlandSupplySurveyCandidate.run
+        else -> error("Unsupported expanded chapter")
+    }
     key(mission.chapter.id, mission.chapter.revision) {
-        MapExpeditionContent(mission, 1, onExit, MapLook.FIELD_GUIDE, {}, false, null)
+        MapExpeditionContent(mission, chapterNumber, onExit, MapLook.FIELD_GUIDE, {}, false, null)
     }
 }
 
@@ -132,7 +146,8 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
     val woodland = map == ExplorationMaps.woodland
     val chapterTwo = chapterNumber == 2
     val chapterThree = chapterNumber == 3
-    val expandedPreview = mission === WoodlandFieldSurveyCandidate.run
+    val expandedPreview = mission === WoodlandFieldSurveyCandidate.run ||
+        mission === WoodlandSupplySurveyCandidate.run
     val clueChapter = !woodland || chapterTwo || chapterThree || expandedPreview
     val scene = if (woodland) publishedMapScene(map,mapLook) else coastalTerrainDraftScene(map,mapLook)
     val prefs = remember(context, mission.saveName) {
@@ -298,7 +313,8 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
         selectedCell = null
         enteredCode = ""
         chosenLandmark = null
-        feedback = if (expandedPreview) "The journal and survey are ready to explore again."
+        feedback = if (expandedPreview && chapterTwo) "The supply route is ready to explore again."
+            else if (expandedPreview) "The journal and survey are ready to explore again."
             else if (!woodland) "The coastal clues are ready to explore again."
             else if (chapterThree) "The return trail is ready to explore again."
             else if (chapterTwo) "The supply clues are ready to trace again."
@@ -594,12 +610,12 @@ private fun MixedExpeditionFinish(
 ) {
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         PuzzleFinishCard(
-            title = if (total > 4) "Field survey complete!" else if (!woodland) "$chapterName complete!" else when (chapterNumber) {
+            title = if (total > 4 && woodland && chapterNumber == 2) "Supply route complete!" else if (total > 4) "Field survey complete!" else if (!woodland) "$chapterName complete!" else when (chapterNumber) {
                 3 -> "Your woodland circuit is complete!"
                 2 -> "The supply trail is complete!"
                 else -> "The field notes are together!"
             },
-            description = if (total > 4) "The recovered journal and survey appendix are complete." else if (!woodland) "Every coastal discovery is recorded in your journal." else when (chapterNumber) {
+            description = if (total > 4 && woodland && chapterNumber == 2) "The last known stop and route checks are recorded in your journal." else if (total > 4) "The recovered journal and survey appendix are complete." else if (!woodland) "Every coastal discovery is recorded in your journal." else when (chapterNumber) {
                 3 -> "You recorded the return route and reached the trailhead."
                 2 -> "You traced the supplies to their last known stop."
                 else -> "Every lost page has been recovered. Your field journal is whole."
@@ -635,7 +651,7 @@ internal fun ExpeditionJournalDialog(
     val earned = mission.discoveries(step)
     val active = mission.objectiveAt(step)
     val woodland = mission.chapter.map == ExplorationMaps.woodland
-    val expanded = mission.size > 4 && woodland && chapterNumber == 1
+    val expanded = mission.size > 4 && woodland
     val unit = if (expanded) "Discovery" else if (!woodland || chapterNumber > 1) "Clue" else "Page"
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -703,7 +719,7 @@ internal fun ExpeditionJournalDialog(
                         modifier = Modifier.fillMaxWidth().testTag("journalEntry_${objective.id}")
                     ) {
                         Column(Modifier.padding(10.dp)) {
-                            Text(if (expanded && index >= 4) "SURVEY · ENTRY ${index - 3}" else "RECOVERED · $unit ${index + 1}", color = Forest, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                            Text(if (expanded && index >= 4) "${if (chapterNumber == 2) "ROUTE" else "SURVEY"} · ENTRY ${index - 3}" else "RECOVERED · $unit ${index + 1}", color = Forest, fontWeight = FontWeight.Bold, fontSize = 10.sp)
                             Text(objective.title, color = Ink,
                                 fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             Text(objective.discovery.ifBlank { "Discovery recorded." },
