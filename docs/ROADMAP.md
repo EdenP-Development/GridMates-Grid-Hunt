@@ -1,27 +1,26 @@
 # Roadmap — GridMates: Grid Hunt
 
-## Current roadmap — GH-V42-B (2026-11-27)
+## Current roadmap — GH-V45-A (2026-11-27)
 
-This section supersedes historical status summaries below. See [current development handoff](CURRENT_DEVELOPMENT_HANDOFF.md) for exact source and QA receipts.
+See [current development handoff](CURRENT_DEVELOPMENT_HANDOFF.md) for exact source and QA receipts. This supersedes historical status below.
 
 | Workstream | Current state |
 | --- | --- |
-| Little Woodland | Existing live modes, three Adventure chapters, Academy, Custom Play and saved progress protected |
-| Multi-world architecture | Map, campaign, selection, scene and isolated session foundations implemented |
-| Whispering Coast | Unpublished six-landmark map, terrain and local vector art, three four-objective draft chapters |
-| Golden Spots | Five authored markers, shared gameplay and Android playthrough passed |
-| Treasure Checklist | Six discoveries, shared screen and coastal guide; Android playthrough passed |
-| Landmark identification | Six questions, shared screen, core and Android playthrough passed |
-| Trail Treasures | Nine objectives across three trails, map-specific movement, core and Android playthrough passed QA479 |
-| Custom Play | Five map-specific generated modes and isolated versioned session store implemented; QA481 JVM/build and upgrade passed; Android blocked by dependency HTTP 429; dedicated coastal playthrough pending |
-| Adventure | Draft coastal campaign and prerequisites; shared runtime and navigation pending |
-| World selection | Core selection rules implemented; live UI and publication pending |
-| Chapter expansion | Working target 12 meaningful levels per chapter, minimum 10 mature; 72 target levels across two worlds; save migration gate required |
-| Quality and release | Final screenshot pixel review, survey swatch parity, physical layout, process death, production signing and store readiness pending |
+| Little Woodland | Existing three Adventure chapters, five Quick modes, Academy and Custom preserved |
+| Multi-world foundation | Exact map/campaign identity, scoped selection, terrain scenes and isolated sessions implemented |
+| Whispering Coast | Six landmarks, three four-objective chapters, four Quick modes and five Custom modes; tested preview only |
+| Regional navigation | Shared controller, guarded next chapter, published/preview separation; QA533 verified |
+| Regional presentation | Illustrated Atlas portraits and compact hubs; 29 screenshot gate; final pixel/device acceptance open |
+| Published Atlas | Published-only host and tests verified QA533; normal Home entry implemented GH44Y |
+| MainActivity acceptance | QA534 all 64 tests finished successfully but screenshot transfer failed; GH44Z retry and new recreation test awaiting full verification |
+| Save preservation | QA534 signed install-over passed; dedicated earned-ledger and legacy replay migration still open |
+| Chapter expansion | 12 meaningful levels target, minimum 10 mature; explicit non-destructive migration required |
+| Large-scale exploration | Synthetic scaling fixture, camera/clipping, larger authored map, persistent multi-session expedition; eventual 1,000+ discoveries |
+| Release | No merge/publication/release; actual device review, production signing and store readiness pending |
 
-QA479 source `c98a0190131b82d30ecc6d17047268e79931cbf4`: all three jobs passed, artwork #59 passed. QA481 source `09feffbf6ebfc1e812b457e83a39c6752ef0b445`: build and signed upgrade passed, Android dependency resolution blocked by HTTP 429; artwork #61 passed. No merge, release or production publication. Preserve original save namespaces and signed QA identity.
+Last fully green QA533 run 46096770163. QA536 run 46099562525 was in progress at inspection, art #116 passed. Documentation commits may cause a new run; verify newest source. Preserve existing saves, approved branding and QA signer.
 
-Next sequence: coastal Custom Play verification; shared Adventure runtime; world selection; content expansion with migration tests; consolidated device QA and owner approval. The [chapter level standard](ADVENTURE_CHAPTER_LEVEL_STANDARD.md) governs expansion.
+Next: consolidated green QA; actual Home/Atlas visual review and playable device candidate; earned ledger and legacy progression tests; explicit coast publication decision; chapter expansion and large-map infrastructure. See [chapter standard](ADVENTURE_CHAPTER_LEVEL_STANDARD.md) and [large-scale vision](LARGE_SCALE_EXPLORATION_VISION.md).
 
 ## Historical roadmap and milestones
 
