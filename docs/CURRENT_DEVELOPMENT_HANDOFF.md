@@ -1,8 +1,16 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-27. **Current checkpoint: GH-V45-E — physical phone review and content transition.**
+Updated 2026-11-27. **Current checkpoint: GH-V45-F — read-only expansion foundation and local co-op vision.**
 
-## Authoritative current checkpoint — GH-V45-E
+## Authoritative current checkpoint — GH-V45-F
+
+- Latest verified baseline QA539 run 46101196381 at b3b5be9977b4adaef58cb0a466d81c6345dd749d; prior GH45E phone review and roadmap retained below. No merge, release or Coast publication.
+- Owner explicitly wants long-term local Wi-Fi cooperative large puzzle hunts with spouse over days/weeks; approved concept of durable independent replicas, offline progress union and deduplication, no permanent host. Specification docs/vision/LOCAL_COOP_GRAND_EXPEDITIONS.md commit 5052b3692fb323cfe138d679e4538dde925d2749. Networking remains future scope.
+- GH45F core ChapterExpansionPlan.kt e06f5cf1065fd2d32a4d44195e71ddb1626c173c validates same chapter ID/map, increased revision, larger objective count and exact original objective prefix; project valid legacy integer step to stable solved ID set and separate legacy entitlement; null step means zero, out-of-range rejected; supplied historical flag must be revision-validated by caller. accepts checks exact expanded identity and known IDs; count and full completion independent of historical entitlement. No storage, live registry, authored content or unlock changes.
+- ChapterExpansionPlanTest.kt 3cf8e63d761a93c3830531400be83be420f97622 uses synthetic 12-objective fixture; tests every old step, earned replay, invalid steps/IDs/revisions and changed prefix. CI not yet verified. Synthetic additions are not real authored levels.
+- Next: verify CI; design malformed typed preference handling, downstream legacy entitlement recovery, ordered replay versus independently solved discoveries, manifest identity and immutable save validation; add dedicated tests before persistence or integration. Current projection does not establish downstream access or merge safety on its own. Preserve existing saves, approved art, signer/package. See chapter standard and co-op specification.
+
+## Historical checkpoint — GH-V45-E
 
 - Repository EdenP-Development/GridMates-Grid-Hunt, draft PR #12, branch feature/gh-v02-in-puzzle-map-look. Latest fully verified source b3b5be9977b4adaef58cb0a466d81c6345dd749d: QA539 run 46101196381 all three jobs passed, art #119 run 46101196409 passed. 31 required screenshots generated. Documentation-only commits may trigger fresh runs; distinguish verified source from current head.
 - QA537 run 46099805312 at ba7cfac0cd0623ec6ad60e01d3a24840df00b1b4 fully green, art #117. Signed upgrade logs confirm 11 exact preference maps baseline seed, baseline cold launch, actual APK replacement prelaunch, candidate cold launch; Adventure restored, no uninstall or clear. QA537 build artifact 15244433624 supplied to owner. QA539 adds actual MainActivity published Atlas/region screenshot coverage 8604507 and 31-image gate b3b5be9; new image pixels not inspected yet.
