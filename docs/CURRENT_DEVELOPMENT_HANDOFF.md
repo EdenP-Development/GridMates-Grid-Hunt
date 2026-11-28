@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V46-J — QA-only expanded Adventure selector implemented.**
+Updated 2026-11-28. **Current checkpoint: GH-V46-L — expanded selector navigation regression coverage.**
 
-## Authoritative current checkpoint — GH-V46-J
+## Authoritative current checkpoint — GH-V46-L
+
+- QA596 source c05fc5a3a23c1a7e32d661352fcc02b39cd8c7bc run 46125591896 remains confirmed full green baseline: 73 Android tests, 35 required screenshots, signed upgrade passed. GH46J selector run 46127984728 passed JVM/build and artwork 46127984723; emulator and signed upgrade were running at last inspection.
+- GH46L updates nine existing Home-to-Adventure test paths to explicitly select classicAdventure: HomeNavigationTest.kt 1e8320b36a74786bcff8ffab1001521da13caa66 (5), PopulatedSaveTest.kt c77eb0158c53636fec34b669832bfe261c398d03 (1), VisualCaptureTest.kt 1f733ed9be237a362a982a1c1637c83a4f787807 (3). Original assertions retained.
+- GH46L 578dc141d6850969ac60e7c6e2dad7080a84ba52 adds ExpandedAdventureNavigationTest.kt opening all six candidate screens, returning to selector and classic route. Execution pending; add dedicated progress refresh/recreation, save isolation, BackHandler and actual selector screenshot tests next. Audit remaining test files for alternate Home entry calls; broad lookup hit connector call limit. Upgrade script currently checks restored Home visibility rather than entering Adventure, so no script change necessary from selector alone.
+- User reports temporary GitHub Codex review quota exhaustion; continue connector source inspection and Actions without claiming independent Codex review. No need to change signing or release policy. Preserve draft PR #12, approved branding and original saves; no live migration, publication, merge, release or networking authorized. Prefer grouped commits and let consolidated QA finish.
+
+## Historical checkpoint — GH-V46-J
 
 - QA596 source c05fc5a3a23c1a7e32d661352fcc02b39cd8c7bc, run 46125591896 remains latest confirmed green baseline: 73 Android tests, mandatory 35 screenshot gate, signed upgrade and core/build passed. See historical GH46G for artifacts and visual review.
 - GH46I 0087fda09f5b200e037465c5ed2c6addaea2cff1 modifies MainActivity routing: requires both FLAG_DEBUGGABLE and exact .qa package for Adventure choice/expanded selector routes. Classic route retained; beta/release continue directly to classic. Intermediate commit referenced missing composables.
