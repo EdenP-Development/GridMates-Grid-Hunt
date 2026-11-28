@@ -136,6 +136,32 @@ class VisualCaptureTest {
         prepare()
         compose.onNodeWithTag("openAdventure").assertExists()
         capture("16_explorer_desk_home.png")
+        // Actual published route in MainActivity, not the separate preview activity.
+        val woodland = com.playereden.gridhunt.core.PublishedWorlds.selection.destinations.single()
+        val prefs = target.getSharedPreferences("gridhunt_world_selection_v1", Context.MODE_PRIVATE)
+        val previous = prefs.all["world_id"]
+        try {
+            compose.onNodeWithTag("openAtlas").performScrollTo().performClick()
+            compose.onNodeWithTag("explorerAtlas").assertExists()
+            capture("30_published_atlas.png")
+            compose.onNodeWithTag("atlasOpen_"+woodland.world.id).performScrollTo().performClick()
+            compose.onNodeWithTag("regionGameplayHub").assertExists()
+            capture("31_published_region.png")
+            compose.onNodeWithTag("regionBack").performScrollTo().performClick()
+            compose.onNodeWithTag("atlasBack").performScrollTo().performClick()
+        } finally {
+            val edit = prefs.edit()
+            when(previous) {
+                is String -> edit.putString("world_id",previous)
+                is Int -> edit.putInt("world_id",previous)
+                is Boolean -> edit.putBoolean("world_id",previous)
+                is Long -> edit.putLong("world_id",previous)
+                is Float -> edit.putFloat("world_id",previous)
+                is Set<*> -> edit.putStringSet("world_id",previous.filterIsInstance<String>().toSet())
+                else -> edit.remove("world_id")
+            }
+            check(edit.commit())
+        }
         compose.onNodeWithTag("openAdventure").performClick()
         compose.onNodeWithTag("adventureRouteMap").assertExists()
         compose.onNodeWithTag("openAdventureChapter").assertExists()
