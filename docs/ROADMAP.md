@@ -1,6 +1,6 @@
 # Roadmap — GridMates: Grid Hunt
 
-## Current roadmap — GH-V45-A (2026-11-27)
+## Current roadmap — GH-V45-E (2026-11-27)
 
 See [current development handoff](CURRENT_DEVELOPMENT_HANDOFF.md) for exact source and QA receipts. This supersedes historical status below.
 
@@ -10,17 +10,17 @@ See [current development handoff](CURRENT_DEVELOPMENT_HANDOFF.md) for exact sour
 | Multi-world foundation | Exact map/campaign identity, scoped selection, terrain scenes and isolated sessions implemented |
 | Whispering Coast | Six landmarks, three four-objective chapters, four Quick modes and five Custom modes; tested preview only |
 | Regional navigation | Shared controller, guarded next chapter, published/preview separation; QA533 verified |
-| Regional presentation | Illustrated Atlas portraits and compact hubs; 29 screenshot gate; final pixel/device acceptance open |
-| Published Atlas | Published-only host and tests verified QA533; normal Home entry implemented GH44Y |
-| MainActivity acceptance | QA534 all 64 tests finished successfully but screenshot transfer failed; GH44Z retry and new recreation test awaiting full verification |
-| Save preservation | QA534 signed install-over passed; dedicated earned-ledger and legacy replay migration still open |
+| Regional presentation | Illustrated Atlas portraits and compact hubs; 31 screenshot gate passed QA539; nine owner phone screens reviewed; new emulator pixels and full device interaction acceptance open |
+| Published Atlas | Published-only host and tests verified QA533; normal Home entry verified QA537/539 |
+| MainActivity acceptance | QA537 and QA539 fully green; actual Home route and recreation verified |
+| Save preservation | QA537/539 signed install-over passed; dedicated earned-ledger and legacy replay migration still open |
 | Chapter expansion | 12 meaningful levels target, minimum 10 mature; explicit non-destructive migration required |
 | Large-scale exploration | Synthetic scaling fixture, camera/clipping, larger authored map, persistent multi-session expedition; eventual 1,000+ discoveries |
 | Release | No merge/publication/release; actual device review, production signing and store readiness pending |
 
-Last fully green QA533 run 46096770163. QA536 run 46099562525 was in progress at inspection, art #116 passed. Documentation commits may cause a new run; verify newest source. Preserve existing saves, approved branding and QA signer.
+Last fully green QA539 run 46101196381 at b3b5be9; artwork #119 passed. Owner phone evidence recorded in [GH45 review](vision/GH_V45_PHONE_REVIEW_AND_CONTENT_TRANSITION.md). Documentation commits may cause a new run; verify newest source. Preserve existing saves, approved branding and QA signer.
 
-Next: consolidated green QA; actual Home/Atlas visual review and playable device candidate; earned ledger and legacy progression tests; explicit coast publication decision; chapter expansion and large-map infrastructure. See [chapter standard](ADVENTURE_CHAPTER_LEVEL_STANDARD.md) and [large-scale vision](LARGE_SCALE_EXPLORATION_VISION.md).
+Next: read-only chapter expansion progress model and legacy entitlement migration design; dedicated earned-ledger and legacy progression tests; explicit coast publication decision; authored content and large-map infrastructure. Retain remaining visual/device checks. See [chapter standard](ADVENTURE_CHAPTER_LEVEL_STANDARD.md) and [large-scale vision](LARGE_SCALE_EXPLORATION_VISION.md).
 
 ## Historical roadmap and milestones
 
