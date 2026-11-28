@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-W — complete expanded Woodland preview integration.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-X — first expanded coastal chapter authored.**
 
-## Authoritative current checkpoint — GH-V45-W
+## Authoritative current checkpoint — GH-V45-X
+
+- GH45W head 31e54dcddbadd409a63fdcfa45d3983696fbc25b run 46122734411: JVM/build passed, emulator and signed upgrade running at inspection. Artwork 46122734346 passed. GH45R run 46117766835 remains last confirmed fully green; 35 screenshot gate and pixel review pending.
+- GH45X CoastalBeaconSurveyCandidate.kt 8b571ae3e99981e83cdb7ded15a8a8f5f8fe3bf6 authors eight chart appendix objectives after exact original four Beacon's Message objectives, revision 2, same canonical draft map, twelve distinct answer cells; uses coastal markers C/D/E and existing Driftwood Cove/Shell Beach. Independent namespace gridhunt_candidate_beacon_survey_r2. No registry or Android route changes.
+- GH45X CoastalBeaconSurveyCandidateTest.kt 7cee377278034af21188986077a8a129679dd10f verifies exact prefix, distinct cells, map identity, literal references, four offset relationships, correct/wrong progression, legacy projection and historical entitlement. Execution pending.
+- Total authored Adventure 56/72 (24 original, 32 candidate). Woodland 36/36 implemented in isolated Android previews; Coast 20/36 authored. Next verify consolidated QA; integrate exact coastal candidate via isolated preview with no completion ledger writes and correct coastal labels; then expand Tide Trail and Last Light. Preserve existing saves, approved branding, package/signer and draft PR #12. No publication, live migration, merge, release or networking authorized. Avoid superseding full QA unnecessarily.
+
+## Historical checkpoint — GH-V45-W
 
 - GH45V head 7aaaca3474e1dbd2312cdb382a16ff1215dba786 run 46122461480 was in progress at inspection; JVM/build and Android jobs not yet complete, upgrade not yet reported. Artwork 46122461510 passed. GH45R run 46117766835 remains last confirmed full green baseline. Prior Maven HTTP 429 and baseline Home restoration gate failures remain documented below; no QA gate waived.
 - GH45W bc0c9bb32d7ab64fa2887d3e0b271ccf806181f4 extends exact internal ExpandedWoodlandPreview allowlist to Return Trail and adds ExpandedReturnSurveyPreview. All three exact candidates bypass completion ledger construction/capture, use separate candidate preferences, no next chapter or MainActivity route. Navigation-specific journal entry, finish and replay labels. Original registry unchanged.
