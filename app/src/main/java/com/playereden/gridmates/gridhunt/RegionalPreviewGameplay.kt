@@ -15,7 +15,7 @@ import com.playereden.gridhunt.core.*
 
 /** Opt-in internal host only; no new MainActivity entry point. */
 @Composable
-internal fun RegionalPreviewGameplay(onExit: () -> Unit) {
+internal fun RegionalPreviewGameplay(hapticsEnabled: Boolean = false, onExit: () -> Unit) {
     AtlasPreviewNavigation(onExit) { destination, mode, chapter, onBack, onNext ->
         val map = destination.map
         val look = MapLook.FIELD_GUIDE
@@ -28,24 +28,24 @@ internal fun RegionalPreviewGameplay(onExit: () -> Unit) {
                     } else null
                 if (coastalRun != null) {
                     WoodlandMixedExpeditionScreen(onHome = onBack, mapLook = look,
-                        onLook = {}, hapticsEnabled = false, coastalPreview = coastalRun, onNextChapter = onNext)
+                        onLook = {}, hapticsEnabled = hapticsEnabled, coastalPreview = coastalRun, onNextChapter = onNext)
                 } else if (map == ExplorationMaps.woodland && canonical != null &&
                     canonical.chapter.id in setOf(WoodlandExpedition.chapter.id,
                         WoodlandSupplyExpedition.chapter.id,WoodlandReturnExpedition.chapter.id)) {
                     WoodlandMixedExpeditionScreen(onHome = onBack, mapLook = look,
-                        onLook = {}, hapticsEnabled = false, onNextChapter = onNext,
+                        onLook = {}, hapticsEnabled = hapticsEnabled, onNextChapter = onNext,
                         chapterTwo = canonical.chapter.id == WoodlandSupplyExpedition.chapter.id,
                         chapterThree = canonical.chapter.id == WoodlandReturnExpedition.chapter.id)
                 } else PreviewRouteUnavailable(onBack)
             }
             RegionalMode.CUSTOM_PLAY -> CustomHuntScreen(look, {}, onBack, map)
-            RegionalMode.QUICK_PLAY -> RegionalQuickPlayPreview(map, onBack)
+            RegionalMode.QUICK_PLAY -> RegionalQuickPlayPreview(map, hapticsEnabled, onBack)
         }
     }
 }
 
 @Composable
-private fun RegionalQuickPlayPreview(map: ExplorationMap, onBack: () -> Unit) {
+private fun RegionalQuickPlayPreview(map: ExplorationMap, hapticsEnabled: Boolean, onBack: () -> Unit) {
     val trail = TrailChapterCatalog.forAuthoredMap(map)
     val reverse = SurveyMarkerCatalog.forAuthoredMap(map)
     val treasure = TreasureChecklistCatalog.forAuthoredMap(map)
@@ -55,13 +55,17 @@ private fun RegionalQuickPlayPreview(map: ExplorationMap, onBack: () -> Unit) {
     BackHandler(enabled = mode != null) { returnToModes() }
     val look = MapLook.FIELD_GUIDE
     when (mode) {
-        "trail" -> if (trail != null) FirstBearingsScreen(returnToModes,look,{},false,trail)
+        "trail" -> if (trail != null) FirstBearingsScreen(returnToModes,look,{},hapticsEnabled,trail)
             else PreviewRouteUnavailable(returnToModes)
-        "gold" -> if (reverse != null) ReversePracticeScreen(returnToModes,look,{},false,reverse)
+        "gold" -> if (reverse != null) ReversePracticeScreen(returnToModes,look,{},hapticsEnabled,reverse)
             else PreviewRouteUnavailable(returnToModes)
-        "treasure" -> if (treasure != null) TreasureChecklistScreen(returnToModes,look,{},false,treasure)
+        "treasure" -> if (treasure != null) TreasureChecklistScreen(returnToModes,look,{},hapticsEnabled,treasure)
             else PreviewRouteUnavailable(returnToModes)
-        "identify" -> if (identify != null) WoodlandIdentifyScreen(returnToModes,look,{},false,identify)
+        "identify" -> if (identify != null) WoodlandIdentifyScreen(returnToModes,look,{},hapticsEnabled,identify)
+            else PreviewRouteUnavailable(returnToModes)
+        "mixed" -> if (map == ExplorationMaps.woodland)
+            WoodlandMixedExpeditionScreen(onHome = returnToModes, mapLook = look,
+                onLook = {}, hapticsEnabled = hapticsEnabled)
             else PreviewRouteUnavailable(returnToModes)
         else -> Column(Modifier.fillMaxSize().journalPaper().statusBarsPadding()
             .navigationBarsPadding().journalScroll().padding(16.dp),
@@ -71,7 +75,8 @@ private fun RegionalQuickPlayPreview(map: ExplorationMap, onBack: () -> Unit) {
             listOf(Triple("trail","Trail Treasures",trail != null),
                 Triple("gold","Golden Spots",reverse != null),
                 Triple("treasure","Treasure Checklist",treasure != null),
-                Triple("identify","What's at This Grid?",identify != null))
+                Triple("identify","What's at This Grid?",identify != null),
+                Triple("mixed","The Missing Field Notes",map == ExplorationMaps.woodland))
                 .filter { it.third }.forEach { (id,label,_) ->
                     Button(onClick = { mode = id }, shape = JournalActionShape,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("regionalQuick_$id")) {
