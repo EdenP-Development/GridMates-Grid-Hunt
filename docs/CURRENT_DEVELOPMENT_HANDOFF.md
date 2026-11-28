@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V46-M — selector restoration and system back regression coverage.**
+Updated 2026-11-28. **Current checkpoint: GH-V46-N — actual discovery refresh and expanded selector screenshot gate.**
 
-## Authoritative current checkpoint — GH-V46-M
+## Authoritative current checkpoint — GH-V46-N
+
+- QA596 source c05fc5a3a23c1a7e32d661352fcc02b39cd8c7bc run 46125591896 remains last confirmed fully green baseline. GH46M artwork 46129526646 passed; QA 46129526653 was in progress at initial inspection. Independent Codex review temporarily unavailable per user.
+- GH46N 31aab7b4f3fef689ecfcee79fc132c398c1ffdf1 adds actual first objective completion through MainActivity QA selector, waits for persisted step 1, returns to selector without recreation, asserts updated chapter count, restores original candidate preferences in finally. Captures 36_adventure_choice.png, 37_expanded_adventure_selector.png, 38_expanded_selector_progress.png and 39_expanded_selector_coast.png using existing MediaStore capture pattern.
+- GH46N 64c48509059e9f06001a2e3c7e571aa981cc1c28 extends CI mandatory nonempty screenshot checks from 35 to 39; existing checks retained. New test and captures not yet executed/verified.
+- Next freeze source while consolidated QA completes; inspect failures and actual 36–39 screenshot pixels, finish remaining classic entry audit if required, verify upgrade and prepare physical-device QA playtest artifact after acceptance. Preserve draft PR #12, approved branding, original saves, package/signer. No live migration, public coastal publication, merge, release or networking authorized.
+
+## Historical checkpoint — GH-V46-M
 
 - QA596 source c05fc5a3a23c1a7e32d661352fcc02b39cd8c7bc run 46125591896 remains last confirmed fully green baseline. GH46L artwork 46128966391 passed; QA 46128966423 was in progress at initial inspection. No independent Codex review currently available per user.
 - GH46M 02f1a779d9ed87c7121932921e0496a93fd31694 extends ExpandedAdventureNavigationTest with controlled candidate step fixture 3, menu count assertion, chapter opening and activity recreation, system back to selector, fixture update to 4 and selector recreation, system back to choice, both earned-ledger equality assertions and restoration of original candidate preferences. This tests fixture refresh on recreation, not real solved-answer refresh without recreation; execution pending.
