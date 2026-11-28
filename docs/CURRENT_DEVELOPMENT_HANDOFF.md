@@ -1,8 +1,16 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-N — isolated Android expedition persistence tests.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-P — first isolated twelve-objective chapter candidate.**
 
-## Authoritative current checkpoint — GH-V45-N
+## Authoritative current checkpoint — GH-V45-P
+
+- Repository EdenP-Development/GridMates-Grid-Hunt, draft PR #12, branch feature/gh-v02-in-puzzle-map-look. Preserve existing saves, approved fox/startup, package and QA signer. No merge, release, live migration, Coast publication or networking authorized.
+- GH45O audit commit 654e210f3e5d08b3cfc3dd34d2454cadb7b25097: six four-objective Adventure chapters (24 existing, target 72); continuation concepts and acceptance gates in docs/vision/GH_V45_O_CHAPTER_EXPANSION_AUDIT.md.
+- GH45P WoodlandFieldSurveyCandidate.kt a72942bbc59b7014b52da92dd59e016867ddf0d4: revision 2 of Missing Field Notes, exact original four-objective prefix, eight new field survey appendix objectives using existing landmarks, golden markers C/D/E and grid offsets. All 12 answer cells distinct. Separate candidate runtime namespace gridhunt_candidate_field_survey_r2, no live registration or persistence. Tests c642302648beef9d8005520f45832295d18af9e6 verify exact prefix, distinct answers, literal expected cells, offsets, correct/wrong answer progression, legacy step projection and historical replay entitlement. Tests committed; execution pending.
+- Recovered QA: QA549 build and upgrade passed, emulator cancelled; QA550 build passed, emulator and upgrade cancelled; dd3e646 run cancelled. At 2b3f7a26d925daf817e5a5860113b3eaa2d76c3e run 46110438426 JVM/build and emulator passed, upgrade failed before candidate install after all eleven baseline preference maps seeded (Restored Home progress not visible). Artwork 46110438414 passed. Individual Android atomic storage test execution not confirmed from log search. QA539 remains last confirmed fully green baseline. No gate waived.
+- Next: verify source-matched candidate CI, inspect actual Android storage test coverage, investigate baseline upgrade visibility failure; review appendix clues and scalable journal in isolated preview before live integration. Audit typed preferences and historical unlock routes before any migration. Maintain existing revision-one campaign and saves. Larger maps, persistent Grand Expeditions and eventual offline-first local Wi-Fi co-op remain planned.
+
+## Historical checkpoint — GH-V45-N
 
 - Repository EdenP-Development/GridMates-Grid-Hunt, draft PR #12, branch feature/gh-v02-in-puzzle-map-look. Preserve approved fox icon, startup artwork, existing saves, package and QA signer. No merge, production release, Coast publication, migration or network permissions authorized.
 - Last confirmed fully green QA539 run 46101196381 at b3b5be9. QA548 run 46108308734 at 8350340 passed core/build, Android and art128; upgrade failed before candidate replacement after seeding baseline 11 maps, restored Home not visible. QA549 run 46109239982 at 6a42ccc passed core/build, signed upgrade and art129, Android pending at inspection. QA550 run 46109956553 at 53e73a1 passed core/build (including atomic storage JVM tests), art130 passed; Android and upgrade pending at inspection. Subsequent commits may supersede runs. Verify newest source; do not treat prior partial runs as fully green.
