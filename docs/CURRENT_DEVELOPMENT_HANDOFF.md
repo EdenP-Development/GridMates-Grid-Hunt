@@ -1,8 +1,18 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-27. **Current checkpoint: GH-V45-F — read-only expansion foundation and local co-op vision.**
+Updated 2026-11-27. **Current checkpoint: GH-V45-K — versioned expedition save codec.**
 
-## Authoritative current checkpoint — GH-V45-F
+## Authoritative current checkpoint — GH-V45-K
+
+- Repo EdenP-Development/GridMates-Grid-Hunt, draft PR #12, branch feature/gh-v02-in-puzzle-map-look. No merge, release, Coast publication, live save migration or network permissions authorized. Preserve approved launcher/startup, package, QA signer and existing saves. Last confirmed fully green QA539 run 46101196381 at b3b5be9; owner nine-phone-screen review in GH45E below.
+- QA544 run 46106102778 passed JVM/build and art124, upgrade failed before candidate replacement: baseline seeded 11 maps then restored Home progress not visible. QA545 run 46107117423 passed JVM/build and art125; remaining jobs not confirmed before subsequent commits. QA546 run 46107444283 initially in progress, art126 passed. QA547 run 46107681886 at f442b5daa015761012b29685da08ed901cfd3b02 passed JVM/build including all new core tests, signed upgrade and art127; Android still running at inspection. Subsequent commits may supersede; verify newest source.
+- GH45H LegacyEntitlementRecovery.kt 94cc35a and tests 72ee764: pure read-only proposal separates explicit earned, inferred prerequisites, invalid steps; only caller-audited historical gated IDs, valid positive step or explicit earned evidence, zero/unknown/invalid cannot infer. Caller must validate historical gating and revision; never remote/imported evidence. No live integration.
+- GH45I ChapterManifest.kt 4521fdc and tests e056358: schema1 SHA256 length-prefixed authored chapter/map identity, bounds, ordered landmarks and objectives, text and answer references. External marker positions/rendering and artwork outside contract; accurate map revision required. No authorization.
+- GH45J ExpeditionProgressContract.kt affdbcb and tests f442b5d: UUID project + chapter/revision/manifest schema/fingerprint, defensive immutable snapshot, exact identity and known objective IDs; pure trusted set union commutative/associative/idempotent, no remote proof/authentication, no campaign entitlement or reset merges.
+- GH45K ExpeditionSaveCodec.kt 5f746e89022d5269fe53abea53bb1c1075899bb5 and tests d09344af12242ddf7d7a28e14105ebb244184724: candidate GHEX binary schema1, UUID and chapter identity, sorted solved IDs, SHA256 integrity checksum, 2MiB/20000-ID limits, reject invalid checksum/schema/identity/count/duplicate/unknown/trailing/truncated. Java modified UTF length limit applies; encoder currently allocates body before size check, must preflight bounds before untrusted data or storage integration. Decoder requires known project contract; no standalone import/manifest reconstruction. Checksum not authentication. Tests committed, not yet verified. No disk writes.
+- Next: verify codec CI, strengthen bounded encoder and malicious-but-rechecksummed duplicate/unknown/count tests; design atomic local persistence with interruption recovery, known-project discovery and immutable content manifest; audit legacy typed preferences and historical entry gates before any migration. Then author actual chapter additions and scalable journal, larger-map fixture, durable Grand Expeditions, later LAN co-op. Owner approved local Wi-Fi co-op vision docs/vision/LOCAL_COOP_GRAND_EXPEDITIONS.md. Avoid excessive UI redesign and networking scope creep.
+
+## Historical checkpoint — GH-V45-F
 
 - Latest verified baseline QA539 run 46101196381 at b3b5be9977b4adaef58cb0a466d81c6345dd749d; prior GH45E phone review and roadmap retained below. No merge, release or Coast publication.
 - Owner explicitly wants long-term local Wi-Fi cooperative large puzzle hunts with spouse over days/weeks; approved concept of durable independent replicas, offline progress union and deduplication, no permanent host. Specification docs/vision/LOCAL_COOP_GRAND_EXPEDITIONS.md commit 5052b3692fb323cfe138d679e4538dde925d2749. Networking remains future scope.
