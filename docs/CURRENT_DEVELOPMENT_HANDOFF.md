@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-V — complete Woodland chapter candidate authorship.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-W — complete expanded Woodland preview integration.**
 
-## Authoritative current checkpoint — GH-V45-V
+## Authoritative current checkpoint — GH-V45-W
+
+- GH45V head 7aaaca3474e1dbd2312cdb382a16ff1215dba786 run 46122461480 was in progress at inspection; JVM/build and Android jobs not yet complete, upgrade not yet reported. Artwork 46122461510 passed. GH45R run 46117766835 remains last confirmed full green baseline. Prior Maven HTTP 429 and baseline Home restoration gate failures remain documented below; no QA gate waived.
+- GH45W bc0c9bb32d7ab64fa2887d3e0b271ccf806181f4 extends exact internal ExpandedWoodlandPreview allowlist to Return Trail and adds ExpandedReturnSurveyPreview. All three exact candidates bypass completion ledger construction/capture, use separate candidate preferences, no next chapter or MainActivity route. Navigation-specific journal entry, finish and replay labels. Original registry unchanged.
+- GH45W d9bbe2e1df58f30426de92a1a3f1becce006b2fc adds twelve-objective Android return playthrough, close/reopen at 4 and 8, journal progress/final navigation entry, replay, exact unchanged original three Woodland saves, both other candidate saves and both earned ledgers. Candidate preferences restored. Execution pending.
+- Woodland 36/36 authored and internal Android implementation complete, consolidated acceptance pending. Total Adventure authorship 48/72. Next check source-matched QA including 35 screenshot gate and inspect actual screenshots if accessible; investigate recurring upgrade visibility failure if repeated. Begin isolated coastal expansion with canonical map data and exact legacy prefix, no live migration or coastal publication. Preserve existing saves, approved branding, package/signing and draft PR #12. No merge, release or network permissions authorized. Avoid unnecessary commits while consolidated QA runs.
+
+## Historical checkpoint — GH-V45-V
 
 - GH45U run 46121732847 at 3f4a660ed50a12df8fff8531f04f1ad583a603f6: JVM/build passed, artwork 46121732775 passed. Android job 140907537746 failed before executing tests due to Maven Central HTTP 429 resolving UTP dependencies (Kotlin stdlib, auto-service, dagger and others). Upgrade job 140908277897 failed baseline restored Home visibility check. Neither gate waived; GH45R run 46117766835 remains last confirmed all-green baseline. New 35 screenshot archive and actual pixel review remain unverified.
 - GH45V WoodlandReturnSurveyCandidate.kt 8b13ccae9b553201bec075694a5f18148d65ad1d authors eight navigation circuit objectives after exact original four Return Trail objectives, same map, revision 2, 12 distinct answer cells. Isolated namespace gridhunt_candidate_return_survey_r2, no live registry or Android preview route yet.
