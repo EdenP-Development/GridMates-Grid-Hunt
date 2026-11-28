@@ -58,7 +58,8 @@ internal fun ExplorerDeskHome(
     onQuickPlay: () -> Unit,
     onCustom: () -> Unit,
     onAcademy: () -> Unit,
-    onSettings: () -> Unit
+    onSettings: () -> Unit,
+    onAtlas: (() -> Unit)? = null
 ) {
     val completedChapters = worldProgress.count { it.everCompleted }
     val nextChapter = worldProgress.firstOrNull {
@@ -83,7 +84,19 @@ internal fun ExplorerDeskHome(
         }
         Text("Grid Hunt", color = Ink, fontWeight = FontWeight.ExtraBold,
             fontSize = 30.sp)
-        Text("Little maps. Big discoveries.", color = Muted, fontSize = 13.sp)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Little maps. Big discoveries.", color = Muted, fontSize = 13.sp,
+                modifier = Modifier.weight(1f))
+            if (onAtlas != null) {
+                TextButton(onClick = onAtlas,
+                    modifier = Modifier.heightIn(min = 48.dp).testTag("openAtlas")) {
+                    Image(painterResource(R.drawable.gh_tool_map), contentDescription = null,
+                        modifier = Modifier.size(24.dp))
+                    Text("Atlas", color = Forest, fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 5.dp))
+                }
+            }
+        }
 
         // One primary illustrated journey feature; don't repeat a big hero
         // postcard above a second oversized Adventure information card.
