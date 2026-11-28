@@ -1,6 +1,10 @@
 package com.playereden.gridmates.gridhunt
 
 import android.content.Context
+import android.content.ContentValues
+import android.graphics.Bitmap
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -12,6 +16,38 @@ import org.junit.Test
 
 class ExpandedFieldSurveyPreviewTest {
     @get:Rule val compose = createComposeRule()
+
+    private fun capture(filename: String) {
+        compose.waitForIdle()
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.waitForIdleSync()
+        android.os.SystemClock.sleep(500L)
+        val bitmap = requireNotNull(instrumentation.uiAutomation.takeScreenshot())
+        val resolver = instrumentation.targetContext.contentResolver
+        var uri: android.net.Uri? = null
+        try {
+            val values = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                put(MediaStore.Images.Media.RELATIVE_PATH,
+                    "${Environment.DIRECTORY_PICTURES}/GridHuntVisualQA")
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
+            val created = requireNotNull(resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values))
+            uri = created
+            requireNotNull(resolver.openOutputStream(created)).use {
+                check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it))
+            }
+            check(resolver.update(created, ContentValues().apply {
+                put(MediaStore.Images.Media.IS_PENDING, 0)
+            }, null, null) == 1)
+        } catch (failure: Throwable) {
+            uri?.let { resolver.delete(it, null, null) }
+            throw failure
+        } finally {
+            bitmap.recycle()
+        }
+    }
 
     @Test fun playAllTwelveResumeAndReplayWithoutPublishedWrites() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -58,12 +94,21 @@ class ExpandedFieldSurveyPreviewTest {
                     compose.onNodeWithTag("mixedHome").performClick()
                     compose.runOnIdle { visible.value = true }
                     progress(i + 1)
+                    if (i == 3) {
+                        capture("32_expanded_survey_opening.png")
+                        compose.onNodeWithTag("mixedJournal").performClick()
+                        compose.onNodeWithTag("journalProgress").assertTextEquals("4 of 12 discoveries recorded")
+                        capture("33_expanded_journal_progress.png")
+                        compose.onNodeWithTag("closeJournal").performClick()
+                    }
                 }
             }
             compose.onNodeWithText("Field survey complete!").assertExists()
+            capture("34_expanded_survey_finish.png")
             compose.onNodeWithTag("finishJournal").performClick()
             compose.onNodeWithTag("journalEntry_" + run.chapter.objectives.last().id)
                 .performScrollTo().assertIsDisplayed()
+            capture("35_expanded_journal_final_entry.png")
             compose.onNodeWithTag("closeJournal").performClick()
             compose.onNodeWithTag("finishContinue").performClick()
             progress(0)
