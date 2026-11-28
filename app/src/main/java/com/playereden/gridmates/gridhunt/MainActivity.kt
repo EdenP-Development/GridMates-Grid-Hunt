@@ -161,7 +161,7 @@ private fun GridHuntScreen() {
     val goBack = {
         screen = when (screen) {
             "settings" -> settingsOrigin
-            "quick", "adventure", "custom", "academy" -> "home"
+            "quick", "adventure", "custom", "academy", "atlas" -> "home"
             else -> returnHub
         }
     }
@@ -190,8 +190,11 @@ private fun GridHuntScreen() {
             onQuickPlay = { screen = "quick" },
             onCustom = { screen = "custom" },
             onAcademy = { screen = "academy" },
-            onSettings = { settingsOrigin = "home"; screen = "settings" }
+            onSettings = { settingsOrigin = "home"; screen = "settings" },
+            onAtlas = { screen = "atlas" }
         )
+        "atlas" -> PublishedRegionalGameplay(hapticsEnabled = hapticsEnabled,
+            onExit = { screen = "home" })
         "settings" -> GridHuntSettings(hapticsEnabled, { hapticsEnabled = it }, mapLook,
             onBack = { screen = settingsOrigin })
         "academy" -> ExplorerAcademyScreen(onHome = { screen = "home" }, mapLook = mapLook, onLook = { _ -> })
