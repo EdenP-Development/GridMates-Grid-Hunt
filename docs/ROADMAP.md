@@ -1,6 +1,6 @@
 # Roadmap — GridMates: Grid Hunt
 
-## Current roadmap — GH-V45-K (2026-11-27)
+## Current roadmap — GH-V45-N (2026-11-28)
 
 See [current development handoff](CURRENT_DEVELOPMENT_HANDOFF.md) for exact source and QA receipts. This supersedes historical status below.
 
@@ -16,13 +16,13 @@ See [current development handoff](CURRENT_DEVELOPMENT_HANDOFF.md) for exact sour
 | Save preservation | QA537/539 signed install-over passed; dedicated earned-ledger and legacy replay migration still open |
 | Chapter expansion | 12 meaningful levels target, minimum 10 mature; read-only objective projection and audited entitlement proposal passed core QA547; explicit non-destructive migration required |
 | Large-scale exploration | Synthetic scaling fixture, camera/clipping, larger authored map, persistent multi-session expedition; eventual 1,000+ discoveries |
-| Expedition save foundations | Content fingerprint and project identity/union passed core QA547; bounded schema1 codec implemented, verification pending; no disk persistence |
+| Expedition save foundations | Content identity, union and hardened schema1 codec core verified; isolated atomic file storage JVM verified QA550; Android storage test added, execution pending; no live integration |
 | Local cooperative expeditions | Long-term offline-first replicated saves, local Wi-Fi pairing and deterministic deduplication; [design specification](vision/LOCAL_COOP_GRAND_EXPEDITIONS.md); no networking implemented |
 | Release | No merge/publication/release; actual device review, production signing and store readiness pending |
 
 Last fully green QA539 run 46101196381 at b3b5be9; artwork #119 passed. Owner phone evidence recorded in [GH45 review](vision/GH_V45_PHONE_REVIEW_AND_CONTENT_TRANSITION.md). Documentation commits may cause a new run; verify newest source. Preserve existing saves, approved branding and QA signer.
 
-Next: verify codec, bound encoder and test malformed envelopes; atomic local persistence design; historical gate and typed preference audit; explicit coast publication decision; authored content, scalable journal and large-map infrastructure. Retain remaining visual/device checks. See [chapter standard](ADVENTURE_CHAPTER_LEVEL_STANDARD.md) and [large-scale vision](LARGE_SCALE_EXPLORATION_VISION.md).
+Next: verify Android storage test, historical gate and typed preference audit; explicit coast publication decision; authored chapter content, scalable journal and large-map infrastructure. Further persistence gates: project discovery, backup, lifecycle, concurrency and power-loss durability. Retain remaining visual/device checks. See [chapter standard](ADVENTURE_CHAPTER_LEVEL_STANDARD.md) and [large-scale vision](LARGE_SCALE_EXPLORATION_VISION.md).
 
 ## Historical roadmap and milestones
 
