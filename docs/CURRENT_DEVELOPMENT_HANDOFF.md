@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-S — expanded chapter visual QA gates.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-T — second twelve-objective chapter candidate.**
 
-## Authoritative current checkpoint — GH-V45-S
+## Authoritative current checkpoint — GH-V45-T
+
+- GH45S head bcacd62b31965f23aa49b986b20fc6a5ef49a235 run 46121060679: JVM/build passed, emulator and signed upgrade running at inspection before subsequent commits; artwork 46121060668 passed. New 35-image capture acceptance and pixel review remain pending. GH45R run 46117766835 remains last confirmed fully green baseline.
+- GH45T WoodlandSupplySurveyCandidate.kt 3c8a642d6fb64c2d6f3334aa7ddbe8b9c169743e authors eight route verification objectives after exact four-objective Lost Supplies prefix. Same map, revision 2, twelve distinct answer cells; candidate namespace gridhunt_candidate_supply_survey_r2; no live registration or UI route. Story records route checks, does not invent a physical supply cache.
+- GH45T WoodlandSupplySurveyCandidateTest.kt 4784d831417577f6f86bfb04e9b76e87849cc4cf verifies exact prefix, distinct cells, literal answer references and five offset relationships, correct/wrong progression, separate namespaces, every legacy step and historical entitlement. Execution pending.
+- Authored Adventure count now 40/72 (24 original, 16 candidate). Next verify source-matched CI, review actual expanded chapter screenshot archive, generalize internal preview with exact candidate allowlist and no completion ledger access, adapt chapter-two journal/finish labels, then test twelve-objective supply preview. No live migration, Coast publication, merge, release or network permission changes authorized. Preserve existing saves, approved branding and QA signer.
+
+## Historical checkpoint — GH-V45-S
 
 - GH45R head a14321c215b77bd5124f936a28272e0f4e82b7e2 fully green: QA run 46117766835, artwork 46117766892. Emulator job 140895316739 logs report 68 tests executed and BUILD SUCCESSFUL; signed upgrade 140896185797 passed, JVM/build 140895316475 passed. This is latest confirmed all-green baseline; individual test names not printed in inspected console logs.
 - GH45S d75658d9f0f28c30c51a67b5a846778430ea752e extends actual twelve-objective playthrough instrumentation to capture four screenshots via emulator UI automation and MediaStore: 32_expanded_survey_opening.png, 33_expanded_journal_progress.png, 34_expanded_survey_finish.png, 35_expanded_journal_final_entry.png. Captures follow earned progress, not seeded completion. Failed image writes clean up pending MediaStore entry. Existing candidate save cleanup and protected ledger assertions retained.
