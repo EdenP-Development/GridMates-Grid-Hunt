@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V46-G — QA596 consolidated automated acceptance passed.**
+Updated 2026-11-28. **Current checkpoint: GH-V46-J — QA-only expanded Adventure selector implemented.**
 
-## Authoritative current checkpoint — GH-V46-G
+## Authoritative current checkpoint — GH-V46-J
+
+- QA596 source c05fc5a3a23c1a7e32d661352fcc02b39cd8c7bc, run 46125591896 remains latest confirmed green baseline: 73 Android tests, mandatory 35 screenshot gate, signed upgrade and core/build passed. See historical GH46G for artifacts and visual review.
+- GH46I 0087fda09f5b200e037465c5ed2c6addaea2cff1 modifies MainActivity routing: requires both FLAG_DEBUGGABLE and exact .qa package for Adventure choice/expanded selector routes. Classic route retained; beta/release continue directly to classic. Intermediate commit referenced missing composables.
+- GH46J eaf10bb4a8b140b202bd7e141e4145b3cd3585bd adds ExpandedAdventureSelector.kt containing choice and six-chapter selector, separate existing candidate namespaces, bounded read-only progress counts, chapter wrappers, saved selection and nested Android BackHandler. All chapters unrestricted for QA; no live progression or migration. Compilation and UI execution pending; missing-composable source dependency addressed.
+- Next: inspect CI and existing Home-to-Adventure Android tests (QA navigation now requires classicAdventure click), add selector navigation and save-isolation regression tests, capture actual selector screenshot, verify QA-only gate including beta/release, and rehearse upgrade. No public release, merge, live migration, signing or networking changes authorized. Preserve original saves, branding, package/signer and draft PR #12.
+
+## Historical checkpoint — GH-V46-G
 
 - Source c05fc5a3a23c1a7e32d661352fcc02b39cd8c7bc, workflow 46125591896: all three primary jobs passed. JVM/build 140919429385, Android instrumentation 140919429592, signed upgrade 140920369931. Coastal artwork 46125591869 passed. QA596 is new consolidated green baseline.
 - Android artifact 15256445662 downloaded and inspected: XML reports 73 tests, 0 failures, 0 errors; 42 PNGs in vision-screenshots including mandatory numbered 01–35. Four new expanded Field Survey captures 32–35 inspected visually: 12-cell journal fits three rows, final entry scrolls into view, completed map and replay presentation visible. Minor future physical-device readability check for small header links. Other 38 captures not individually visually reviewed in this checkpoint.
