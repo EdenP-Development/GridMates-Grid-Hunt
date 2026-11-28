@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-27. **Current checkpoint: GH-V45-A — Home Atlas integration and recovery consolidation.**
+Updated 2026-11-27. **Current checkpoint: GH-V45-E — physical phone review and content transition.**
 
-## Authoritative current checkpoint — GH-V45-A
+## Authoritative current checkpoint — GH-V45-E
+
+- Repository EdenP-Development/GridMates-Grid-Hunt, draft PR #12, branch feature/gh-v02-in-puzzle-map-look. Latest fully verified source b3b5be9977b4adaef58cb0a466d81c6345dd749d: QA539 run 46101196381 all three jobs passed, art #119 run 46101196409 passed. 31 required screenshots generated. Documentation-only commits may trigger fresh runs; distinguish verified source from current head.
+- QA537 run 46099805312 at ba7cfac0cd0623ec6ad60e01d3a24840df00b1b4 fully green, art #117. Signed upgrade logs confirm 11 exact preference maps baseline seed, baseline cold launch, actual APK replacement prelaunch, candidate cold launch; Adventure restored, no uninstall or clear. QA537 build artifact 15244433624 supplied to owner. QA539 adds actual MainActivity published Atlas/region screenshot coverage 8604507 and 31-image gate b3b5be9; new image pixels not inspected yet.
+- Owner provided nine physical screenshots showing Home Atlas and 1/3 Woodland chapters, Academy 6/9, Trail 6/9, Gold 5/5, Checklist 4/4, Identify 4/4, Mixed 4/4, Lost Supplies 0/4, five Custom modes, Settings/Map Guide. Dark system icons visible normally, white on dimmed dialogs. Exact installed version and full interaction acceptance not established. No regional hub/launcher/startup/landscape phone evidence. Full findings in [phone review](vision/GH_V45_PHONE_REVIEW_AND_CONTENT_TRANSITION.md), commit 48ee429de83ece7bf04efbed8ca96fa44ede4d61. Original screenshots remain in chat, not uploaded to repo.
+- Published Woodland-only Home Atlas verified; coast remains unpublished. Avoid broad menu redesign. Next: read-only expansion progress and migration design for stable objective IDs and legacy earned entitlements, journal scalable to 12, explicit coast publication approval and migration decision; no changes to save formats until tested. Large-map fixture, camera/clipping and persistent multi-session Grand Expeditions follow. Preserve approved launcher/startup, package, signer and saves. No merge or release. Owner asks keep GitHub up to date as conversation fills.
+
+## Historical checkpoint — GH-V45-A
 
 - Draft PR #12, branch feature/gh-v02-in-puzzle-map-look, repository EdenP-Development/GridMates-Grid-Hunt. Last app/test source 30e6e4c293258b2070bbadd3ddeffa54e78ea63c. QA536 run 46099562525 still running when inspected; art #116 passed. Documentation commits may supersede running QA; check newest head and do not claim acceptance without all gates.
 - Last fully green QA533 run 46096770163 at 1d9654544c21d5e672ecc600e368e3ca59d5640b, all three jobs passed, art #113. QA534 run 46097844846 at 4a51bc93eac817774876571a11f3840f3629a304: build and signed upgrade passed, all 64 instrumentation tests finished BUILD SUCCESSFUL; Android job failed during adb pull of screenshot 26 (not an observed assertion failure); screenshot gate not satisfied. GH44Z 8446253 retries adb pull once without removing 29 required files; 30e6e4c adds actual MainActivity Atlas route/recreation/back/legacy shortcut test. New test acceptance pending.
