@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-Y — first expanded coastal gameplay preview.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-Z — fifth expanded Adventure chapter authored.**
 
-## Authoritative current checkpoint — GH-V45-Y
+## Authoritative current checkpoint — GH-V45-Z
+
+- GH45Y head 50c9cf782419d3d5ccdf39d64b466060eb62c139 run 46123311800: JVM/build passed, emulator and signed upgrade running at inspection; artwork 46123311900 passed. GH45R run 46117766835 remains last confirmed fully green baseline. Mandatory 35-image capture acceptance and pixel review pending.
+- GH45Z CoastalTideSurveyCandidate.kt ef57ab48f785a56a27b9787ba02baa214ea22851 authors eight route cross-checks after exact original four Tide Trail objectives, revision 2, canonical coastal map, separate namespace gridhunt_candidate_tide_survey_r2. Original repeated 4654 answer retained intentionally; all eight new cells distinct and disjoint from original answers. No live registry or Android route changes.
+- GH45Z CoastalTideSurveyCandidateTest.kt 7b9ac818478ee984cf8d264075a257ed366cfa12 verifies exact prefix, intentional repeat, distinct added answers, canonical map, literal references, five offsets, correct/wrong progression, legacy projection and historical entitlement. Execution pending.
+- Adventure authorship 64/72 (24 original, 40 candidate); isolated gameplay implementation 56/72. Woodland 36/36 authored and implemented, coast 28/36 authored and 20/36 implemented. Next verify source-matched QA, integrate exact Tide candidate into internal preview with chapter-specific labels and no ledger writes, then author Last Light. Preserve existing saves, approved branding, package/signer, draft PR #12. No live migration, publication, merge, release or networking authorized. Avoid unnecessary superseding commits while consolidated QA runs.
+
+## Historical checkpoint — GH-V45-Y
 
 - GH45X head ba35c840e2a6cec823a4f5a9392119457edd9bc3 run 46123070934: JVM/build and emulator running at inspection; artwork 46123070932 passed. GH45R run 46117766835 remains last confirmed fully green. Mandatory 35-image capture and actual pixel review pending; no gate waived.
 - GH45Y 1be21f3a5b4a2e5d8887536e14bfe3c2da485c25 adds internal ExpandedBeaconSurveyPreview, exact CoastalBeaconSurveyCandidate.run only, separate candidate preferences, no MainActivity route or next chapter. Exact identity bypasses completion ledger construction/capture, shared coastal renderer, discovery counts, chart-specific journal/finish/replay labels. Original four-objective coastal previews retain existing terminology; published registry unchanged.
