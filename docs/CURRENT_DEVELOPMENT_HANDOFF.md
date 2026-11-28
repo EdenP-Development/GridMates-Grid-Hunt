@@ -1,8 +1,15 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V45-R — isolated playable expanded field survey.**
+Updated 2026-11-28. **Current checkpoint: GH-V45-S — expanded chapter visual QA gates.**
 
-## Authoritative current checkpoint — GH-V45-R
+## Authoritative current checkpoint — GH-V45-S
+
+- GH45R head a14321c215b77bd5124f936a28272e0f4e82b7e2 fully green: QA run 46117766835, artwork 46117766892. Emulator job 140895316739 logs report 68 tests executed and BUILD SUCCESSFUL; signed upgrade 140896185797 passed, JVM/build 140895316475 passed. This is latest confirmed all-green baseline; individual test names not printed in inspected console logs.
+- GH45S d75658d9f0f28c30c51a67b5a846778430ea752e extends actual twelve-objective playthrough instrumentation to capture four screenshots via emulator UI automation and MediaStore: 32_expanded_survey_opening.png, 33_expanded_journal_progress.png, 34_expanded_survey_finish.png, 35_expanded_journal_final_entry.png. Captures follow earned progress, not seeded completion. Failed image writes clean up pending MediaStore entry. Existing candidate save cleanup and protected ledger assertions retained.
+- GH45S 6bb570aaa7080d0c7bb41b2e6da3cdf80ae464ae extends existing mandatory screenshot gate from 31 to 35 without dropping prior requirements. New capture execution, archive and actual pixel review pending. No gameplay changes in GH45S.
+- Next verify new source-matched QA, inspect actual screenshot pixels if accessible, correct any visual issues; then author isolated Lost Supplies expansion. Continue historical typed preference/unlock audit before live migration. Preserve existing saves, approved launcher/startup, signer/package, draft PR #12. No release, merge, coastal publication or network permissions authorized.
+
+## Historical checkpoint — GH-V45-R
 
 - GH45Q source-matched head b50695e7be1274f688af95629b03b0de43f9e1af, run 46116458759: all three jobs passed (JVM/build, emulator gameplay, signed upgrade); artwork 46116458840 passed. This supersedes QA539 as last confirmed fully green baseline. Exact individual test logs and screenshot pixels not reviewed here.
 - GH45R 2a5174a4964453f69f81bbe2ca1a26dffadefd6f introduces internal ExpandedFieldSurveyPreview, exact candidate run only, no MainActivity route, no next chapter, no live completion ledger construction/capture on candidate replay, isolated gridhunt_candidate_field_survey_r2 preferences. Shared gameplay header/prompt/finish/replay labels support twelve discoveries. Original chapter registry remains revision 1.
