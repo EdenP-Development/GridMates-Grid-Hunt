@@ -218,6 +218,10 @@ jobs:
             test -s vision-screenshots/33_expanded_journal_progress.png
             test -s vision-screenshots/34_expanded_survey_finish.png
             test -s vision-screenshots/35_expanded_journal_final_entry.png
+            test -s vision-screenshots/36_adventure_choice.png
+            test -s vision-screenshots/37_expanded_adventure_selector.png
+            test -s vision-screenshots/38_expanded_selector_progress.png
+            test -s vision-screenshots/39_expanded_selector_coast.png
       - name: Publish Android instrumentation results
         if: always()
         uses: actions/upload-artifact@v4
