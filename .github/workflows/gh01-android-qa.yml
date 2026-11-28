@@ -214,6 +214,10 @@ jobs:
             test -s vision-screenshots/29_coastal_region_hub.png
             test -s vision-screenshots/30_published_atlas.png
             test -s vision-screenshots/31_published_region.png
+            test -s vision-screenshots/32_expanded_survey_opening.png
+            test -s vision-screenshots/33_expanded_journal_progress.png
+            test -s vision-screenshots/34_expanded_survey_finish.png
+            test -s vision-screenshots/35_expanded_journal_final_entry.png
       - name: Publish Android instrumentation results
         if: always()
         uses: actions/upload-artifact@v4
