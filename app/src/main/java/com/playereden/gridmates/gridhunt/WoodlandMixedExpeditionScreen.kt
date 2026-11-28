@@ -71,6 +71,7 @@ import com.playereden.gridhunt.core.MapCamera
 import com.playereden.gridhunt.core.PixelPoint
 import com.playereden.gridhunt.core.ReverseTraining
 import com.playereden.gridhunt.core.WoodlandExpedition
+import com.playereden.gridhunt.core.WoodlandFieldSurveyCandidate
 import com.playereden.gridhunt.core.WoodlandSupplyExpedition
 import com.playereden.gridhunt.core.WoodlandReturnExpedition
 import com.playereden.gridhunt.core.ExpeditionPlaythrough
@@ -113,6 +114,15 @@ internal fun WoodlandMixedExpeditionScreen(
     }
 }
 
+/** Internal preview only. Never exposed from the published navigation or ledger. */
+@Composable
+internal fun ExpandedFieldSurveyPreview(onExit: () -> Unit) {
+    val mission = WoodlandFieldSurveyCandidate.run
+    key(mission.chapter.id, mission.chapter.revision) {
+        MapExpeditionContent(mission, 1, onExit, MapLook.FIELD_GUIDE, {}, false, null)
+    }
+}
+
 @Composable
 private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: Int, onHome: () -> Unit,
     mapLook: MapLook, onLook: (MapLook) -> Unit, hapticsEnabled: Boolean, onNextChapter: (() -> Unit)?) {
@@ -122,7 +132,8 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
     val woodland = map == ExplorationMaps.woodland
     val chapterTwo = chapterNumber == 2
     val chapterThree = chapterNumber == 3
-    val clueChapter = !woodland || chapterTwo || chapterThree
+    val expandedPreview = mission === WoodlandFieldSurveyCandidate.run
+    val clueChapter = !woodland || chapterTwo || chapterThree || expandedPreview
     val scene = if (woodland) publishedMapScene(map,mapLook) else coastalTerrainDraftScene(map,mapLook)
     val prefs = remember(context, mission.saveName) {
         context.getSharedPreferences(mission.saveName, Context.MODE_PRIVATE)
@@ -155,8 +166,8 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
             "Follow the journal notes to trace the missing supplies."
             else "Follow the next clue to recover the missing field notes.")
     }
-    val completion = remember(context, woodland) {
-        CampaignCompletionStore(context, if (woodland) PublishedWorlds.selection else CoastalExpeditionPreview.selection, !woodland)
+    val completion = remember(context, woodland, expandedPreview) {
+        if (expandedPreview) null else CampaignCompletionStore(context, if (woodland) PublishedWorlds.selection else CoastalExpeditionPreview.selection, !woodland)
     }
     val scope = rememberCoroutineScope()
     var replayPending by remember { mutableStateOf(false) }
@@ -271,8 +282,9 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
         scope.launch {
             try {
                 val recorded = withContext(Dispatchers.IO) {
-                    completion.captureCompleted() &&
-                        mission.chapter.id in completion.snapshot().earnedChapterIds
+                    if (expandedPreview) true else requireNotNull(completion).let {
+                        it.captureCompleted() && mission.chapter.id in it.snapshot().earnedChapterIds
+                    }
                 }
                 if (!recorded) {
                     replaySaveError = true
@@ -286,7 +298,8 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
         selectedCell = null
         enteredCode = ""
         chosenLandmark = null
-        feedback = if (!woodland) "The coastal clues are ready to explore again."
+        feedback = if (expandedPreview) "The journal and survey are ready to explore again."
+            else if (!woodland) "The coastal clues are ready to explore again."
             else if (chapterThree) "The return trail is ready to explore again."
             else if (chapterTwo) "The supply clues are ready to trace again."
             else "All four notes have been hidden again. Enjoy the hunt!"
@@ -401,7 +414,8 @@ private fun MixedExpeditionHeader(
         Text(chapterName, color = Ink,
             fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, maxLines = 1)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(if (chapterTwo) "$step of $total clues solved"
+            Text(if (total > 4) "$step of $total discoveries recorded"
+             else if (chapterTwo) "$step of $total clues solved"
              else "$step of $total pages found", color = Forest, fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f).testTag("mixedProgress"))
@@ -425,7 +439,7 @@ private fun MixedExpeditionPrompt(
     Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFFFF0CF)) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text((if (chapterTwo) "CLUE" else "PAGE") + " $stage OF $total · " + when (objective.verb) {
+            Text((if (total > 4) "DISCOVERY" else if (chapterTwo) "CLUE" else "PAGE") + " $stage OF $total · " + when (objective.verb) {
                 ExpeditionVerb.FIND_SQUARE -> "FIND THE SQUARE"
                 ExpeditionVerb.READ_MARKER -> "READ THE GOLDEN DOT"
                 ExpeditionVerb.LOCATE_LANDMARK -> "FIND THE LANDMARK"
@@ -580,17 +594,17 @@ private fun MixedExpeditionFinish(
 ) {
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         PuzzleFinishCard(
-            title = if (!woodland) "$chapterName complete!" else when (chapterNumber) {
+            title = if (total > 4) "Field survey complete!" else if (!woodland) "$chapterName complete!" else when (chapterNumber) {
                 3 -> "Your woodland circuit is complete!"
                 2 -> "The supply trail is complete!"
                 else -> "The field notes are together!"
             },
-            description = if (!woodland) "Every coastal discovery is recorded in your journal." else when (chapterNumber) {
+            description = if (total > 4) "The recovered journal and survey appendix are complete." else if (!woodland) "Every coastal discovery is recorded in your journal." else when (chapterNumber) {
                 3 -> "You recorded the return route and reached the trailhead."
                 2 -> "You traced the supplies to their last known stop."
                 else -> "Every lost page has been recovered. Your field journal is whole."
             },
-            discoveries = if (!woodland || chapterNumber > 1) "$total OF $total CLUES SOLVED" else "$total OF $total PAGES RECOVERED",
+            discoveries = if (total > 4) "$total OF $total DISCOVERIES RECORDED" else if (!woodland || chapterNumber > 1) "$total OF $total CLUES SOLVED" else "$total OF $total PAGES RECOVERED",
             primaryLabel = if (onNextChapter != null) {
                 if (!woodland) "Continue · " + (CoastalExpeditionPreview.nextName(chapterNumber) ?: "Next chapter")
                 else if (chapterNumber == 1) "Continue · The Lost Supplies" else "Continue · The Return Trail"
