@@ -69,6 +69,7 @@ class PopulatedSaveTest {
             compose.onNodeWithText("2 of 3 chapters complete").assertExists()
             compose.onNodeWithText("2 of 4 objectives solved").assertExists()
             compose.onNodeWithTag("openAdventure").performClick()
+            compose.onNodeWithTag("classicAdventure").performClick()
             compose.onNodeWithTag("openThirdChapter").performClick()
             compose.onNodeWithTag("mixedJournal").performClick()
             compose.onNodeWithTag("journalEntry_return-waystone").assertExists()
