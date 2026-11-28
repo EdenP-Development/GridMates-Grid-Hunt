@@ -1,8 +1,14 @@
 # GridMates: Grid Hunt — current development handoff
 
-Updated 2026-11-28. **Current checkpoint: GH-V46-L — expanded selector navigation regression coverage.**
+Updated 2026-11-28. **Current checkpoint: GH-V46-M — selector restoration and system back regression coverage.**
 
-## Authoritative current checkpoint — GH-V46-L
+## Authoritative current checkpoint — GH-V46-M
+
+- QA596 source c05fc5a3a23c1a7e32d661352fcc02b39cd8c7bc run 46125591896 remains last confirmed fully green baseline. GH46L artwork 46128966391 passed; QA 46128966423 was in progress at initial inspection. No independent Codex review currently available per user.
+- GH46M 02f1a779d9ed87c7121932921e0496a93fd31694 extends ExpandedAdventureNavigationTest with controlled candidate step fixture 3, menu count assertion, chapter opening and activity recreation, system back to selector, fixture update to 4 and selector recreation, system back to choice, both earned-ledger equality assertions and restoration of original candidate preferences. This tests fixture refresh on recreation, not real solved-answer refresh without recreation; execution pending.
+- Next add actual solved-answer selector refresh test, capture selector and choice screenshots (extend mandatory screenshot gate only with matching capture implementation), finish remaining classic entry audit, verify consolidated QA and signed upgrade. Avoid repeated commits while final QA runs. Preserve draft PR #12, approved branding, original saves, package/signer. No live migration, public coastal publication, merge, release or networking authorized.
+
+## Historical checkpoint — GH-V46-L
 
 - QA596 source c05fc5a3a23c1a7e32d661352fcc02b39cd8c7bc run 46125591896 remains confirmed full green baseline: 73 Android tests, 35 required screenshots, signed upgrade passed. GH46J selector run 46127984728 passed JVM/build and artwork 46127984723; emulator and signed upgrade were running at last inspection.
 - GH46L updates nine existing Home-to-Adventure test paths to explicitly select classicAdventure: HomeNavigationTest.kt 1e8320b36a74786bcff8ffab1001521da13caa66 (5), PopulatedSaveTest.kt c77eb0158c53636fec34b669832bfe261c398d03 (1), VisualCaptureTest.kt 1f733ed9be237a362a982a1c1637c83a4f787807 (3). Original assertions retained.
