@@ -158,9 +158,12 @@ private fun GridHuntScreen() {
     // Preserve the originating hub when returning from a puzzle.
     var returnHub by rememberSaveable { mutableStateOf("quick") }
     var settingsOrigin by rememberSaveable { mutableStateOf("home") }
+    val expandedPlaytestEnabled = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0 && context.packageName == "com.playereden.gridmates.gridhunt.qa"
     val goBack = {
         screen = when (screen) {
             "settings" -> settingsOrigin
+            "expandedAdventure" -> "adventureChoice"
+            "adventureChoice" -> "home"
             "quick", "adventure", "custom", "academy", "atlas" -> "home"
             else -> returnHub
         }
@@ -186,7 +189,7 @@ private fun GridHuntScreen() {
     when (screen) {
         "home" -> ExplorerDeskHome(
             worldProgress = GridHuntCampaign.registry.worldProgress(GridHuntCampaign.littleWoodlandId, campaignSnapshot),
-            onAdventure = { screen = "adventure" },
+            onAdventure = { screen = if (expandedPlaytestEnabled) "adventureChoice" else "adventure" },
             onQuickPlay = { screen = "quick" },
             onCustom = { screen = "custom" },
             onAcademy = { screen = "academy" },
@@ -198,6 +201,11 @@ private fun GridHuntScreen() {
         "settings" -> GridHuntSettings(hapticsEnabled, { hapticsEnabled = it }, mapLook,
             onBack = { screen = settingsOrigin })
         "academy" -> ExplorerAcademyScreen(onHome = { screen = "home" }, mapLook = mapLook, onLook = { _ -> })
+        "adventureChoice" -> if (expandedPlaytestEnabled) ExpandedAdventureChoice(
+            onClassic = { screen = "adventure" }, onExpanded = { screen = "expandedAdventure" },
+            onBack = { screen = "home" }) else LaunchedEffect(Unit) { screen = "adventure" }
+        "expandedAdventure" -> if (expandedPlaytestEnabled) ExpandedAdventureSelector(
+            onExit = { screen = "adventureChoice" }) else LaunchedEffect(Unit) { screen = "adventure" }
         "adventure" -> WoodlandAdventureJourney(
             progress = expeditionProgress,
             secondStatus = supplyState.status,
