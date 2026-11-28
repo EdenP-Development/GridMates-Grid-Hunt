@@ -76,6 +76,7 @@ import com.playereden.gridhunt.core.WoodlandSupplySurveyCandidate
 import com.playereden.gridhunt.core.WoodlandReturnSurveyCandidate
 import com.playereden.gridhunt.core.CoastalBeaconSurveyCandidate
 import com.playereden.gridhunt.core.CoastalTideSurveyCandidate
+import com.playereden.gridhunt.core.CoastalLightSurveyCandidate
 import com.playereden.gridhunt.core.WoodlandSupplyExpedition
 import com.playereden.gridhunt.core.WoodlandReturnExpedition
 import com.playereden.gridhunt.core.ExpeditionPlaythrough
@@ -155,10 +156,15 @@ internal fun ExpandedTideSurveyPreview(onExit: () -> Unit) =
     ExpandedCoastalSurveyPreview(2, onExit)
 
 @Composable
+internal fun ExpandedLightSurveyPreview(onExit: () -> Unit) =
+    ExpandedCoastalSurveyPreview(3, onExit)
+
+@Composable
 private fun ExpandedCoastalSurveyPreview(chapterNumber: Int, onExit: () -> Unit) {
     val mission = when (chapterNumber) {
         1 -> CoastalBeaconSurveyCandidate.run
         2 -> CoastalTideSurveyCandidate.run
+        3 -> CoastalLightSurveyCandidate.run
         else -> error("Unsupported expanded coastal chapter")
     }
     key(mission.chapter.id, mission.chapter.revision) {
@@ -179,7 +185,8 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
         mission === WoodlandSupplySurveyCandidate.run ||
         mission === WoodlandReturnSurveyCandidate.run ||
         mission === CoastalBeaconSurveyCandidate.run ||
-        mission === CoastalTideSurveyCandidate.run
+        mission === CoastalTideSurveyCandidate.run ||
+        mission === CoastalLightSurveyCandidate.run
     val clueChapter = !woodland || chapterTwo || chapterThree || expandedPreview
     val scene = if (woodland) publishedMapScene(map,mapLook) else coastalTerrainDraftScene(map,mapLook)
     val prefs = remember(context, mission.saveName) {
@@ -345,7 +352,8 @@ private fun MapExpeditionContent(mission: ExpeditionPlaythrough, chapterNumber: 
         selectedCell = null
         enteredCode = ""
         chosenLandmark = null
-        feedback = if (expandedPreview && !woodland && chapterTwo) "The tide route is ready to explore again."
+        feedback = if (expandedPreview && !woodland && chapterThree) "The coastal verification record is ready to explore again."
+            else if (expandedPreview && !woodland && chapterTwo) "The tide route is ready to explore again."
             else if (expandedPreview && !woodland) "The coastal chart is ready to explore again."
             else if (expandedPreview && chapterThree) "The navigation circuit is ready to explore again."
             else if (expandedPreview && chapterTwo) "The supply route is ready to explore again."
@@ -645,12 +653,12 @@ private fun MixedExpeditionFinish(
 ) {
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         PuzzleFinishCard(
-            title = if (total > 4 && !woodland && chapterNumber == 2) "Tide route complete!" else if (total > 4 && !woodland) "Coastal chart complete!" else if (total > 4 && woodland && chapterNumber == 3) "Navigation circuit complete!" else if (total > 4 && woodland && chapterNumber == 2) "Supply route complete!" else if (total > 4) "Field survey complete!" else if (!woodland) "$chapterName complete!" else when (chapterNumber) {
+            title = if (total > 4 && !woodland && chapterNumber == 3) "Coastal verification complete!" else if (total > 4 && !woodland && chapterNumber == 2) "Tide route complete!" else if (total > 4 && !woodland) "Coastal chart complete!" else if (total > 4 && woodland && chapterNumber == 3) "Navigation circuit complete!" else if (total > 4 && woodland && chapterNumber == 2) "Supply route complete!" else if (total > 4) "Field survey complete!" else if (!woodland) "$chapterName complete!" else when (chapterNumber) {
                 3 -> "Your woodland circuit is complete!"
                 2 -> "The supply trail is complete!"
                 else -> "The field notes are together!"
             },
-            description = if (total > 4 && !woodland && chapterNumber == 2) "The supply stop and coastal route checks are recorded in your journal." else if (total > 4 && !woodland) "The recovered chart and coastal survey entries are recorded in your journal." else if (total > 4 && woodland && chapterNumber == 3) "Both woodland circuits and the navigation checks are recorded in your journal." else if (total > 4 && woodland && chapterNumber == 2) "The last known stop and route checks are recorded in your journal." else if (total > 4) "The recovered journal and survey appendix are complete." else if (!woodland) "Every coastal discovery is recorded in your journal." else when (chapterNumber) {
+            description = if (total > 4 && !woodland && chapterNumber == 3) "The original survey and final chart checks are recorded in your journal." else if (total > 4 && !woodland && chapterNumber == 2) "The supply stop and coastal route checks are recorded in your journal." else if (total > 4 && !woodland) "The recovered chart and coastal survey entries are recorded in your journal." else if (total > 4 && woodland && chapterNumber == 3) "Both woodland circuits and the navigation checks are recorded in your journal." else if (total > 4 && woodland && chapterNumber == 2) "The last known stop and route checks are recorded in your journal." else if (total > 4) "The recovered journal and survey appendix are complete." else if (!woodland) "Every coastal discovery is recorded in your journal." else when (chapterNumber) {
                 3 -> "You recorded the return route and reached the trailhead."
                 2 -> "You traced the supplies to their last known stop."
                 else -> "Every lost page has been recovered. Your field journal is whole."
@@ -754,7 +762,7 @@ internal fun ExpeditionJournalDialog(
                         modifier = Modifier.fillMaxWidth().testTag("journalEntry_${objective.id}")
                     ) {
                         Column(Modifier.padding(10.dp)) {
-                            Text(if (expanded && index >= 4) "${if (!woodland) { if (chapterNumber == 2) "ROUTE" else "CHART" } else when (chapterNumber) { 3 -> "NAVIGATION"; 2 -> "ROUTE"; else -> "SURVEY" }} · ENTRY ${index - 3}" else "RECOVERED · $unit ${index + 1}", color = Forest, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                            Text(if (expanded && index >= 4) "${if (!woodland) { when (chapterNumber) { 3 -> "VERIFICATION"; 2 -> "ROUTE"; else -> "CHART" } } else when (chapterNumber) { 3 -> "NAVIGATION"; 2 -> "ROUTE"; else -> "SURVEY" }} · ENTRY ${index - 3}" else "RECOVERED · $unit ${index + 1}", color = Forest, fontWeight = FontWeight.Bold, fontSize = 10.sp)
                             Text(objective.title, color = Ink,
                                 fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             Text(objective.discovery.ifBlank { "Discovery recorded." },
