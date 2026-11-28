@@ -22,11 +22,35 @@ object ExpeditionSaveCodec {
     private fun digest(bytes: ByteArray) =
         MessageDigest.getInstance("SHA-256").digest(bytes)
 
+    // DataOutputStream.writeUTF uses modified UTF-8, including surrogate code
+    // units and a two-byte length prefix. Match its exact wire size.
+    private fun utfSize(value: String): Int {
+        var length = 0
+        for (ch in value) {
+            length += when (ch.code) {
+                in 1..127 -> 1
+                in 0..2047 -> 2
+                else -> 3
+            }
+            require(length <= 65535) { "UTF field exceeds wire limit" }
+        }
+        return length + 2
+    }
+
     fun encode(contract: ExpeditionProgressContract,
                snapshot: ExpeditionProgressContract.Snapshot): ByteArray {
         require(contract.restore(snapshot.identity,snapshot.solvedObjectiveIds) != null)
         require(snapshot.solvedObjectiveIds.size <= maxIds)
-        val buffer = ByteArrayOutputStream()
+        val identity = snapshot.identity
+        // Fixed fields: magic, schema, UUID, revisions and count = 36 bytes.
+        var bodySize = 36 + utfSize(identity.chapterId) +
+            utfSize(identity.manifestFingerprint)
+        require(bodySize <= maxBytes - checksumBytes)
+        for (objectiveId in snapshot.solvedObjectiveIds) {
+            bodySize += utfSize(objectiveId)
+            require(bodySize <= maxBytes - checksumBytes) { "Save exceeds byte limit" }
+        }
+        val buffer = ByteArrayOutputStream(bodySize)
         DataOutputStream(buffer).use { out ->
             out.writeInt(magic)
             out.writeInt(schemaVersion)
@@ -41,7 +65,7 @@ object ExpeditionSaveCodec {
             snapshot.solvedObjectiveIds.sorted().forEach { out.writeUTF(it) }
         }
         val body = buffer.toByteArray()
-        require(body.size <= maxBytes - checksumBytes)
+        check(body.size == bodySize)
         return body + digest(body)
     }
 
